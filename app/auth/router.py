@@ -40,3 +40,10 @@ async def login_hikka(
     )
 
     return response
+
+
+@router.get("/logout")
+async def logout():
+    response = RedirectResponse("/", status_code=302)
+    response.delete_cookie("auth")
+    return response

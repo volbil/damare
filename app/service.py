@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from app.models import User, AuthToken
 from sqlalchemy import select, func
-from app.models import User
 
 
 async def get_user_by_username(
@@ -8,4 +9,14 @@ async def get_user_by_username(
 ) -> User | None:
     return await session.scalar(
         select(User).filter(func.lower(User.username) == username.lower())
+    )
+
+
+async def get_auth_token(
+    session: AsyncSession, secret: str
+) -> AuthToken | None:
+    return await session.scalar(
+        select(AuthToken)
+        .filter(AuthToken.secret == secret)
+        .options(selectinload(AuthToken.user))
     )
