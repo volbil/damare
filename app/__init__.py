@@ -1,9 +1,9 @@
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
+from app.database import sessionmanager
 from app.utils import get_settings
 from fastapi import FastAPI
-from fastapi import Request
-import traceback
 import arel
 
 
@@ -14,13 +14,25 @@ templates = Jinja2Templates(directory="templates")
 def create_app(init_db: bool = True) -> FastAPI:
     lifespan = None
 
-    app = FastAPI()
+    app = FastAPI(
+        lifespan=lifespan,
+    )
 
     app.mount(
         "/static",
         StaticFiles(directory="static"),
         name="static",
     )
+
+    # SQLAlchemy initialization process
+    if init_db:
+        sessionmanager.init(settings.database.endpoint)
+
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            yield
+            if sessionmanager._engine is not None:
+                await sessionmanager.close()
 
     # Hot reload for Jinja templates
     if settings.backend.debug:

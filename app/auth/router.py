@@ -1,7 +1,11 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Request, Depends
-from .dependencies import get_username
+from fastapi.responses import RedirectResponse
+from .dependencies import get_hikka_user_data
+from app.database import get_session
 from app.utils import get_settings
 from app import templates
+from . import service
 
 
 router = APIRouter()
@@ -20,8 +24,19 @@ async def login(request: Request):
 
 
 @router.get("/login/hikka")
-async def login_hikka(request: Request, username: str = Depends(get_username)):
-    return templates.TemplateResponse(
-        "auth/login.html",
-        {"request": request, "username": username},
+async def login_hikka(
+    session: AsyncSession = Depends(get_session),
+    user_data: str = Depends(get_hikka_user_data),
+):
+    user = await service.get_or_create_oauth_user(session, "hikka", user_data)
+    token = await service.create_auth_token(session, user)
+
+    response = RedirectResponse(url="/", status_code=302)
+
+    response.set_cookie(
+        key="auth",
+        value=token.secret,
+        max_age=360 * 24 * 60 * 60,
     )
+
+    return response

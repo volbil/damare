@@ -3,7 +3,7 @@ from fastapi import status
 from . import service
 
 
-async def get_username(reference: str) -> str:
+async def get_hikka_user_data(reference: str) -> str:
     data = await service.check_user_reference(reference)
 
     if "code" in data:
@@ -14,4 +14,4 @@ async def get_username(reference: str) -> str:
 
     data = await service.get_hikka_username(data["secret"])
 
-    return data["username"]
+    return data
