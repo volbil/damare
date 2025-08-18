@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if not username %}
+    <div class="w-full max-w-sm mx-auto mt-20 space-y-4">
+        <a
+            href="https://hikka.io/oauth?reference=34f0e804-5cd4-4af6-94f6-4a3e9bc36572&scope=read:user-details"
+            class="w-full flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition hover:cursor-pointer">
+            <span class="font-medium">Авторизуватись через Hikka.io</span>
+        </a>
+    </div>
+{% else %}
+    Привіт {{ username }}
+{% endif %}
+
+{% endblock %}
