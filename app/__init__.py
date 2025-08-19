@@ -55,9 +55,11 @@ def create_app(init_db: bool = True) -> FastAPI:
     else:
         templates.env.globals["DEBUG"] = False
 
+    from .editor import router as editor_router
     from .home import router as home_router
     from .auth import router as auth_router
 
+    app.include_router(editor_router)
     app.include_router(home_router)
     app.include_router(auth_router)
 

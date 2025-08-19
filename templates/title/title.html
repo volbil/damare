@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="max-w-5xl mx-auto px-6 py-10 space-y-12">
+
+  <!-- Top info block -->
+  <div class="flex flex-col md:flex-row gap-8">
+    <!-- Poster -->
+    <div class="w-full md:w-1/3">
+      <div class="relative w-full" style="padding-top:150%;">
+        <img src="/static/poster.jpg" class="absolute inset-0 w-full h-full object-cover rounded-xl border border-[#13352b] bg-[#0e1e1a]/60" />
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="md:flex-1">
+        <div class="flex mr-2">
+            <h1 class="text-3xl font-bold mb-2">Монолог травниці</h1>
+            <div class="ml-auto text-3xl font-semibold text-green-400">4.7</div>
+        </div>
+        <h2 class="text-xl text-green-400 italic mb-2">
+            薬屋のひとりごと / Kusuriya no Hitorigoto / The Apothecary Diaries
+        </h2>
+      
+      <!-- Genres -->
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span class="px-3 py-1 rounded-full bg-[#0e1e1a]/60 border border-[#13352b] text-sm">Детектив</span>
+        <span class="px-3 py-1 rounded-full bg-[#0e1e1a]/60 border border-[#13352b] text-sm">Драма</span>
+        <span class="px-3 py-1 rounded-full bg-[#0e1e1a]/60 border border-[#13352b] text-sm">Історичне</span>
+        <span class="px-3 py-1 rounded-full bg-[#0e1e1a]/60 border border-[#13352b] text-sm">Комедія</span>
+        <span class="px-3 py-1 rounded-full bg-[#0e1e1a]/60 border border-[#13352b] text-sm">Романтика</span>
+      </div>
+
+
+        <p class="text-gray-300 mb-6 leading-relaxed">
+            <p class="mb-2">
+                Маомао подалася до лісу по лікарські трави, але потрапила до рук ловців «наречених» для імператорського гарему. І тепер молоденька аптекарка, помічниця знахаря з кварталу червоних ліхтарів, вимушена працювати служницею другорядних підложниць на жіночій половині палацу.
+            </p>
+
+            <p class="mb-2">
+                Незадоволена таким станом справ, вона сподівається тишком-нишком відпрацювати мінімальний строк служби, аби якнайшвидше повернутися до аптекарської справи. Одначе її допитливість, жага знань та почуття справедливості стають на заваді цим планам.
+            </p>
+
+            <p class="mb-2">
+                Випадково вона розкриває справу, яка привертає до неї увагу улюбленої гаремниці імператора та високоповажного євнуха — наглядача гарему.
+            </p>
+
+            <p class="mb-2">
+                Але поки що Маомао все ще сподівається на швидке повернення додому й сумно зітхає, притискаючи до себе кошик з білизною..
+            </p>
+
+            <p class="mb-2">
+                // Це переклад веб-версії новели, який автор викладає у вільному доступі на своїй сторінці на японському літ-порталі.
+            </p>
+        </p>
+
+      <!-- Metadata -->
+      {# <ul class="space-y-2 mb-6">
+        <li><strong class="text-green-400">Author:</strong> Kugane Maruyama</li>
+        <li><strong class="text-green-400">Status:</strong> Ongoing</li>
+        <li><strong class="text-green-400">Translated by:</strong> Hikka Team</li>
+      </ul> #}
+
+      <!-- Read button -->
+      <button class="cursor-pointer mt-2 px-6 py-3 bg-green-500 hover:bg-green-400 text-[#0a1713] font-medium rounded-lg transition">
+        Читати
+      </button>
+    </div>
+  </div>
+
+  <!-- Volumes -->
+  <section>
+  <h3 class="text-2xl font-bold mb-4">Розділи</h3>
+  <div class="space-y-6">
+
+    <!-- Volume -->
+    <div class="p-4 rounded-lg bg-[#0e1e1a]/60 border border-[#13352b]">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-semibold">Том 3.0</span>
+        </div>
+            <ul class="space-y-1 pl-4">
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 62 - Стратегія викупу (частина 2)</li>
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 61 - Стратегія викупу (частина 1)</li>
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 60 - Дикі суниці</li>
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 59 - Жасмин</li>
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 58 - Ефірні олії</li>
+                <li class="py-1 px-3 rounded bg-[#07100d]/60">Розділ 57 - Караван</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+
+</div>
+
+{% endblock %}

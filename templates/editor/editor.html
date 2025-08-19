@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .ProseMirror {
+            min-height: 300px;
+            outline: none; /* The focus ring is now on the parent container */
+        }
+
+        /* Style for the active toolbar button */
+        .is-active {
+            background-color: #09090b; /* bg-zinc-900 */
+            color: #fafafa; /* text-zinc-50 */
+        }
+
+        .element {
+            /* Global element styling */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #e5e5e5;
+        }
+
+        .element h1,
+        .element h2,
+        .element h3,
+        .element h4,
+        .element h5 {
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 0.4em;
+        }
+
+        .element h1 { font-size: 2rem; }
+        .element h2 { font-size: 1.75rem; }
+        .element h3 { font-size: 1.5rem; }
+        .element h4 { font-size: 1.25rem; }
+        .element h5 { font-size: 1rem; }
+
+        .element p {
+            margin: 0.8em 0;
+            font-size: 0.95rem;
+        }
+
+        .element a {
+            color: #4ade80; /* emerald-ish green */
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .element a:hover {
+            color: #34d399;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .element b,
+        .element strong {
+            font-weight: 700;
+        }
+
+        .element i,
+        .element em {
+            font-style: italic;
+        }
+
+        .element ul {
+            margin: 0.8em 0 0.8em 1.2em;
+            padding: 0;
+            list-style: disc;
+        }
+
+        .element ul ul {
+            list-style-type: circle; /* nested lists */
+        }
+
+        .element li {
+            margin: 0.3em 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .element ol {
+            margin: 0.8em 0 0.8em 1.2em;
+            padding: 0;
+            list-style: decimal;
+        }
+
+        .element ol ol {
+            list-style-type: lower-alpha; /* nested ordered lists */
+        }
+
+        .element li {
+            margin: 0.3em 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .element blockquote {
+            margin: 1em 0;
+            padding: 0.6em 1em;
+            border-left: 4px solid #4ade80; /* green accent */
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #d1d1d1;
+        }
+
+    </style>
+
+    <div class="w-full p-4">
+        <div>
+            <div id="toolbar" class="flex flex-wrap items-center gap-2 p-3 rounded-t-lg">
+                <button id="bold" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">B</button>
+                <button id="italic" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition italic">I</button>
+                <button id="strike" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition line-through">S</button>
+                <button id="h1" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">H1</button>
+                <button id="h2" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">H2</button>
+                <button id="bulletList" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">UL</button>
+                <button id="orderedList" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">OL</button>
+                <button id="blockquote" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">“ ”</button>
+                <button id="log-data" class="cursor-pointer flex items-center justify-center px-4 py-3 rounded-lg border border-[#13352b] bg-[#0e1e1a]/60 hover:bg-[#13352b]/50 text-gray-200 transition">Log Data</button>
+            </div>
+
+            <!-- 2. The Tiptap editor element with prose classes applied -->
+            <div class="element border border-[#13352b] bg-[#0e1e1a]/60 rounded-2xl z-20 p-4 m-2 prose prose-lg max-w-none"></div>
+        </div>
+    </div>
+
+    <!-- The JavaScript Logic -->
+    <script type="module">
+        import { Editor } from 'https://esm.sh/@tiptap/core'
+        import StarterKit from 'https://esm.sh/@tiptap/starter-kit'
+      
+        const buttons = {
+            bold: document.querySelector('#bold'),
+            italic: document.querySelector('#italic'),
+            strike: document.querySelector('#strike'),
+            h1: document.querySelector('#h1'),
+            h2: document.querySelector('#h2'),
+            bulletList: document.querySelector('#bulletList'),
+            orderedList: document.querySelector('#orderedList'),
+            blockquote: document.querySelector('#blockquote'),
+            logData: document.querySelector('#log-data'),
+        };
+
+        const editor = new Editor({
+            element: document.querySelector('.element'),
+            extensions: [
+                StarterKit,
+            ],
+            // 3. Updated content to showcase the new styles
+            content: `
+                <h1>Welcome to the Styled Editor</h1>
+                <p>This editor's content is now styled using the <strong>Tailwind CSS Typography</strong> plugin. Notice the beautiful defaults for headings, lists, and other elements.</p>
+                <ul>
+                    <li>Unordered lists have nice spacing.</li>
+                    <li>And so do their items.</li>
+                </ul>
+                <ol>
+                    <li>Ordered lists are also styled.</li>
+                    <li>Just like this one.</li>
+                </ol>
+                <blockquote>
+                    Blockquotes are a great way to highlight important information. They now have a distinct style.
+                </blockquote>
+                <p>You can also use <code>inline code</code> snippets or just keep writing regular paragraphs.</p>
+            `,
+            onUpdate: ({ editor }) => {
+                buttons.bold.classList.toggle('is-active', editor.isActive('bold'));
+                buttons.italic.classList.toggle('is-active', editor.isActive('italic'));
+                buttons.strike.classList.toggle('is-active', editor.isActive('strike'));
+                buttons.h1.classList.toggle('is-active', editor.isActive('heading', { level: 1 }));
+                buttons.h2.classList.toggle('is-active', editor.isActive('heading', { level: 2 }));
+                buttons.bulletList.classList.toggle('is-active', editor.isActive('bulletList'));
+                buttons.orderedList.classList.toggle('is-active', editor.isActive('orderedList'));
+                buttons.blockquote.classList.toggle('is-active', editor.isActive('blockquote'));
+            }
+        });
+
+        // Add click event listeners to the buttons
+        buttons.bold.addEventListener('click', () => editor.chain().focus().toggleBold().run());
+        buttons.italic.addEventListener('click', () => editor.chain().focus().toggleItalic().run());
+        buttons.strike.addEventListener('click', () => editor.chain().focus().toggleStrike().run());
+        buttons.h1.addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 1 }).run());
+        buttons.h2.addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 2 }).run());
+        buttons.bulletList.addEventListener('click', () => editor.chain().focus().toggleBulletList().run());
+        buttons.orderedList.addEventListener('click', () => editor.chain().focus().toggleOrderedList().run());
+        buttons.blockquote.addEventListener('click', () => editor.chain().focus().toggleBlockquote().run());
+      
+        buttons.logData.addEventListener('click', () => {
+            const html = editor.getHTML();
+            const json = editor.getJSON();
+
+            console.group("Tiptap Editor Content");
+            console.log("---------- HTML ----------");
+            console.log(html);
+            console.log("---------- JSON ----------");
+            console.log(json);
+            console.groupEnd();
+        });
+    </script>
+{% endblock %}

@@ -7,19 +7,20 @@
 
 		<title>Damare</title>
 
-		{% set cache = 1 %}
+		{% set cache = 2 %}
 
 		<link rel="icon" href="/static/favicon.png?cache={{ cache }}" type="image/png">
 
 		{# <link href="/static/modern-normalize.css?cache={{ cache }}" rel="stylesheet"> #}
 		<link href="/static/styles.css?cache={{ cache }}" rel="stylesheet">
 
-		{# <script src="/static/alpine.min.js?cache={{ cache }}"></script>
-		<script src="/static/htmx.min.js?cache={{ cache }}"></script> #}
+		<script src="/static/alpine.min.js?cache={{ cache }}"></script>
+
+		{# <script src="/static/htmx.min.js?cache={{ cache }}"></script> #}
 	</head>
 
 	<body class="h-full bg-[#0a1713] text-gray-200">
-		<nav class="fixed top-0 w-full backdrop-blur bg-[#020a08]/70 border-b border-[#0f2a21]">
+		<nav class="z-40 fixed top-0 w-full backdrop-blur bg-[#020a08]/70 border-b border-[#0f2a21]">
 			<div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 				<a
 					href="/"
@@ -27,7 +28,9 @@
 				</a>
 				
 				{% if user %}
-					<span>Привіт <b>{{ user.username }}</b></span>
+					<div class="px-4 py-2">
+						<span>Привіт <b>{{ user.username }}</b></span>
+					</div>
 				{% else %}
 					<a
 						href="/login"

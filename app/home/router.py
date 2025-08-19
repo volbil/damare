@@ -16,3 +16,14 @@ async def home(request: Request, user: User | None = Depends(auth_optional)):
             "user": user,
         },
     )
+
+
+@router.get("/title")
+async def title(request: Request, user: User | None = Depends(auth_optional)):
+    return templates.TemplateResponse(
+        "title/title.html",
+        {
+            "request": request,
+            "user": user,
+        },
+    )

@@ -1,12 +1,12 @@
-from fastapi import Header, Cookie, Query, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.exceptions import HTTPException
 from app.models import User, AuthToken
 from app.service import get_auth_token
 from app.database import get_session
-from app.utils import get_settings
-from datetime import timedelta
+from fastapi import Cookie, Depends
 from typing import Annotated
 from app.utils import utcnow
+from fastapi import status
 
 
 async def get_request_auth_token(
@@ -47,3 +47,15 @@ async def auth_optional(
         return token.user
 
     return None
+
+
+async def auth_mandatory(
+    token: AuthToken | None = Depends(get_token),
+) -> User | None:
+    if token is not None:
+        return token.user
+
+    raise HTTPException(
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={"Location": "/login"},
+    )
