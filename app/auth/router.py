@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse
 from .dependencies import get_hikka_user_data
+from app.dependencies import anon_mandatory
 from app.database import get_session
 from app.utils import get_settings
 from app import templates
@@ -11,7 +12,7 @@ from . import service
 router = APIRouter()
 
 
-@router.get("/login")
+@router.get("/login", dependencies=[Depends(anon_mandatory)])
 async def login(request: Request):
     settings = get_settings()
     return templates.TemplateResponse(

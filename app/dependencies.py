@@ -59,3 +59,13 @@ async def auth_mandatory(
         status_code=status.HTTP_307_TEMPORARY_REDIRECT,
         headers={"Location": "/login"},
     )
+
+
+async def anon_mandatory(
+    token: AuthToken | None = Depends(get_token),
+) -> User | None:
+    if token is not None:
+        raise HTTPException(
+            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            headers={"Location": "/"},
+        )
