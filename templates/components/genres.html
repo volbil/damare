@@ -25,11 +25,11 @@
 
     <div
         @click="focused=true"
-        class="flex flex-wrap items-center gap-2 min-h-[42px] p-2.5 rounded-lg bg-[#0e1e1a]/60 border border-[#13352b]
-               hover:border-green-400 focus-within:border-green-500 transition">
+        class="flex flex-wrap items-center gap-1 min-h-10 px-1 rounded-lg bg-[#0e1e1a]/60 border border-[#13352b] hover:border-green-400 focus-within:border-green-500 transition">
 
         <template x-for="tag in selected" :key="tag">
-            <div class="px-3 py-1 rounded-md bg-[#07100d]/60 border border-[#13352b] text-sm flex items-center gap-2">
+            <div
+                class="px-3 py-1 rounded-md bg-[#07100d]/60 border border-[#13352b] text-sm flex items-center gap-2">
                 <span x-text="tag"></span>
                 <button type="button" @click="remove(tag)" class="text-gray-400 hover:text-red-400">×</button>
             </div>
@@ -47,16 +47,17 @@
 
     <div
         x-show="focused"
-        class="mt-2 p-2 rounded-lg max-h-32 overflow-y-auto bg-[#0e1e1a]/90 border border-[#13352b]
-               flex flex-wrap gap-2">
+        class="mt-2 p-2 rounded-lg max-h-32 overflow-y-auto bg-[#0e1e1a]/90 border border-[#13352b] flex flex-wrap gap-2">
+
         <template x-for="genre in filtered" :key="genre">
             <button
-                type="button"
-                @click="add(genre)"
                 class="px-3 py-1 rounded bg-[#07100d]/60 border border-[#13352b] text-sm hover:bg-[#13352b]"
+                @click="add(genre)"
                 x-text="genre"
-            ></button>
+                type="button">
+            </button>
         </template>
+
         <template x-if="filtered.length === 0">
             <span class="text-gray-500 text-sm">Жанр не знайдено</span>
         </template>
