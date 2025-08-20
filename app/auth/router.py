@@ -38,6 +38,7 @@ async def login_hikka(
         key="auth",
         value=token.secret,
         max_age=360 * 24 * 60 * 60,
+        samesite="lax",
     )
 
     return response
