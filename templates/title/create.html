@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% from "components/genres.html" import genres_select %}
+
+{% macro simple_input(label, name, type="text") %}
+<div>
+    <label for="{{ name }}" class="block mb-1 text-green-400 select-none">{{ label }}</label>
+    <input
+        class="leading-tight w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none"
+        type="{{ type }}"
+        name="{{ name }}"
+        id="{{ name }}">
+</div>
+{% endmacro %}
+
+{% block content %}
+
+<h1 class="text-4xl font-bold mb-6">Додати твір</h1>
+
+<form action="" method="post" enctype="multipart/form-data" class="space-y-6 mb-4">
+    <div class="flex items-center gap-2">
+        <input id="is-original" name="is-original" type="checkbox"
+                class="h-5 w-5 text-green-500 accent-green-500 rounded">
+        <label for="is-original" class="select-none">Оригінальний твір (не переклад)</label>
+    </div>
+
+    {{ simple_input("Назва", "title") }}
+
+    {{ simple_input("Оригінальна назва (JP/KR/CN)", "original-title") }}
+
+    <div>
+        <label for="description" class="block mb-1 text-green-400 select-none">Опис</label>
+        <textarea
+            class="w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none"
+            name="description"
+            id="description"
+            rows="5"></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>
+            <label class="block mb-1 text-green-400 select-none">Статус</label>
+            <select
+                class="leading-tight w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none"
+                name="status">
+                <option>Онґоїнґ</option>
+                <option>Завершено</option>
+                <option>На паузі</option>
+                <option>Закинуто</option>
+            </select>
+        </div>
+
+        {{ simple_input("Рік", "year", "number") }}
+    </div>
+
+    {{ simple_input("Автор", "author") }}
+
+    <div>
+        <label class="block mb-1 text-green-400 select-none">Постер</label>
+        <input
+            class="bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 w-full"
+            accept="image/*"
+            type="file"
+            name="poster">
+    </div>
+
+    {{ genres_select() }}
+
+    <button
+        type="submit"
+        class="cursor-pointer px-6 py-3 bg-green-500 hover:bg-green-400 text-[#0a1713] font-medium rounded-lg transition">
+        Створити
+    </button>
+</form>
+
+{% endblock %}

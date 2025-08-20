@@ -1,0 +1,20 @@
+{% from "components/button_link.html" import button_link %}
+
+<nav class="z-40 fixed top-0 w-full backdrop-blur bg-[#020a08]/70 border-b border-[#0f2a21]">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a
+            class="text-2xl font-semibold tracking-wide"
+            href="/">Damare
+        </a>
+        
+        {% if user %}
+            <div class="px-4 py-2 ml-auto">
+                <span>Привіт <b>{{ user.username }}</b></span>
+            </div>
+
+            {{ button_link("Писати", "/editor")}}
+        {% else %}
+            {{ button_link("Увійти", "/login")}}
+        {% endif %}
+    </div>
+</nav>

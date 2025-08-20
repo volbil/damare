@@ -4,6 +4,7 @@ from app.models import User, AuthToken
 from app.service import get_auth_token
 from app.database import get_session
 from fastapi import Cookie, Depends
+from datetime import timedelta
 from typing import Annotated
 from app.utils import utcnow
 from fastapi import status
@@ -34,6 +35,11 @@ async def get_token(
 
     if now > token.expiration:
         return None
+
+    if now - token.user.last_active >= timedelta(minutes=5):
+        token.expiration = now + timedelta(days=7)
+        token.user.last_active = now
+        session.add(token)
 
     await session.commit()
 
