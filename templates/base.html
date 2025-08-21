@@ -7,16 +7,13 @@
 
 		<title>Damare</title>
 
-		{% set cache = 3 %}
+		{% set cache = 4 %}
 
 		<link rel="icon" href="/static/favicon.png?cache={{ cache }}" type="image/png">
-
-		{# <link href="/static/modern-normalize.css?cache={{ cache }}" rel="stylesheet"> #}
 		<link href="/static/styles.css?cache={{ cache }}" rel="stylesheet">
 
-		<script src="/static/alpine.min.js?cache={{ cache }}"></script>
-
-		{# <script src="/static/htmx.min.js?cache={{ cache }}"></script> #}
+		<script defer src="/static/alpine.min.js?cache={{ cache }}"></script>
+		<script src="/static/htmx.min.js?cache={{ cache }}"></script>
 	</head>
 
 	<body class="h-full bg-[#0a1713] text-gray-200">

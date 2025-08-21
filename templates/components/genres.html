@@ -1,4 +1,4 @@
-{% macro genres_select() %}
+{% macro genres_select(name="genres") %}
 <div
     x-data="{
         available: ['Романтика', 'Драма', 'Ісекай', 'Кумедія', 'Фентезі'],
@@ -21,7 +21,7 @@
     @click.away="focused=false"
     class="relative">
 
-    <input type="hidden" name="genres" :value="JSON.stringify(selected)" />
+    <input type="hidden" name="{{ name }}" :value="selected.join(',')" />
 
     <div
         @click="focused=true"
@@ -31,7 +31,7 @@
             <div
                 class="px-3 py-1 rounded-md bg-[#07100d]/60 border border-[#13352b] text-sm flex items-center gap-2">
                 <span x-text="tag"></span>
-                <button type="button" @click="remove(tag)" class="text-gray-400 hover:text-red-400">×</button>
+                <button type="button" @click="remove(tag)" class="text-gray-400 hover:text-red-400 cursor-pointer">×</button>
             </div>
         </template>
 
