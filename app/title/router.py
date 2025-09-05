@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends
+from .dependencies import validate_title_create
 from app.dependencies import auth_mandatory
 from app.dependencies import auth_optional
 from fastapi import UploadFile, File
+from app.schemas import FormResult
 from .schemas import CreateForm
 from app.models import User
 from app import templates
@@ -25,20 +27,18 @@ async def title(request: Request, user: User | None = Depends(auth_optional)):
 async def create_title(
     request: Request,
     user: User | None = Depends(auth_mandatory),
-    file: UploadFile | None = File(None, alias="poster"),
+    data: FormResult = Depends(validate_title_create),
+    # file: UploadFile | None = File(None, alias="poster"),
 ):
-    form = await CreateForm.from_formdata(request)
 
-    valid = await form.validate_on_submit()
-
-    print(valid)
-    print(form.genres.data)
+    # print(valid)
+    # print(form.genres.data)
 
     return templates.TemplateResponse(
         "title/create.html",
         {
             "request": request,
+            "form": data.form,
             "user": user,
-            "form": form,
         },
     )

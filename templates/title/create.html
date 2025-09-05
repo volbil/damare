@@ -35,7 +35,13 @@
         <label for="is-original" class="select-none cursor-pointer">Оригінальний твір (не переклад)</label>
     </div>
 
-    {{ simple_input("Назва", "title") }}
+    <div>
+        {{ simple_input("Назва", "title") }}
+
+        {% if form.title.errors | length > 0 %}
+            <div class="text-red-400 mt-1">{{ form.title.errors[0] }}</div>
+        {% endif %}
+    </div>
 
     <div x-show="!original">
         {{ simple_input("Оригінальна назва (JP/KR/CN)", "title-original") }}

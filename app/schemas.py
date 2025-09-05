@@ -2,6 +2,7 @@ from starlette.requests import Request as StarletteRequest
 from starlette.datastructures import ImmutableMultiDict
 from pydantic import BaseModel, ConfigDict
 from wtforms import Form, ValidationError
+from dataclasses import dataclass
 import asyncio
 
 
@@ -86,3 +87,9 @@ class CustomForm(Form):
         return self.is_submitted() and await self.validate(
             extra_validators=extra_validators
         )
+
+
+@dataclass
+class FormResult:
+    form: CustomForm
+    valid: bool
