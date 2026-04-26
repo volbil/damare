@@ -1,0 +1,53 @@
+{# Programmatic SVG cover, ported from frontend_reference/covers.jsx.
+   Calls cover_palette() and cover_layout() exposed as Jinja globals. #}
+
+{% macro cover(title, author='', seed='', show_text=true) -%}
+{%- set palette_seed = seed if seed else title -%}
+{%- set pal = cover_palette(palette_seed) -%}
+{%- set lay = cover_layout(seed, title) -%}
+{%- set bg = pal[0] -%}
+{%- set accent = pal[1] -%}
+{%- set ink = pal[2] -%}
+<svg viewBox="0 0 200 300" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+{%- if lay == 0 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+<circle cx="100" cy="120" r="60" fill="{{ accent }}" opacity="0.9"/>
+<rect x="0" y="180" width="200" height="120" fill="{{ accent }}" opacity="0.08"/>
+<line x1="20" y1="180" x2="180" y2="180" stroke="{{ ink }}" stroke-opacity="0.3"/>
+{%- elif lay == 1 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+<rect x="0" y="0" width="60" height="300" fill="{{ accent }}" opacity="0.85"/>
+<rect x="80" y="40" width="2" height="220" fill="{{ ink }}" opacity="0.5"/>
+<circle cx="140" cy="80" r="24" fill="none" stroke="{{ ink }}" stroke-opacity="0.4"/>
+{%- elif lay == 2 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+<polygon points="0,0 200,0 200,180" fill="{{ accent }}" opacity="0.18"/>
+<polygon points="0,300 200,300 0,80" fill="{{ accent }}" opacity="0.05"/>
+<line x1="0" y1="80" x2="200" y2="180" stroke="{{ accent }}" stroke-width="1" opacity="0.6"/>
+{%- elif lay == 3 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+<circle cx="100" cy="220" r="120" fill="none" stroke="{{ accent }}" stroke-width="1" opacity="0.5"/>
+<circle cx="100" cy="220" r="80" fill="none" stroke="{{ accent }}" stroke-width="1" opacity="0.4"/>
+<circle cx="100" cy="220" r="40" fill="{{ accent }}" opacity="0.7"/>
+{%- elif lay == 4 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+{%- for y in [40, 80, 120, 160, 200, 240] -%}
+<line x1="0" y1="{{ y }}" x2="200" y2="{{ y }}" stroke="{{ ink }}" stroke-opacity="0.07"/>
+{%- endfor -%}
+<circle cx="100" cy="100" r="7" fill="{{ accent }}"/>
+{%- elif lay == 5 -%}
+<rect width="200" height="300" fill="{{ bg }}"/>
+<rect x="14" y="14" width="172" height="272" fill="none" stroke="{{ accent }}" stroke-opacity="0.45"/>
+<rect x="14" y="14" width="172" height="60" fill="{{ accent }}" opacity="0.12"/>
+{%- endif -%}
+{%- if show_text -%}
+{%- set ty = 50 if lay == 5 else 240 -%}
+{%- set ay = 66 if lay == 5 else 256 -%}
+{%- set short_title = (title[:21] ~ '…') if title|length > 22 else title -%}
+<text x="20" y="{{ ty }}" font-family="Newsreader, Georgia, serif" font-size="16" font-weight="500" fill="{{ ink }}" style="letter-spacing: -0.01em;">{{ short_title }}</text>
+{%- if author -%}
+<text x="20" y="{{ ay }}" font-family="Inter, sans-serif" font-size="9" fill="{{ ink }}" fill-opacity="0.65" style="letter-spacing: 0.05em; text-transform: uppercase;">{{ author }}</text>
+{%- endif -%}
+{%- endif -%}
+</svg>
+{%- endmacro %}

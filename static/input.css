@@ -1,7 +1,199 @@
 @import "tailwindcss";
 
-/* @layer theme, base, components, utilities;
+@theme {
+    /* Background scale (warm-tinted dark) */
+    --color-bg-0: oklch(0.16 0.008 60);
+    --color-bg-1: oklch(0.20 0.008 60);
+    --color-bg-2: oklch(0.235 0.009 60);
+    --color-bg-3: oklch(0.27 0.010 60);
+    --color-bg-4: oklch(0.32 0.012 60);
 
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css" layer(utilities); */
+    /* Lines */
+    --color-line: oklch(0.32 0.010 60 / 0.6);
+    --color-line-soft: oklch(0.32 0.010 60 / 0.3);
+
+    /* Foreground scale */
+    --color-fg-0: oklch(0.96 0.005 80);
+    --color-fg-1: oklch(0.82 0.006 80);
+    --color-fg-2: oklch(0.66 0.008 75);
+    --color-fg-3: oklch(0.50 0.008 70);
+    --color-fg-4: oklch(0.38 0.008 65);
+
+    /* Accent (saffron / gold) */
+    --color-accent: #e8c547;
+    --color-accent-soft: oklch(0.82 0.13 90 / 0.16);
+    --color-accent-fg: oklch(0.18 0.01 80);
+
+    /* Semantic */
+    --color-warn: oklch(0.72 0.14 35);
+    --color-love: oklch(0.74 0.14 20);
+    --color-info: oklch(0.74 0.08 220);
+
+    /* Type */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-serif: "Newsreader", ui-serif, "Iowan Old Style", Georgia, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+    /* Radius (overrides Tailwind defaults) */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    /* Shadow (overrides Tailwind defaults) */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+@layer base {
+    .dmr {
+        font-family: var(--font-sans);
+        color: var(--color-fg-1);
+        background: var(--color-bg-0);
+        font-feature-settings: "cv02", "cv03", "cv11", "ss01";
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .dmr h1,
+    .dmr h2,
+    .dmr h3,
+    .dmr h4 {
+        margin: 0;
+        color: var(--color-fg-0);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+
+    .dmr ::-webkit-scrollbar { width: 8px; height: 8px; }
+    .dmr ::-webkit-scrollbar-track { background: transparent; }
+    .dmr ::-webkit-scrollbar-thumb { background: var(--color-bg-3); border-radius: 4px; }
+    .dmr ::-webkit-scrollbar-thumb:hover { background: var(--color-bg-4); }
+
+    .dmr ::selection {
+        background: var(--color-accent);
+        color: var(--color-accent-fg);
+    }
+}
+
+@layer components {
+    /* Tag */
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        border-radius: 9999px;
+        background: var(--color-bg-2);
+        color: var(--color-fg-1);
+        border: 1px solid var(--color-line-soft);
+        white-space: nowrap;
+    }
+    .tag.fandom {
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
+        border-color: transparent;
+    }
+    .tag.warn {
+        background: oklch(0.72 0.14 35 / 0.16);
+        color: var(--color-warn);
+        border-color: transparent;
+    }
+    .tag.rating {
+        background: var(--color-bg-2);
+        color: var(--color-fg-2);
+        font-variant: small-caps;
+        letter-spacing: 0.04em;
+    }
+
+    /* Button */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 500;
+        background: var(--color-bg-2);
+        color: var(--color-fg-0);
+        border: 1px solid var(--color-line-soft);
+        transition: background .12s, border-color .12s, transform .06s;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+    .btn:hover { background: var(--color-bg-3); }
+    .btn:active { transform: scale(.98); }
+    .btn.primary {
+        background: var(--color-accent);
+        color: var(--color-accent-fg);
+        border-color: transparent;
+        font-weight: 600;
+    }
+    .btn.primary:hover { background: oklch(0.86 0.14 90); }
+    .btn.ghost { background: transparent; }
+    .btn.ghost:hover { background: var(--color-bg-2); }
+    .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+    .btn.icon { width: 34px; padding: 0; }
+    .btn.icon.sm { width: 28px; }
+
+    /* Stat row */
+    .stat-row {
+        display: flex;
+        gap: 16px;
+        color: var(--color-fg-2);
+        font-size: 12px;
+        align-items: center;
+    }
+    .stat-row .stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Avatar */
+    .avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: var(--color-bg-3);
+        color: var(--color-fg-1);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        flex-shrink: 0;
+        user-select: none;
+    }
+
+    /* Cover */
+    .cover {
+        position: relative;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--color-bg-2);
+        aspect-ratio: 2 / 3;
+    }
+    .cover.wide { aspect-ratio: 16 / 9; }
+
+    /* Hairline */
+    .hr {
+        height: 1px;
+        background: var(--color-line-soft);
+        border: 0;
+        margin: 0;
+    }
+
+    /* Density modifiers */
+    .dmr[data-density="compact"] .stat-row { gap: 12px; font-size: 11px; }
+    .dmr[data-density="compact"] .tag { font-size: 10.5px; padding: 2px 8px; }
+    .dmr[data-density="comfy"] .stat-row { gap: 20px; font-size: 13px; }
+}

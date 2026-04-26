@@ -1,19 +1,99 @@
 {% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+{% from "components/novel_card.html" import novel_card %}
 
 {% block content %}
-    <h1 class="text-4xl font-bold mb-6">Вітаємо на Дамаре 🌿</h1>
-    <p class="text-gray-400 leading-relaxed mb-12">
-        Місце, де ви зможете читати та публікувати ранобе, новели, фанфіки та будь який інший літературний контент зі зручністю.
-    </p>
+<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
 
-    <div class="grid sm:grid-cols-2 gap-6">
-        <div class="p-6 rounded-2xl border border-[#13352b] bg-[#0e1e1a]/60">
-            <h2 class="text-xl font-semibold mb-2">Заголовок картки</h2>
-            <p class="text-gray-400">Тут дуже цікавий декст.</p>
+    {# Continue reading #}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Продовжити читати</h2>
+            <a href="#" class="text-xs text-fg-3 hover:text-fg-1">Уся бібліотека →</a>
         </div>
-        <div class="p-6 rounded-2xl border border-[#13352b] bg-[#0e1e1a]/60">
-            <h2 class="text-xl font-semibold mb-2">Друга картка</h2>
-            <p class="text-gray-400">А GPT непогано так генерує дизайн для тейлвінду.</p>
+        <a href="/title/{{ continue_reading.id }}" class="block">
+            <div class="flex gap-5 p-5 border border-line-soft rounded-lg cursor-pointer" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
+                <div class="cover w-[120px] shrink-0">
+                    {{ cover(continue_reading.title, continue_reading.author, continue_reading.id, show_text=false) }}
+                </div>
+                <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="text-[11px] text-fg-3 uppercase tracking-[0.06em] mb-1.5">
+                            Розділ {{ continue_reading.chapters }} з {{ continue_reading.chapter_count }}
+                        </div>
+                        <h3 class="font-serif text-2xl font-medium mb-1 leading-tight">{{ continue_reading.title }}</h3>
+                        <div class="text-fg-2 text-[13px] mb-3">{{ continue_reading.author }}</div>
+                        <p class="text-fg-2 text-[13px] leading-relaxed m-0 max-w-[520px]">«Маринка опустилася на лавку біля воріт. Сніжинка впала на лист, повільно розтанула…»</p>
+                    </div>
+                    <div class="flex items-center gap-3.5 mt-4">
+                        <span class="btn primary">Продовжити читання {{ icon('arrow-r', 13) }}</span>
+                        <div class="flex-1 flex items-center gap-2.5">
+                            <div class="flex-1 h-0.5 bg-bg-3 rounded-full">
+                                <div class="h-full bg-accent rounded-full" style="width: {{ continue_reading.progress }}%;"></div>
+                            </div>
+                            <span class="text-[11px] text-fg-3 tabular-nums">{{ continue_reading.progress }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </section>
+
+    {# Featured / editorial pick #}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
+                {{ icon('sparkle', 11) }} Редакторський вибір
+            </h2>
         </div>
-    </div>
+        <a href="/title/{{ featured.id }}" class="block">
+            <div class="relative cursor-pointer h-[280px] rounded-lg overflow-hidden border border-line-soft">
+                <div class="absolute inset-0">
+                    {{ cover(featured.title, featured.author, featured.id, show_text=false) }}
+                </div>
+                <div class="absolute inset-0" style="background: linear-gradient(110deg, rgba(20,18,14,0.95) 0%, rgba(20,18,14,0.7) 50%, rgba(20,18,14,0.4) 100%);"></div>
+                <div class="absolute inset-0 flex flex-col justify-end p-8 max-w-[600px]">
+                    <span class="text-[10px] font-semibold tracking-[0.1em] uppercase text-accent mb-2">Тиждень тому · в тренді</span>
+                    <h3 class="font-serif text-4xl font-medium leading-[1.05] mb-2 text-white">{{ featured.title }}</h3>
+                    <div class="text-white/70 text-[13px] mb-3.5">{{ featured.author }} · {{ featured.chapter_count }} розділів</div>
+                    <p class="text-white/85 text-sm leading-[1.55] m-0 mb-[18px]">{{ featured.summary }}</p>
+                    <div class="flex gap-1.5 flex-wrap">
+                        {%- for t in featured.tags %}
+                        <span class="tag" style="background: rgba(255,255,255,0.1); color: #fff; border-color: transparent;">{{ t }}</span>
+                        {%- endfor %}
+                    </div>
+                </div>
+            </div>
+        </a>
+    </section>
+
+    {# Trending #}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3.5">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
+                {{ icon('flame', 11) }} Зараз у тренді
+            </h2>
+            <a href="#" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
+        </div>
+        <div class="grid grid-cols-4 gap-[18px]">
+            {%- for n in trending %}
+            {{ novel_card(n, with_covers=true) }}
+            {%- endfor %}
+        </div>
+    </section>
+
+    {# Recently updated #}
+    <section>
+        <div class="flex items-baseline justify-between mb-3.5">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Нещодавно оновлені</h2>
+        </div>
+        <div class="grid grid-cols-4 gap-[18px]">
+            {%- for n in new_releases %}
+            {{ novel_card(n, with_covers=true) }}
+            {%- endfor %}
+        </div>
+    </section>
+
+</div>
 {% endblock %}

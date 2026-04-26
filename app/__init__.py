@@ -2,13 +2,42 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from app.database import sessionmanager
-from app.utils import get_settings
+from app.utils import get_settings, cover_palette, cover_layout
 from fastapi import FastAPI
 import arel
 
 
 settings = get_settings()
 templates = Jinja2Templates(directory="templates")
+
+
+# Expose cover helpers to Jinja templates
+templates.env.globals["cover_palette"] = cover_palette
+templates.env.globals["cover_layout"] = cover_layout
+
+
+def _thousands_uk(n):
+    """Format an int with space as thousand separator (Ukrainian style)."""
+
+    return "{:,}".format(int(n)).replace(",", " ")
+
+
+def _initials(name, max_chars=2):
+    """Return up to max_chars initials from a name (first letter of each word)."""
+
+    if not name:
+        return ""
+
+    parts = name.split()
+
+    if len(parts) >= 2:
+        return "".join(p[0] for p in parts[:max_chars]).upper()
+
+    return name[:max_chars].upper()
+
+
+templates.env.filters["thousands_uk"] = _thousands_uk
+templates.env.filters["initials"] = _initials
 
 
 def create_app(init_db: bool = True) -> FastAPI:

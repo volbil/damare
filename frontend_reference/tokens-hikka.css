@@ -1,0 +1,172 @@
+/* Hikka-style design tokens — shadcn dark, dense, neutral */
+.hka {
+  /* Near-black neutrals (zinc-900 family — shadcn dark) */
+  --hk-bg-0: oklch(0.145 0 0);       /* page bg, like #0b0b0d */
+  --hk-bg-1: oklch(0.18 0 0);        /* surface / card */
+  --hk-bg-2: oklch(0.22 0 0);        /* raised */
+  --hk-bg-3: oklch(0.27 0 0);        /* hover */
+  --hk-bg-4: oklch(0.32 0 0);
+
+  --hk-line: oklch(1 0 0 / 0.10);    /* hairline */
+  --hk-line-strong: oklch(1 0 0 / 0.16);
+
+  --hk-fg-0: oklch(0.98 0 0);
+  --hk-fg-1: oklch(0.86 0 0);
+  --hk-fg-2: oklch(0.66 0 0);
+  --hk-fg-3: oklch(0.50 0 0);
+  --hk-fg-4: oklch(0.38 0 0);
+
+  /* Single-chroma accent — hikka uses a vivid red/scarlet by default; keep configurable */
+  --hk-accent: oklch(0.62 0.22 25);   /* scarlet */
+  --hk-accent-fg: oklch(0.98 0.01 25);
+  --hk-accent-soft: oklch(0.62 0.22 25 / 0.14);
+
+  /* Status colors for watch-list states (planned/watching/completed/dropped/on-hold) */
+  --hk-st-planning:  oklch(0.70 0.12 230);   /* blue */
+  --hk-st-reading:   oklch(0.72 0.16 145);   /* green */
+  --hk-st-completed: oklch(0.72 0.14 290);   /* purple */
+  --hk-st-onhold:    oklch(0.78 0.13 75);    /* amber */
+  --hk-st-dropped:   oklch(0.65 0.18 25);    /* red */
+
+  /* Score color scale (low → high, MAL-style) */
+  --hk-score-1: oklch(0.55 0.20 25);
+  --hk-score-5: oklch(0.78 0.16 75);
+  --hk-score-9: oklch(0.72 0.18 145);
+
+  /* Type — Hikka uses Geist (sans + mono); we substitute Inter + JetBrains as fallback */
+  --hk-font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --hk-font-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Radii — shadcn convention is ~6px/10px, fairly tight */
+  --hk-r-sm: 4px;
+  --hk-r-md: 6px;
+  --hk-r-lg: 8px;
+  --hk-r-xl: 12px;
+
+  font-family: var(--hk-font-sans);
+  color: var(--hk-fg-1);
+  background: var(--hk-bg-0);
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv02', 'cv03', 'cv11';
+}
+
+.hka h1, .hka h2, .hka h3, .hka h4 {
+  margin: 0;
+  color: var(--hk-fg-0);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Scrollbar */
+.hka ::-webkit-scrollbar { width: 8px; height: 8px; }
+.hka ::-webkit-scrollbar-track { background: transparent; }
+.hka ::-webkit-scrollbar-thumb { background: var(--hk-bg-3); border-radius: 999px; }
+.hka ::-webkit-scrollbar-thumb:hover { background: var(--hk-bg-4); }
+
+/* ─── Buttons (shadcn-ish) ─── */
+.hka .hk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; padding: 0 14px; font-size: 13px; font-weight: 500;
+  border-radius: var(--hk-r-md); white-space: nowrap;
+  background: var(--hk-bg-2); color: var(--hk-fg-0);
+  border: 1px solid var(--hk-line);
+  transition: background .12s, border-color .12s;
+}
+.hka .hk-btn:hover { background: var(--hk-bg-3); border-color: var(--hk-line-strong); }
+.hka .hk-btn.primary { background: var(--hk-fg-0); color: var(--hk-bg-0); border-color: transparent; }
+.hka .hk-btn.primary:hover { background: oklch(0.92 0 0); }
+.hka .hk-btn.accent { background: var(--hk-accent); color: var(--hk-accent-fg); border-color: transparent; }
+.hka .hk-btn.accent:hover { background: oklch(0.66 0.22 25); }
+.hka .hk-btn.ghost { background: transparent; border-color: transparent; }
+.hka .hk-btn.ghost:hover { background: var(--hk-bg-2); }
+.hka .hk-btn.outline { background: transparent; }
+.hka .hk-btn.outline:hover { background: var(--hk-bg-2); }
+.hka .hk-btn.sm { height: 26px; padding: 0 10px; font-size: 12px; border-radius: var(--hk-r-sm); }
+.hka .hk-btn.lg { height: 38px; padding: 0 18px; font-size: 14px; }
+.hka .hk-btn.icon { width: 32px; padding: 0; }
+.hka .hk-btn.icon.sm { width: 26px; }
+
+/* ─── Badges (shadcn) ─── */
+.hka .hk-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; font-size: 11px; font-weight: 500;
+  border-radius: var(--hk-r-sm); line-height: 16px;
+  background: var(--hk-bg-2); color: var(--hk-fg-1);
+  border: 1px solid var(--hk-line);
+}
+.hka .hk-badge.sec  { background: transparent; color: var(--hk-fg-2); }
+.hka .hk-badge.solid { background: var(--hk-fg-0); color: var(--hk-bg-0); border-color: transparent; }
+.hka .hk-badge.accent { background: var(--hk-accent-soft); color: var(--hk-accent); border-color: transparent; }
+.hka .hk-badge.outline { background: transparent; }
+
+/* ─── Cards ─── */
+.hka .hk-card {
+  background: var(--hk-bg-1);
+  border: 1px solid var(--hk-line);
+  border-radius: var(--hk-r-lg);
+  overflow: hidden;
+}
+
+/* ─── Inputs ─── */
+.hka .hk-input {
+  height: 32px; padding: 0 10px; font-size: 13px;
+  background: var(--hk-bg-1); color: var(--hk-fg-0);
+  border: 1px solid var(--hk-line); border-radius: var(--hk-r-md); outline: none;
+}
+.hka .hk-input:focus { border-color: var(--hk-line-strong); background: var(--hk-bg-2); }
+
+/* ─── Tabs (underline, shadcn) ─── */
+.hka .hk-tabs {
+  display: flex; gap: 4px; border-bottom: 1px solid var(--hk-line);
+}
+.hka .hk-tab {
+  padding: 10px 14px; font-size: 13px; color: var(--hk-fg-2);
+  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
+  transition: color .12s;
+}
+.hka .hk-tab:hover { color: var(--hk-fg-1); }
+.hka .hk-tab.active { color: var(--hk-fg-0); border-bottom-color: var(--hk-fg-0); font-weight: 500; }
+
+/* ─── Avatar ─── */
+.hka .hk-av {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: var(--hk-bg-3); color: var(--hk-fg-0);
+  font-weight: 600; font-size: 11px; flex-shrink: 0;
+}
+
+/* ─── Score chip ─── */
+.hka .hk-score {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600; font-size: 12px;
+  padding: 2px 7px; border-radius: var(--hk-r-sm);
+  background: var(--hk-bg-2);
+}
+
+/* ─── Status dot ─── */
+.hka .hk-dot {
+  width: 8px; height: 8px; border-radius: 999px; display: inline-block;
+}
+
+/* ─── Cover (poster) ─── */
+.hka .hk-cover {
+  position: relative; border-radius: var(--hk-r-md); overflow: hidden;
+  background: var(--hk-bg-2); aspect-ratio: 2 / 3;
+  border: 1px solid var(--hk-line);
+}
+.hka .hk-cover-art {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 10px;
+}
+
+/* ─── Mono numeric ─── */
+.hka .num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+
+/* ─── Density ─── */
+.hka[data-density="compact"] .hk-btn { height: 28px; }
+.hka[data-density="comfy"] .hk-btn { height: 36px; }
+
+/* ─── Selection ─── */
+.hka ::selection { background: var(--hk-accent); color: var(--hk-accent-fg); }

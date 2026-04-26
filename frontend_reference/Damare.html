@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <title>Damare — Ukrainian Novels & Fanfiction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    html, body, #root { height: 100%; }
+    body { margin: 0; background: #f0eee9; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="data.jsx"></script>
+  <script type="text/babel" src="covers.jsx"></script>
+  <script type="text/babel" src="chrome.jsx"></script>
+  <script type="text/babel" src="novel-card.jsx"></script>
+  <script type="text/babel" src="screen-home.jsx"></script>
+  <script type="text/babel" src="screen-novel.jsx"></script>
+  <script type="text/babel" src="screen-reader.jsx"></script>
+  <script type="text/babel" src="screen-writer.jsx"></script>
+  <script type="text/babel" src="screen-search.jsx"></script>
+  <script type="text/babel" src="screen-profile.jsx"></script>
+  <script type="text/babel" src="screen-login.jsx"></script>
+  <script type="text/babel" src="screen-comments.jsx"></script>
+  <script type="text/babel" src="screen-forums.jsx"></script>
+  <script type="text/babel" src="screen-articles.jsx"></script>
+  <script type="text/babel" src="screen-feed.jsx"></script>
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="screen-mobile.jsx"></script>
+
+  <script type="text/babel">
+  const { useState, useEffect } = React;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "#9bb89a",
+    "font": "inter-newsreader",
+    "density": "regular",
+    "covers": false,
+    "motif": "subtle"
+  }/*EDITMODE-END*/;
+
+  const ACCENT_PRESETS = {
+    '#e8c547': { name: 'Saffron',   soft: 'oklch(0.82 0.13 90 / 0.16)' },
+    '#d4a574': { name: 'Wheat',     soft: 'oklch(0.78 0.10 70 / 0.16)' },
+    '#7c9eb2': { name: 'Steel',     soft: 'oklch(0.72 0.06 230 / 0.18)' },
+    '#c4564f': { name: 'Cinnabar',  soft: 'oklch(0.62 0.16 25 / 0.18)' },
+    '#9b8cb8': { name: 'Wisteria',  soft: 'oklch(0.70 0.08 300 / 0.18)' },
+    '#9bb89a': { name: 'Sage',      soft: 'oklch(0.72 0.06 140 / 0.18)' },
+  };
+
+  const FONT_PAIRS = {
+    'inter-newsreader': { sans: "'Inter', ui-sans-serif, system-ui, sans-serif",
+                          serif: "'Newsreader', ui-serif, Georgia, serif",
+                          name: 'Inter + Newsreader' },
+    'inter-only':       { sans: "'Inter', ui-sans-serif, system-ui, sans-serif",
+                          serif: "'Inter', ui-sans-serif, system-ui, sans-serif",
+                          name: 'Inter (sans-only)' },
+    'serif-heavy':      { sans: "'Newsreader', ui-serif, Georgia, serif",
+                          serif: "'Newsreader', ui-serif, Georgia, serif",
+                          name: 'Newsreader (serif)' },
+  };
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    const [reader, setReader] = useState(false);
+
+    // Apply accent + font live to CSS vars
+    useEffect(() => {
+      const root = document.documentElement;
+      root.style.setProperty('--accent', t.accent);
+      root.style.setProperty('--accent-soft', ACCENT_PRESETS[t.accent]?.soft || 'rgba(232,197,71,0.16)');
+      const pair = FONT_PAIRS[t.font] || FONT_PAIRS['inter-newsreader'];
+      root.style.setProperty('--font-sans', pair.sans);
+      root.style.setProperty('--font-serif', pair.serif);
+    }, [t.accent, t.font]);
+
+    const dmrProps = { className: 'dmr', 'data-density': t.density };
+    const screenStyle = {
+      width: 1280, height: 880, display: 'flex',
+      background: 'var(--bg-0)', overflow: 'hidden',
+      borderRadius: 'var(--r-lg)',
+    };
+    const sideMain = (active, label, content) => (
+      <div {...dmrProps} style={screenStyle}>
+        <Sidebar active={active} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <Topbar page={label} />
+          {content}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="dmr">
+        <DesignCanvas>
+          <DCSection id="home" title="Стрічка / Discover"
+                      subtitle="Continue-reading hero, editorial pick, trending grid, recently updated">
+            <DCArtboard id="home-1" label="Discover" width={1280} height={880}>
+              {sideMain('home', 'Стрічка', <HomeScreen density={t.density} withCovers={t.covers}
+                                                          onOpenNovel={() => {}} />)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="novel" title="Novel detail"
+                      subtitle="Hero with cover, summary, tags, chapters table, similar works">
+            <DCArtboard id="novel-1" label="Novel · Sim Zymovykh Nochey" width={1280} height={880}>
+              {sideMain('discover', 'Твір', <NovelDetailScreen onOpenReader={() => setReader(true)} />)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="reader" title="Reader (hero polish)"
+                      subtitle="4 themes, font swap, size/leading/width controls, drop cap, kudos & next">
+            <DCArtboard id="reader-1" label="Reader · Розділ 3" width={1280} height={1180}>
+              <div {...dmrProps} style={{ ...screenStyle, height: 1180 }}>
+                <ReaderScreen onBack={() => {}} />
+              </div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="writer" title="Writer / editor"
+                      subtitle="Distraction-light editor, autosave, stats, scheduling, streak chart">
+            <DCArtboard id="writer-1" label="Writer · compose chapter" width={1280} height={880}>
+              {sideMain('write', 'Писати', <WriterScreen />)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="search" title="Search & browse"
+                      subtitle="AO3-style faceted filters: rating, status, words, included/excluded tags">
+            <DCArtboard id="search-1" label="Search · «зимові»" width={1280} height={1080}>
+              {sideMain('discover', 'Пошук', <SearchScreen density={t.density} withCovers={t.covers}
+                                                              onOpenNovel={() => {}} />)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="profile" title="Profile / library"
+                      subtitle="Tabs: works, currently reading, finished, lists, activity feed">
+            <DCArtboard id="profile-1" label="Profile · @kalyna_l" width={1280} height={1100}>
+              {sideMain('library', 'Профіль', <ProfileScreen density={t.density} withCovers={t.covers}
+                                                                onOpenNovel={() => {}} />)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="mobile" title="Mobile views"
+                      subtitle="iPhone frames — discover feed, novel detail, reader (with drop cap), profile">
+            <DCArtboard id="m-home" label="Mobile · Discover" width={420} height={894}>
+              <IOSDevice width={420} height={894} dark>
+                <MobileApp screen="home" density={t.density} withCovers={t.covers} />
+              </IOSDevice>
+            </DCArtboard>
+            <DCArtboard id="m-novel" label="Mobile · Novel" width={420} height={894}>
+              <IOSDevice width={420} height={894} dark>
+                <MobileApp screen="novel" density={t.density} withCovers={t.covers} />
+              </IOSDevice>
+            </DCArtboard>
+            <DCArtboard id="m-reader" label="Mobile · Reader" width={420} height={894}>
+              <IOSDevice width={420} height={894} dark>
+                <MobileApp screen="reader" density={t.density} withCovers={t.covers} />
+              </IOSDevice>
+            </DCArtboard>
+            <DCArtboard id="m-profile" label="Mobile · Profile" width={420} height={894}>
+              <IOSDevice width={420} height={894} dark>
+                <MobileApp screen="profile" density={t.density} withCovers={t.covers} />
+              </IOSDevice>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="login" title="Login / signup"
+                      subtitle="Two-pane: cover collage left, form right; toggle between sign-in & register">
+            <DCArtboard id="login-1" label="Sign up" width={1280} height={780}>
+              <div {...dmrProps} style={{ ...screenStyle, height: 780 }}>
+                <LoginScreen />
+              </div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="social" title="Social — community & discussion"
+                      subtitle="Comments on a chapter, public forums, the editorial blog, and an author-updates feed">
+            <DCArtboard id="comments-1" label="Chapter comments · 148 replies" width={1280} height={1180}>
+              {sideMain('discover', 'Обговорення', <CommentsScreen />)}
+            </DCArtboard>
+            <DCArtboard id="forums-1" label="Forums · Громада" width={1280} height={1080}>
+              {sideMain('forums', 'Громада', <ForumsScreen />)}
+            </DCArtboard>
+            <DCArtboard id="articles-1" label="Articles · Записник" width={1280} height={1280}>
+              {sideMain('articles', 'Записник', <ArticlesScreen />)}
+            </DCArtboard>
+            <DCArtboard id="feed-1" label="Author feed · Стрічка авторів" width={1280} height={1380}>
+              {sideMain('feed', 'Стрічка авторів', <FeedScreen />)}
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+
+        <TweaksPanel>
+          <TweakSection label="Бренд" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div className="twk-lbl"><span>Акцентний колір</span>
+              <span className="twk-val">{ACCENT_PRESETS[t.accent]?.name}</span></div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {Object.entries(ACCENT_PRESETS).map(([hex, info]) => (
+                <button key={hex} title={info.name}
+                        onClick={() => setTweak('accent', hex)}
+                        style={{ width: 26, height: 26, borderRadius: 999, background: hex,
+                                  border: t.accent === hex ? '2px solid #29261b' : '1px solid rgba(0,0,0,0.1)',
+                                  cursor: 'pointer', padding: 0 }} />
+              ))}
+            </div>
+          </div>
+
+          <TweakSection label="Типографіка" />
+          <TweakSelect label="Шрифтова пара" value={t.font}
+                        options={[
+                          ['inter-newsreader', 'Inter + Newsreader'],
+                          ['inter-only', 'Inter лише'],
+                          ['serif-heavy', 'Newsreader-only (editorial)'],
+                        ].map(([v]) => v)}
+                        onChange={(v) => setTweak('font', v)} />
+          <div className="twk-lbl" style={{ marginTop: -4, fontSize: 10.5 }}>
+            <span style={{ color: 'rgba(41,38,27,0.5)' }}>{FONT_PAIRS[t.font]?.name}</span>
+          </div>
+
+          <TweakSection label="Щільність" />
+          <TweakRadio label="" value={t.density}
+                      options={['compact', 'regular', 'comfy']}
+                      onChange={(v) => setTweak('density', v)} />
+
+          <TweakSection label="Картки" />
+          <TweakToggle label="Показувати обкладинки" value={t.covers}
+                        onChange={(v) => setTweak('covers', v)} />
+
+          <TweakSection label="Український акцент" />
+          <TweakRadio label="" value={t.motif}
+                      options={['none', 'subtle', 'bold']}
+                      onChange={(v) => setTweak('motif', v)} />
+          <div className="twk-lbl" style={{ fontSize: 10.5, marginTop: -4 }}>
+            <span style={{ color: 'rgba(41,38,27,0.5)' }}>
+              {t.motif === 'none' && 'Лише мова'}
+              {t.motif === 'subtle' && 'Тонкі натяки в типографіці'}
+              {t.motif === 'bold' && 'Виразні візуальні елементи'}
+            </span>
+          </div>
+        </TweaksPanel>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

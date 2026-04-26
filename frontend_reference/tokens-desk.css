@@ -1,0 +1,99 @@
+/* Direction C — The Reading Desk
+   A physical scene, not a UI. Scoped under .dk (desk). */
+
+.dk {
+  --dk-night: #0c0a08;          /* deep night beyond the lamp */
+  --dk-shadow: #1a1410;
+  --dk-wood: #2d1f15;            /* desk surface */
+  --dk-wood-2: #3a2818;          /* highlight grain */
+  --dk-wood-3: #1c130a;          /* deep grain */
+  --dk-paper: #ede2c8;            /* warm lamp-lit paper */
+  --dk-paper-2: #d8c89e;
+  --dk-paper-3: #b8a577;
+  --dk-paper-aged: #c8b287;
+  --dk-ink: #1a120a;              /* iron-gall ink */
+  --dk-ink-soft: #3d2a1a;
+  --dk-ink-faded: #6b5230;
+  --dk-graphite: #2a2520;
+  --dk-pencil-mark: #5a4a30;
+
+  --dk-lamp: #f4d690;             /* lamp warmth */
+  --dk-spot: #c4441f;              /* sealing-wax red */
+  --dk-blue: #3a5878;              /* aerogramme blue */
+
+  --dk-display: 'Fraunces', 'Newsreader', serif;
+  --dk-body: 'Newsreader', Georgia, serif;
+  --dk-hand: 'Caveat', 'Reenie Beanie', cursive;
+  --dk-typewriter: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
+  --dk-mono: 'JetBrains Mono', monospace;
+
+  font-family: var(--dk-body);
+  color: var(--dk-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+.dk h1, .dk h2, .dk h3 { margin: 0; font-weight: 500; }
+
+/* Desk surface — subtle wood grain, warm lamp pool top-left */
+.dk-desk {
+  background:
+    /* Lamp pool — warm light fading off */
+    radial-gradient(ellipse 800px 600px at 28% 18%,
+        rgba(244, 214, 144, 0.32) 0%,
+        rgba(244, 214, 144, 0.14) 30%,
+        rgba(244, 214, 144, 0.04) 55%,
+        transparent 75%),
+    /* Vignette */
+    radial-gradient(ellipse 1200px 900px at 50% 50%,
+        transparent 0%, rgba(0,0,0,0.5) 100%),
+    /* Wood grain — vertical streaks */
+    repeating-linear-gradient(
+      94deg,
+      var(--dk-wood) 0px,
+      var(--dk-wood-2) 1px,
+      var(--dk-wood) 2px,
+      var(--dk-wood) 6px,
+      var(--dk-wood-3) 7px,
+      var(--dk-wood) 9px,
+      var(--dk-wood) 14px
+    ),
+    var(--dk-wood);
+}
+
+/* Paper texture — warm, with grain dots */
+.dk-paper {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(60,40,10,0.04), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(60,40,10,0.03), transparent 35%),
+    var(--dk-paper);
+  color: var(--dk-ink);
+  position: relative;
+}
+
+/* Aged paper — for letters */
+.dk-paper-aged {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(120,80,30,0.10), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(120,80,30,0.08), transparent 60%),
+    var(--dk-paper-aged);
+  color: var(--dk-ink);
+}
+
+/* Object cast shadows — soft, warm */
+.dk-shadow {
+  box-shadow:
+    0 1px 0 rgba(255,230,180,0.05) inset,
+    0 4px 8px rgba(0,0,0,0.4),
+    0 16px 32px -8px rgba(0,0,0,0.6),
+    0 30px 60px -20px rgba(0,0,0,0.5);
+}
+
+.dk-eyebrow {
+  font-family: var(--dk-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dk-ink-faded);
+}
+
+.dk ::selection { background: var(--dk-spot); color: var(--dk-paper); }

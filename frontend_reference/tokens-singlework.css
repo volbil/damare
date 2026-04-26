@@ -1,0 +1,57 @@
+/* Direction B — Single-work feed
+   "TikTok for novels" but quiet. Scoped under .sw (single-work). */
+
+.sw {
+  --sw-bg: #0e0d0c;            /* near-black with warmth */
+  --sw-bg-2: #1a1816;
+  --sw-bg-3: #28241f;
+  --sw-paper: #f4ede0;          /* paper card on dark */
+  --sw-paper-2: #e8dfc9;
+  --sw-ink: #1a1814;
+  --sw-ink-2: #4a4438;
+  --sw-ink-3: #807960;
+  --sw-fg: #efe7d6;             /* warm white text on dark */
+  --sw-fg-2: rgba(239,231,214,0.6);
+  --sw-fg-3: rgba(239,231,214,0.35);
+  --sw-rule: rgba(239,231,214,0.14);
+
+  /* Verdict colors — used like ratings in old film magazines */
+  --sw-yes:  #c4a97a;            /* warm gold */
+  --sw-save: #7a9bc4;            /* paper blue */
+  --sw-no:   #6a635a;            /* worn grey */
+
+  --sw-display: 'Fraunces', 'Newsreader', serif;
+  --sw-body: 'Newsreader', Georgia, serif;
+  --sw-sans: 'Inter', system-ui, sans-serif;
+  --sw-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  font-family: var(--sw-body);
+  color: var(--sw-fg);
+  background: var(--sw-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sw h1, .sw h2, .sw h3 { margin: 0; font-family: var(--sw-display); font-weight: 500; }
+
+.sw-eyebrow {
+  font-family: var(--sw-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sw-fg-2);
+}
+
+.sw-num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+.sw ::selection { background: var(--sw-yes); color: var(--sw-bg); }
+
+/* The "card" — a single work, full presence */
+.sw-card {
+  background: var(--sw-paper);
+  color: var(--sw-ink);
+  border-radius: 6px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04),
+    0 30px 60px -20px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+}

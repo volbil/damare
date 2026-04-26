@@ -1,0 +1,29 @@
+{% from "components/icon.html" import icon %}
+
+{% set _page = page_title|default('') %}
+
+<header class="flex items-center gap-3 px-6 py-3 border-b border-line-soft bg-bg-0">
+    <div class="text-[13px] text-fg-2 min-w-[80px]">{{ _page }}</div>
+
+    <div class="flex-1 max-w-[480px] relative">
+        <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none">
+            {{ icon('search', 14) }}
+        </div>
+        <input
+            type="text"
+            placeholder="Пошук творів, авторів, тегів…"
+            class="w-full h-8 pl-8 pr-2.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-[12.5px] outline-none placeholder:text-fg-3" />
+        <kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-fg-3 font-mono bg-bg-2 px-[5px] py-px rounded-xs">⌘K</kbd>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <button class="btn ghost icon sm relative" title="Сповіщення">
+        {{ icon('bell', 15) }}
+        <span class="absolute top-[5px] right-[5px] w-1.5 h-1.5 rounded-full bg-accent"></span>
+    </button>
+    <a href="/editor" class="btn primary sm">
+        {{ icon('pen', 13) }}
+        <span>Написати</span>
+    </a>
+</header>

@@ -1,0 +1,109 @@
+/* Direction A — Editorial / Literary-magazine
+   Standalone token sheet. Scoped under .ed (editorial). */
+
+.ed {
+  /* Paper-stock palette — but warmer/dirtier than current Damare */
+  --ed-paper: #ece6d6;          /* aged newsprint */
+  --ed-paper-2: #e2dac6;        /* slightly darker margin */
+  --ed-paper-3: #d4caaf;
+  --ed-ink: #1a1814;            /* near-black, never pure */
+  --ed-ink-2: #2d2a22;
+  --ed-ink-3: #5a5345;          /* dust */
+  --ed-ink-4: #8a8472;
+  --ed-rule: #1a1814;           /* heavy, like print rules */
+
+  /* One color used like a print spot — warm rust, not pretty */
+  --ed-spot: #b84a23;           /* spot-color "second pass" */
+  --ed-spot-deep: #7e2f15;
+
+  /* Typography — display serif for masthead, working serif for body */
+  --ed-display: 'Fraunces', 'Newsreader', 'Times New Roman', serif;
+  --ed-body: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --ed-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ed-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  font-family: var(--ed-body);
+  color: var(--ed-ink);
+  background: var(--ed-paper);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'onum', 'liga', 'kern';
+}
+
+.ed h1, .ed h2, .ed h3, .ed h4 {
+  margin: 0;
+  font-family: var(--ed-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ed-ink);
+}
+
+/* Newsprint grain — extremely subtle */
+.ed-paper-bg {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(60,40,10,0.04), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(60,40,10,0.03), transparent 50%),
+    var(--ed-paper);
+}
+
+/* Heavy print rule — used ALL OVER editorial */
+.ed-rule { border-top: 1.5px solid var(--ed-ink); }
+.ed-rule-thin { border-top: 1px solid var(--ed-ink); }
+.ed-rule-double { border-top: 4px double var(--ed-ink); }
+.ed-rule-thick { border-top: 4px solid var(--ed-ink); }
+
+/* Folio / running header */
+.ed-folio {
+  font-family: var(--ed-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ed-ink-2);
+}
+
+/* Section eyebrow */
+.ed-eyebrow {
+  font-family: var(--ed-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ed-spot);
+}
+
+/* Drop cap helper */
+.ed-dropcap::first-letter {
+  font-family: var(--ed-display);
+  font-size: 4.2em;
+  line-height: 0.85;
+  font-weight: 600;
+  float: left;
+  margin: 0.06em 0.08em 0 -0.04em;
+  color: var(--ed-spot);
+}
+
+/* Tabular figures for run lengths */
+.ed-num { font-variant-numeric: tabular-nums oldstyle-nums; font-feature-settings: 'tnum', 'onum'; }
+
+/* Pulled-quote */
+.ed-pull {
+  font-family: var(--ed-display);
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ed-ink);
+  text-wrap: balance;
+}
+
+/* Issue masthead — newspaper-style nameplate */
+.ed-masthead {
+  font-family: var(--ed-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-size: 96px;
+  line-height: 0.85;
+  font-style: italic;
+}
+
+.ed ::selection { background: var(--ed-spot); color: var(--ed-paper); }
