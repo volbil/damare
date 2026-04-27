@@ -1,16 +1,18 @@
 @import "tailwindcss";
 
+@source "../templates/**/*.html";
+
 @theme {
-    /* Background scale (warm-tinted dark) */
-    --color-bg-0: oklch(0.16 0.008 60);
-    --color-bg-1: oklch(0.20 0.008 60);
-    --color-bg-2: oklch(0.235 0.009 60);
-    --color-bg-3: oklch(0.27 0.010 60);
-    --color-bg-4: oklch(0.32 0.012 60);
+    /* Background scale (sage-tinted dark) */
+    --color-bg-0: oklch(0.16 0.008 140);
+    --color-bg-1: oklch(0.20 0.008 140);
+    --color-bg-2: oklch(0.235 0.009 140);
+    --color-bg-3: oklch(0.27 0.010 140);
+    --color-bg-4: oklch(0.32 0.012 140);
 
     /* Lines */
-    --color-line: oklch(0.32 0.010 60 / 0.6);
-    --color-line-soft: oklch(0.32 0.010 60 / 0.3);
+    --color-line: oklch(0.32 0.010 140 / 0.6);
+    --color-line-soft: oklch(0.32 0.010 140 / 0.3);
 
     /* Foreground scale */
     --color-fg-0: oklch(0.96 0.005 80);
@@ -19,9 +21,9 @@
     --color-fg-3: oklch(0.50 0.008 70);
     --color-fg-4: oklch(0.38 0.008 65);
 
-    /* Accent (saffron / gold) */
-    --color-accent: #e8c547;
-    --color-accent-soft: oklch(0.82 0.13 90 / 0.16);
+    /* Accent (sage) */
+    --color-accent: #9bb89a;
+    --color-accent-soft: oklch(0.72 0.06 140 / 0.18);
     --color-accent-fg: oklch(0.18 0.01 80);
 
     /* Semantic */
@@ -137,7 +139,7 @@
         border-color: transparent;
         font-weight: 600;
     }
-    .btn.primary:hover { background: oklch(0.86 0.14 90); }
+    .btn.primary:hover { background: oklch(0.82 0.06 140); }
     .btn.ghost { background: transparent; }
     .btn.ghost:hover { background: var(--color-bg-2); }
     .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }

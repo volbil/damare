@@ -22,7 +22,7 @@
             {%- endif %}
         </div>
         <div>
-            <h3 class="text-sm font-serif font-medium leading-tight mb-[3px]">{{ novel.title }}</h3>
+            <h3 class="text-sm font-serif font-medium leading-tight mb-[3px] line-clamp-2">{{ novel.title }}</h3>
             <div class="text-[11.5px] text-fg-3">{{ novel.author }}</div>
             <div class="stat-row mt-2 text-[11px]">
                 <span class="stat">{{ icon('heart', 11) }}{{ novel.kudos | thousands_uk }}</span>
@@ -37,7 +37,7 @@
 
 {% macro novel_card_list(novel, show_cover=true) -%}
 <a href="/title/{{ novel.id }}" class="block">
-    <article class="cursor-pointer flex gap-3.5 p-4 rounded-lg bg-bg-1 border border-line-soft">
+    <article class="cursor-pointer flex items-start gap-3.5 p-4 rounded-lg bg-bg-1 border border-line-soft">
         {%- if show_cover %}
         <div class="cover w-[76px] flex-shrink-0">
             {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
@@ -45,7 +45,7 @@
         {%- endif %}
         <div class="flex-1 min-w-0 flex flex-col gap-1.5">
             <div class="flex items-baseline justify-between gap-3">
-                <h3 class="text-[15px] font-serif font-medium leading-tight">{{ novel.title }}</h3>
+                <h3 class="text-[15px] font-serif font-medium leading-tight line-clamp-2">{{ novel.title }}</h3>
                 <span class="tag rating">{{ novel.rating }}</span>
             </div>
             <div class="text-xs text-fg-3">

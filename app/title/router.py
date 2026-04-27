@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from .dependencies import validate_title_create
 from app.dependencies import auth_mandatory
 from app.dependencies import auth_optional
-from app.stub_data import NOVELS, novel_by_id
+from app.stub_data import NOVELS, READER_CHAPTER, TAGS, novel_by_id, READER_CHAPTER
 from app.schemas import FormResult
 from app.models import User
 from app import templates
@@ -12,11 +12,24 @@ router = APIRouter()
 
 
 CHAPTER_TITLES = [
-    "Поверненння", "Поштова скринька", "Лист, який ніхто не писав", "Тітка Ніна",
-    "Сон у понеділок", "Сніг на чорнилі", "Друге повернення", "Та, що обіцяла",
-    "Лист третій", "Вокзал у грудні", "Малий Андрій", "Ще один сніг",
-    "Розмова з матір'ю", "Лист, який не дійшов", "Сім ночей", "Сімдесят сім",
-    "Лист останній", "Та, що залишилась",
+    "Я помер. Знову.",
+    "Прокинулась у дівочому тілі",
+    "Хвіст. Чому хвіст?",
+    "Аптекаря не існує — це я",
+    "Принцеса повертається з могили",
+    "Перший пацієнт — генерал",
+    "Що це за магія, я ж хімік",
+    "Дисертація знайшла мене",
+    "Бал, на якому всі помирають",
+    "Тітка Степанида знає більше",
+    "Хвіст — це політична проблема",
+    "Імператор має нежить",
+    "Лабораторія в підвалі замку",
+    "Я отруїв міністра (ненавмисне)",
+    "Чи могла я просто не помирати?",
+    "Принц, що ставить незручні питання",
+    "Стара академія, нові правила",
+    "Хімія — це теж магія",
 ]
 
 CHAPTER_DATES = [
@@ -60,6 +73,50 @@ async def title(
             "novel": novel,
             "chapters": chapters,
             "similar": similar,
+        },
+    )
+
+
+@router.get("/title/{novel_id}/read")
+async def read_chapter(
+    request: Request,
+    novel_id: str,
+    user: User | None = Depends(auth_optional),
+):
+    novel = novel_by_id(novel_id) or NOVELS[0]
+    chapters = _build_chapters(novel)
+    current_no = READER_CHAPTER["chapter_no"]
+    prev_chapter = chapters[current_no - 2] if current_no > 1 else None
+    next_chapter = chapters[current_no] if current_no < len(chapters) else None
+
+    return templates.TemplateResponse(
+        "reader/reader.html",
+        {
+            "request": request,
+            "user": user,
+            "novel": novel,
+            "chapter": READER_CHAPTER,
+            "prev_chapter": prev_chapter,
+            "next_chapter": next_chapter,
+        },
+    )
+
+
+@router.get("/search")
+async def search(request: Request, user: User | None = Depends(auth_optional)):
+    return templates.TemplateResponse(
+        "search/search.html",
+        {
+            "request": request,
+            "user": user,
+            "active": "discover",
+            "page_title": "Пошук",
+            "query": "зимові",
+            "active_tags": ["містика", "повільне горіння"],
+            "excluded_tags": ["насильство", "смерть персонажа"],
+            "popular_tags": TAGS,
+            "result_count": 1284,
+            "results": NOVELS[:5],
         },
     )
 

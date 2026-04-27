@@ -10,7 +10,7 @@
             {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
             <div class="absolute inset-0" style="background: linear-gradient(180deg, transparent 0%, var(--color-bg-0) 90%);"></div>
         </div>
-        <div class="relative max-w-[960px] mx-auto px-8 pt-10 pb-8 flex gap-7">
+        <div class="relative max-w-[1080px] mx-auto px-8 pt-10 pb-8 flex gap-7">
             <div class="cover w-[200px] shrink-0 shadow-lg">
                 {{ cover(novel.title, novel.author, novel.id) }}
             </div>
@@ -26,13 +26,13 @@
                     <span class="tag bg-transparent" style="border-color: var(--color-line);">{{ novel.status }}</span>
                     <span class="tag bg-transparent" style="border-color: var(--color-line);">Українська</span>
                 </div>
-                <h1 class="font-serif text-[40px] font-medium leading-[1.05] mb-2 tracking-tight">{{ novel.title }}</h1>
+                <h1 class="font-serif text-[40px] font-medium leading-[1.05] mb-2 tracking-tight line-clamp-2">{{ novel.title }}</h1>
                 <div class="text-sm text-fg-2 mb-4">
                     від <a href="#" class="text-accent underline underline-offset-[3px]">{{ novel.author }}</a>
                 </div>
                 <p class="text-sm leading-[1.65] text-fg-1 max-w-[560px] mb-5">{{ novel.summary }}</p>
                 <div class="flex gap-2.5 mb-5 flex-wrap">
-                    <a href="#" class="btn primary">{{ icon('book', 14) }} Почати читати</a>
+                    <a href="/title/{{ novel.id }}/read" class="btn primary">{{ icon('book', 14) }} Почати читати</a>
                     <button class="btn">{{ icon('bookmark', 14) }} Зберегти</button>
                     <button class="btn">{{ icon('heart', 14) }} {{ novel.kudos | thousands_uk }}</button>
                     <button class="btn icon">{{ icon('more', 15) }}</button>
@@ -48,7 +48,7 @@
     </div>
 
     {# Body #}
-    <div class="max-w-[960px] mx-auto px-8 pt-8 pb-20 grid grid-cols-[1fr_260px] gap-10">
+    <div class="max-w-[1080px] mx-auto px-8 pt-8 pb-20 grid grid-cols-[1fr_260px] gap-10">
         <div>
             {# Tags #}
             <section class="mb-7">
@@ -72,17 +72,19 @@
                 </div>
                 <ol class="m-0 p-0 list-none border border-line-soft rounded-lg overflow-hidden bg-bg-1">
                     {%- for ch in chapters[:8] %}
-                    <li class="flex items-center gap-3.5 px-4 py-3 border-b border-line-soft {% if ch.current %}cursor-pointer{% endif %}" {% if ch.current %}style="background: var(--color-accent-soft);"{% endif %}>
-                        <span class="w-7 text-xs text-fg-3 tabular-nums text-right">{{ "%02d"|format(ch.no) }}</span>
-                        <div class="flex-1">
-                            <div class="text-[13.5px] mb-0.5 {% if ch.current %}text-accent font-medium{% else %}text-fg-0{% endif %}">{{ ch.title }}</div>
-                            <div class="text-[11px] text-fg-3">{{ ch.words | thousands_uk }} слів · {{ ch.date }}</div>
-                        </div>
-                        {%- if ch.read %}
-                        <span class="text-fg-3">{{ icon('check', 13) }}</span>
-                        {%- elif ch.current %}
-                        <span class="text-[10px] text-accent font-semibold tracking-[0.06em] uppercase">Зараз</span>
-                        {%- endif %}
+                    <li class="border-b border-line-soft" {% if ch.current %}style="background: var(--color-accent-soft);"{% endif %}>
+                        <a href="{% if ch.current %}/title/{{ novel.id }}/read{% else %}#{% endif %}" class="flex items-center gap-3.5 px-4 py-3 {% if ch.current %}cursor-pointer{% endif %}">
+                            <span class="w-7 text-xs text-fg-3 tabular-nums text-right">{{ "%02d"|format(ch.no) }}</span>
+                            <div class="flex-1">
+                                <div class="text-[13.5px] mb-0.5 {% if ch.current %}text-accent font-medium{% else %}text-fg-0{% endif %}">{{ ch.title }}</div>
+                                <div class="text-[11px] text-fg-3">{{ ch.words | thousands_uk }} слів · {{ ch.date }}</div>
+                            </div>
+                            {%- if ch.read %}
+                            <span class="text-fg-3">{{ icon('check', 13) }}</span>
+                            {%- elif ch.current %}
+                            <span class="text-[10px] text-accent font-semibold tracking-[0.06em] uppercase">Зараз</span>
+                            {%- endif %}
+                        </a>
                     </li>
                     {%- endfor %}
                     {%- if novel.chapter_count > 8 %}
