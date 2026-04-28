@@ -1,5 +1,4 @@
 {% from "components/icon.html" import icon %}
-{% from "components/logomark.html" import logomark %}
 
 {% set _active = active|default('') %}
 
@@ -18,9 +17,9 @@
 
 <nav x-data="{ menu: false }" class="border-b border-line-soft bg-bg-0 sticky top-0 z-20">
     <div class="max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center gap-3 md:gap-6">
-        <a href="/" class="flex items-center gap-2 shrink-0">
-            {{ logomark(24) }}
-            <span class="font-semibold text-[17px] text-fg-0 tracking-tight">damare</span>
+        <a href="/" class="flex items-center gap-1 shrink-0">
+            <span class="font-bold text-[18px] text-fg-0 tracking-tight">damare</span>
+            <span class="redact-bar text-accent"></span>
         </a>
 
         {# Hamburger (mobile only) #}

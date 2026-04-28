@@ -44,9 +44,9 @@
 {%- set ty = 50 if lay == 5 else 240 -%}
 {%- set ay = 66 if lay == 5 else 256 -%}
 {%- set short_title = (title[:21] ~ '…') if title|length > 22 else title -%}
-<text x="20" y="{{ ty }}" font-family="Newsreader, Georgia, serif" font-size="16" font-weight="500" fill="{{ ink }}" style="letter-spacing: -0.01em;">{{ short_title }}</text>
+<text x="20" y="{{ ty }}" font-family="IBM Plex Serif, Georgia, serif" font-size="16" font-weight="500" fill="{{ ink }}" style="letter-spacing: -0.01em;">{{ short_title }}</text>
 {%- if author -%}
-<text x="20" y="{{ ay }}" font-family="Inter, sans-serif" font-size="9" fill="{{ ink }}" fill-opacity="0.65" style="letter-spacing: 0.05em; text-transform: uppercase;">{{ author }}</text>
+<text x="20" y="{{ ay }}" font-family="IBM Plex Sans, sans-serif" font-size="9" fill="{{ ink }}" fill-opacity="0.65" style="letter-spacing: 0.05em; text-transform: uppercase;">{{ author }}</text>
 {%- endif -%}
 {%- endif -%}
 </svg>
