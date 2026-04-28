@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from .dependencies import validate_title_create
 from app.dependencies import auth_mandatory
 from app.dependencies import auth_optional
-from app.stub_data import NOVELS, READER_CHAPTER, TAGS, novel_by_id, READER_CHAPTER
+from app.stub_data import NOVELS, NOTIFICATIONS, READER_CHAPTER, TAGS, novel_by_id, READER_CHAPTER
 from app.schemas import FormResult
 from app.models import User
 from app import templates
@@ -117,6 +117,67 @@ async def search(request: Request, user: User | None = Depends(auth_optional)):
             "popular_tags": TAGS,
             "result_count": 1284,
             "results": NOVELS[:5],
+        },
+    )
+
+
+@router.get("/profile")
+async def profile(
+    request: Request,
+    user: User | None = Depends(auth_optional),
+    tab: str = "works",
+):
+    valid_tabs = {"works", "reading", "finished", "lists", "activity"}
+    if tab not in valid_tabs:
+        tab = "works"
+
+    own_works = NOVELS[:3]
+    reading = NOVELS[:4]
+    finished = [NOVELS[1], NOVELS[4], NOVELS[6]]
+
+    lists = [
+        {"name": "Зимове читання", "count": 12, "novels": NOVELS[:4]},
+        {"name": "Перечитати", "count": 8, "novels": NOVELS[2:6]},
+        {"name": "Українське фентезі", "count": 24, "novels": NOVELS[4:8]},
+        {"name": "Ще не торкалась", "count": 6, "novels": NOVELS[1:5]},
+    ]
+
+    profile_data = {
+        "name": "Калина Левчук",
+        "handle": "kalyna_l",
+        "location": "Київ",
+        "joined": "березня 2024",
+        "bio": "Пишу про маленькі міста, листи, які не дійшли, і людей, що повертаються. Магічний реалізм, повільне горіння, зимові настрої. Інколи борщ.",
+        "stats": [
+            {"value": "12", "label": "творів"},
+            {"value": "4.2k", "label": "читачів"},
+            {"value": "38k", "label": "kudos"},
+        ],
+    }
+
+    tabs = [
+        {"id": "works", "label": "Твори", "count": len(own_works)},
+        {"id": "reading", "label": "Зараз читає", "count": len(reading)},
+        {"id": "finished", "label": "Прочитано", "count": len(finished)},
+        {"id": "lists", "label": "Колекції", "count": len(lists)},
+        {"id": "activity", "label": "Активність", "count": None},
+    ]
+
+    return templates.TemplateResponse(
+        "profile/profile.html",
+        {
+            "request": request,
+            "user": user,
+            "active": "library",
+            "page_title": "Профіль",
+            "active_tab": tab,
+            "profile": profile_data,
+            "own_works": own_works,
+            "reading": reading,
+            "finished": finished,
+            "lists": lists,
+            "notifications": NOTIFICATIONS,
+            "tabs": tabs,
         },
     )
 

@@ -6,7 +6,7 @@
 {% set _nav_items = [
     ('home', 'Стрічка', '/'),
     ('discover', 'Огляд', '/search'),
-    ('library', 'Бібліотека', '#'),
+    ('library', 'Бібліотека', '/profile'),
     ('bookmarks', 'Закладки', '#'),
 ] %}
 
@@ -49,7 +49,7 @@
         </a>
 
         {% if user %}
-        <a href="#" class="avatar w-8 h-8 shrink-0 hover:opacity-80 transition" title="{{ user.username }}">
+        <a href="/profile" class="avatar w-8 h-8 shrink-0 hover:opacity-80 transition" title="{{ user.username }}">
             {{ user.username[:2]|upper }}
         </a>
         {% else %}

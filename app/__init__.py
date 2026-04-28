@@ -1,5 +1,6 @@
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 from app.database import sessionmanager
 from app.utils import get_settings, cover_palette, cover_layout
@@ -46,6 +47,8 @@ def create_app(init_db: bool = True) -> FastAPI:
     app = FastAPI(
         lifespan=lifespan,
     )
+
+    app.add_middleware(GZipMiddleware, minimum_size=1000)
 
     app.mount(
         "/static",

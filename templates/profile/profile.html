@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+{% from "components/novel_card.html" import novel_card %}
+
+{% block content %}
+<div class="bg-bg-0">
+    {# Banner #}
+    <div class="h-[140px] border-b border-line-soft" style="background: linear-gradient(120deg, oklch(0.28 0.04 140) 0%, oklch(0.22 0.02 130) 50%, oklch(0.20 0.03 120) 100%);"></div>
+
+    <div class="max-w-[1080px] mx-auto px-8 pb-20">
+        {# Header #}
+        <div class="flex items-end gap-5 -mt-[52px] mb-7">
+            <div class="avatar border-4 border-bg-0 bg-accent text-accent-fg" style="width: 104px; height: 104px; font-size: 36px;">
+                {{ profile.name | initials }}
+            </div>
+            <div class="flex-1 pb-2">
+                <h1 class="text-2xl font-semibold mb-0.5">{{ profile.name }}</h1>
+                <div class="text-[13px] text-fg-3">@{{ profile.handle }} · {{ profile.location }} · з {{ profile.joined }}</div>
+            </div>
+            <div class="flex gap-2 pb-2">
+                <button type="button" class="btn">{{ icon('mail', 14) }} Повідомлення</button>
+                <button type="button" class="btn primary">{{ icon('plus', 13) }} Стежити</button>
+            </div>
+        </div>
+
+        {# Bio + stats #}
+        <div class="grid grid-cols-[1fr_280px] gap-8 mb-7">
+            <p class="text-sm leading-[1.65] text-fg-1 max-w-[600px] m-0">{{ profile.bio }}</p>
+            <div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden">
+                {%- for stat in profile.stats %}
+                <div class="bg-bg-1 px-2.5 py-3 text-center">
+                    <div class="text-[17px] font-semibold text-fg-0 tabular-nums">{{ stat.value }}</div>
+                    <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">{{ stat.label }}</div>
+                </div>
+                {%- endfor %}
+            </div>
+        </div>
+
+        {# Tabs #}
+        <div class="flex border-b border-line-soft mb-6">
+            {%- for t in tabs %}
+            <a href="?tab={{ t.id }}" class="px-4 py-3 text-[13px] flex items-center gap-1.5 border-b-2 -mb-px {% if t.id == active_tab %}text-fg-0 font-medium border-accent{% else %}text-fg-3 border-transparent hover:text-fg-1{% endif %}">
+                {{ t.label }}
+                {%- if t.count is not none %}
+                <span class="text-[11px] text-fg-4 tabular-nums">{{ t.count }}</span>
+                {%- endif %}
+            </a>
+            {%- endfor %}
+        </div>
+
+        {# Tab body #}
+        {%- if active_tab == 'works' %}
+        <div class="grid grid-cols-4 gap-[18px]">
+            {%- for n in own_works %}
+            {{ novel_card(n) }}
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'reading' %}
+        <div class="flex flex-col gap-2.5">
+            {%- for n in reading %}
+            <a href="/title/{{ n.id }}/read" class="flex items-start gap-4 p-3.5 bg-bg-1 border border-line-soft rounded-lg cursor-pointer">
+                <div class="cover w-14 shrink-0">
+                    {{ cover(n.title, n.author, n.id, show_text=false) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-serif text-[15px] mb-0.5 line-clamp-2">{{ n.title }}</div>
+                    <div class="text-xs text-fg-3 mb-2">{{ n.author }} · Розділ {{ n.chapters }} з {{ n.chapter_count }}</div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="flex-1 h-0.5 bg-bg-3 rounded-full">
+                            <div class="h-full bg-accent rounded-full" style="width: {{ n.progress or 35 }}%;"></div>
+                        </div>
+                        <span class="text-[11px] text-fg-3 tabular-nums">{{ n.progress or 35 }}%</span>
+                    </div>
+                </div>
+                <span class="btn sm">Продовжити</span>
+            </a>
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'finished' %}
+        <div class="grid grid-cols-4 gap-[18px]">
+            {%- for n in finished %}
+            {{ novel_card(n) }}
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'lists' %}
+        <div class="grid grid-cols-3 gap-3.5">
+            {%- for list in lists %}
+            <div class="p-4 bg-bg-1 border border-line-soft rounded-lg cursor-pointer">
+                <div class="grid grid-cols-4 gap-1 mb-3">
+                    {%- for n in list.novels %}
+                    <div class="cover" style="aspect-ratio: 2/3;">
+                        {{ cover(n.title, n.author, n.id, show_text=false) }}
+                    </div>
+                    {%- endfor %}
+                </div>
+                <div class="font-serif text-[15px] mb-0.5">{{ list.name }}</div>
+                <div class="text-[11px] text-fg-3">{{ list.count }} творів</div>
+            </div>
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'activity' %}
+        <div class="flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
+            {%- for n in notifications %}
+            <div class="flex gap-3 px-[18px] py-3.5 {% if not loop.last %}border-b border-line-soft{% endif %} {% if not n.read %}bg-accent/5{% endif %}">
+                <div class="w-7 h-7 shrink-0 rounded-full bg-bg-2 flex items-center justify-center {% if n.type == 'kudos' %}text-love{% elif n.type == 'comment' %}text-info{% elif n.type == 'follow' %}text-accent{% elif n.type == 'update' %}text-fg-1{% else %}text-fg-2{% endif %}">
+                    {%- if n.type == 'kudos' %}{{ icon('heart-fill', 13) }}
+                    {%- elif n.type == 'comment' %}{{ icon('message', 13) }}
+                    {%- elif n.type == 'follow' %}{{ icon('plus', 13) }}
+                    {%- elif n.type == 'update' %}{{ icon('rss', 13) }}
+                    {%- else %}{{ icon('bookmark', 13) }}
+                    {%- endif %}
+                </div>
+                <div class="flex-1 text-[13px] text-fg-1">
+                    <span class="text-fg-0 font-medium">{{ n.user }}</span>
+                    {{ n.text }}{% if n.target %} <span class="text-accent">«{{ n.target }}»</span>{% endif %}
+                    <div class="text-[11px] text-fg-3 mt-0.5">{{ n.time }}</div>
+                </div>
+                {%- if not n.read %}
+                <span class="w-1.5 h-1.5 rounded-full bg-accent self-center"></span>
+                {%- endif %}
+            </div>
+            {%- endfor %}
+        </div>
+        {%- endif %}
+    </div>
+</div>
+{% endblock %}
