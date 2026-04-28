@@ -6,26 +6,26 @@
 {% block content %}
 <div class="bg-bg-0">
     {# Banner #}
-    <div class="h-[140px] border-b border-line-soft" style="background: linear-gradient(120deg, oklch(0.28 0.04 140) 0%, oklch(0.22 0.02 130) 50%, oklch(0.20 0.03 120) 100%);"></div>
+    <div class="h-[100px] md:h-[140px] border-b border-line-soft" style="background: linear-gradient(120deg, oklch(0.28 0.04 140) 0%, oklch(0.22 0.02 130) 50%, oklch(0.20 0.03 120) 100%);"></div>
 
-    <div class="max-w-[1080px] mx-auto px-8 pb-20">
+    <div class="max-w-[1080px] mx-auto px-4 md:px-8 pb-16 md:pb-20">
         {# Header #}
-        <div class="flex items-end gap-5 -mt-[52px] mb-7">
-            <div class="avatar border-4 border-bg-0 bg-accent text-accent-fg" style="width: 104px; height: 104px; font-size: 36px;">
+        <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5 -mt-[40px] md:-mt-[52px] mb-7">
+            <div class="avatar border-4 border-bg-0 bg-accent text-accent-fg shrink-0 w-20 h-20 md:w-[104px] md:h-[104px] text-2xl md:text-[36px]">
                 {{ profile.name | initials }}
             </div>
-            <div class="flex-1 pb-2">
+            <div class="flex-1 sm:pb-2">
                 <h1 class="text-2xl font-semibold mb-0.5">{{ profile.name }}</h1>
                 <div class="text-[13px] text-fg-3">@{{ profile.handle }} · {{ profile.location }} · з {{ profile.joined }}</div>
             </div>
-            <div class="flex gap-2 pb-2">
+            <div class="flex gap-2 sm:pb-2 flex-wrap">
                 <button type="button" class="btn">{{ icon('mail', 14) }} Повідомлення</button>
                 <button type="button" class="btn primary">{{ icon('plus', 13) }} Стежити</button>
             </div>
         </div>
 
         {# Bio + stats #}
-        <div class="grid grid-cols-[1fr_280px] gap-8 mb-7">
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 md:gap-8 mb-7">
             <p class="text-sm leading-[1.65] text-fg-1 max-w-[600px] m-0">{{ profile.bio }}</p>
             <div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden">
                 {%- for stat in profile.stats %}
@@ -38,7 +38,7 @@
         </div>
 
         {# Tabs #}
-        <div class="flex border-b border-line-soft mb-6">
+        <div class="flex border-b border-line-soft mb-6 overflow-x-auto">
             {%- for t in tabs %}
             <a href="?tab={{ t.id }}" class="px-4 py-3 text-[13px] flex items-center gap-1.5 border-b-2 -mb-px {% if t.id == active_tab %}text-fg-0 font-medium border-accent{% else %}text-fg-3 border-transparent hover:text-fg-1{% endif %}">
                 {{ t.label }}
@@ -51,7 +51,7 @@
 
         {# Tab body #}
         {%- if active_tab == 'works' %}
-        <div class="grid grid-cols-4 gap-[18px]">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
             {%- for n in own_works %}
             {{ novel_card(n) }}
             {%- endfor %}
@@ -80,14 +80,14 @@
         </div>
 
         {%- elif active_tab == 'finished' %}
-        <div class="grid grid-cols-4 gap-[18px]">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
             {%- for n in finished %}
             {{ novel_card(n) }}
             {%- endfor %}
         </div>
 
         {%- elif active_tab == 'lists' %}
-        <div class="grid grid-cols-3 gap-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {%- for list in lists %}
             <div class="p-4 bg-bg-1 border border-line-soft rounded-lg cursor-pointer">
                 <div class="grid grid-cols-4 gap-1 mb-3">

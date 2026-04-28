@@ -3,7 +3,7 @@
 {% from "components/segmented.html" import segmented %}
 
 {% block content %}
-<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
     {# Header #}
     <div class="flex items-end justify-between mb-7 flex-wrap gap-4">
         <div>
@@ -14,7 +14,7 @@
     </div>
 
     {# Categories #}
-    <div class="grid grid-cols-3 gap-3.5 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-8">
         {%- for c in categories %}
         <a href="#" class="p-4 bg-bg-1 border border-line-soft rounded-lg flex gap-3 items-start hover:border-line transition">
             <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background: {{ c.color }}22; color: {{ c.color }};">

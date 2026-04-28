@@ -10,14 +10,27 @@
     ('bookmarks', 'Закладки', '#'),
 ] %}
 
-<nav class="border-b border-line-soft bg-bg-0 sticky top-0 z-20">
-    <div class="max-w-[1280px] mx-auto px-6 h-14 flex items-center gap-6">
+{% set _community_items = [
+    ('Громада', '/forums'),
+    ('Записник', '/articles'),
+    ('Автори', '/feed'),
+] %}
+
+<nav x-data="{ menu: false }" class="border-b border-line-soft bg-bg-0 sticky top-0 z-20">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center gap-3 md:gap-6">
         <a href="/" class="flex items-center gap-2 shrink-0">
             {{ logomark(24) }}
             <span class="font-semibold text-[17px] text-fg-0 tracking-tight">damare</span>
         </a>
 
-        <div class="flex items-center gap-0.5">
+        {# Hamburger (mobile only) #}
+        <button type="button" @click="menu = !menu" class="md:hidden btn ghost icon sm" aria-label="Меню">
+            <span x-show="!menu">{{ icon('menu', 18) }}</span>
+            <span x-show="menu" style="display: none;">{{ icon('x', 18) }}</span>
+        </button>
+
+        {# Desktop nav #}
+        <div class="hidden md:flex items-center gap-0.5">
             {%- for id, label, href in _nav_items %}
             <a href="{{ href }}" class="px-3 py-2 rounded-md text-[13px] font-medium {% if _active == id %}bg-bg-2 text-fg-0{% else %}text-fg-2 hover:text-fg-0 hover:bg-bg-2/50{% endif %}">
                 {{ label }}
@@ -30,16 +43,17 @@
                     {{ icon('chevron-d', 12) }}
                 </button>
                 <div x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms class="absolute top-full left-0 mt-1 w-44 bg-bg-1 border border-line-soft rounded-md shadow-lg overflow-hidden z-30" style="display: none;">
-                    <a href="/forums" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Громада</a>
-                    <a href="/articles" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Записник</a>
-                    <a href="/feed" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Автори</a>
+                    {%- for label, href in _community_items %}
+                    <a href="{{ href }}" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">{{ label }}</a>
+                    {%- endfor %}
                 </div>
             </div>
         </div>
 
         <div class="flex-1"></div>
 
-        <div class="relative w-64 hidden md:block">
+        {# Search (lg+ only) #}
+        <div class="relative w-64 hidden lg:block">
             <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none">
                 {{ icon('search', 14) }}
             </div>
@@ -50,14 +64,16 @@
             <kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-fg-3 font-mono bg-bg-2 px-[5px] py-px rounded-xs">⌘K</kbd>
         </div>
 
-        <button class="btn ghost icon sm relative" title="Сповіщення">
+        {# Bell (md+ only) #}
+        <button type="button" class="hidden md:inline-flex btn ghost icon sm relative" title="Сповіщення">
             {{ icon('bell', 15) }}
             <span class="absolute top-[5px] right-[5px] w-1.5 h-1.5 rounded-full bg-accent"></span>
         </button>
 
+        {# Написати CTA (icon-only on <sm) #}
         <a href="/editor" class="btn primary sm">
             {{ icon('pen', 13) }}
-            <span>Написати</span>
+            <span class="hidden sm:inline">Написати</span>
         </a>
 
         {% if user %}
@@ -67,5 +83,23 @@
         {% else %}
         <a href="/login" class="btn sm">Увійти</a>
         {% endif %}
+    </div>
+
+    {# Mobile menu panel #}
+    <div x-show="menu" x-transition.duration.150ms class="md:hidden border-t border-line-soft bg-bg-0" style="display: none;">
+        <div class="p-3 flex flex-col gap-0.5">
+            {%- for id, label, href in _nav_items %}
+            <a href="{{ href }}" class="px-3 py-2.5 rounded-md text-sm font-medium {% if _active == id %}bg-bg-2 text-fg-0{% else %}text-fg-2{% endif %}">
+                {{ label }}
+            </a>
+            {%- endfor %}
+
+            <div class="px-3 pt-3 pb-1.5 text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3">Спільнота</div>
+            {%- for label, href in _community_items %}
+            <a href="{{ href }}" class="px-3 py-2.5 rounded-md text-sm {% if _active == 'community' %}bg-bg-2 text-fg-0{% else %}text-fg-2{% endif %}">
+                {{ label }}
+            </a>
+            {%- endfor %}
+        </div>
     </div>
 </nav>

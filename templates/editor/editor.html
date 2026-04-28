@@ -21,9 +21,9 @@
     </div>
 
     {# Editor area + right rail #}
-    <div class="flex-1 grid grid-cols-[1fr_280px]">
+    <div class="flex-1 grid grid-cols-1 md:grid-cols-[1fr_280px]">
         <div class="py-8">
-            <div class="max-w-[680px] mx-auto px-8">
+            <div class="max-w-[680px] mx-auto px-4 md:px-8">
                 {# Toolbar #}
                 <div class="flex items-center gap-0.5 px-1.5 py-1 bg-bg-1 border border-line-soft rounded-md mb-8 w-fit">
                     <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('type', 14) }}</button>
@@ -50,7 +50,7 @@
         </div>
 
         {# Right rail #}
-        <aside class="border-l border-line-soft bg-bg-0 p-5">
+        <aside class="md:border-l border-t md:border-t-0 border-line-soft bg-bg-0 p-4 md:p-5">
             {# Stats #}
             <section class="mb-6">
                 <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2.5">Статистика</h4>

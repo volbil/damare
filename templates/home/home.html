@@ -4,7 +4,7 @@
 {% from "components/novel_card.html" import novel_card %}
 
 {% block content %}
-<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
 
     {# Continue reading #}
     <section class="mb-9">
@@ -13,7 +13,7 @@
             <a href="#" class="text-xs text-fg-3 hover:text-fg-1">Уся бібліотека →</a>
         </div>
         <a href="/title/{{ continue_reading.id }}/read" class="block">
-            <div class="flex items-start gap-5 p-5 border border-line-soft rounded-lg cursor-pointer" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
+            <div class="flex flex-col md:flex-row md:items-start gap-5 p-4 md:p-5 border border-line-soft rounded-lg cursor-pointer" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
                 <div class="cover w-[120px] shrink-0">
                     {{ cover(continue_reading.title, continue_reading.author, continue_reading.id, show_text=false) }}
                 </div>
@@ -76,7 +76,7 @@
             </h2>
             <a href="#" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
         </div>
-        <div class="grid grid-cols-4 gap-[18px]">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
             {%- for n in trending %}
             {{ novel_card(n, with_covers=true) }}
             {%- endfor %}
@@ -88,7 +88,7 @@
         <div class="flex items-baseline justify-between mb-3.5">
             <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Нещодавно оновлені</h2>
         </div>
-        <div class="grid grid-cols-4 gap-[18px]">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
             {%- for n in new_releases %}
             {{ novel_card(n, with_covers=true) }}
             {%- endfor %}

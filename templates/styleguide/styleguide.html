@@ -26,7 +26,7 @@
 {% endmacro %}
 
 {% block content %}
-<div class="max-w-[1200px] mx-auto px-8 pt-10 pb-20">
+<div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-10 pb-20">
     {# Header #}
     <header class="mb-8">
         <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-2">Damare · Devtools</div>
@@ -48,7 +48,7 @@
         <p class="text-sm text-fg-3 mb-8">Дизайн-система — кольори, типографіка, радіуси, тіні. Живуть у <code class="font-mono text-[12px] bg-bg-2 px-1.5 py-0.5 rounded">static/input.css</code> під <code class="font-mono text-[12px] bg-bg-2 px-1.5 py-0.5 rounded">@theme</code>.</p>
 
         {% call entry("Кольори", "Палітра з префіксом --color-*. Доступні як Tailwind-утиліти (bg-bg-0, text-fg-1, border-line-soft).") %}
-        <div class="grid grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {%- for c in tokens.colors %}
             <div class="rounded-md border border-line-soft overflow-hidden">
                 <div class="h-16" style="background: var(--color-{{ c }});"></div>
@@ -79,7 +79,7 @@
         {% endcall %}
 
         {% call entry("Радіуси") %}
-        <div class="grid grid-cols-5 gap-3 p-6 bg-bg-1 border border-line-soft rounded-md">
+        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 p-6 bg-bg-1 border border-line-soft rounded-md">
             {%- for r, px in [('xs', '4px'), ('sm', '6px'), ('md', '10px'), ('lg', '14px'), ('xl', '20px')] %}
             <div class="text-center">
                 <div class="bg-bg-3 mx-auto mb-2" style="width: 80px; height: 80px; border-radius: var(--radius-{{ r }});"></div>
@@ -108,7 +108,7 @@
         <p class="text-sm text-fg-3 mb-8">Базові будівельні блоки: іконки, кнопки, теги, маленькі картки.</p>
 
         {% call entry("Іконка", "Векторні штрихові 24×24, успадковують currentColor. 52 варіанти. Назви, що закінчуються на -fill, мають заповнений варіант.") %}
-        <div class="grid grid-cols-8 gap-2 p-4 bg-bg-1 border border-line-soft rounded-md mb-3">
+        <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 p-4 bg-bg-1 border border-line-soft rounded-md mb-3">
             {%- for name in icon_names %}
             <div class="flex flex-col items-center gap-1.5 p-2 hover:bg-bg-2 rounded-md cursor-pointer" title="{{ name }}">
                 <div class="text-fg-0">{{ icon(name, 18) }}</div>

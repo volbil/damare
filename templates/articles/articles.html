@@ -3,7 +3,7 @@
 {% from "components/segmented.html" import segmented %}
 
 {% block content %}
-<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
     {# Header #}
     <div class="mb-7">
         <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-2.5">Damare · Записник</div>
@@ -23,7 +23,7 @@
     </div>
 
     {# Featured #}
-    <article class="grid grid-cols-[1.4fr_1fr] gap-8 p-7 mb-10 border border-line-soft rounded-lg" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
+    <article class="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6 md:gap-8 p-5 md:p-7 mb-10 border border-line-soft rounded-lg" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
         <div>
             <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-3">Есей тижня</div>
             <h2 class="font-serif text-3xl font-medium leading-[1.15] tracking-tight mb-3">{{ featured.title }}</h2>
@@ -63,7 +63,7 @@
         {{ segmented(['Найсвіжіші', 'Найпопулярніші', 'Найчитаніші'], 'Найсвіжіші', small=true) }}
     </div>
 
-    <div class="grid grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {%- for a in articles %}
         <a href="#" class="p-5 bg-bg-1 border border-line-soft rounded-lg cursor-pointer flex flex-col hover:border-line transition">
             <div class="flex items-center gap-2 mb-3 flex-wrap">

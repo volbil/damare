@@ -4,7 +4,7 @@
 {% block app %}
 <div class="h-screen overflow-auto bg-bg-0 relative">
     {# Sticky mini-bar #}
-    <div class="sticky top-0 z-10 backdrop-blur-md border-b border-white/5 bg-bg-0/95 px-6 py-3 flex items-center gap-4">
+    <div class="sticky top-0 z-10 backdrop-blur-md border-b border-white/5 bg-bg-0/95 px-4 md:px-6 py-3 flex items-center gap-3 md:gap-4">
         <a href="/title/{{ novel.id }}" class="flex items-center gap-1.5 text-fg-3 text-xs hover:text-fg-1 max-w-[300px]">
             {{ icon('arrow-l', 13) }}
             <span class="truncate">{{ novel.title | truncate(40) }}</span>
@@ -18,7 +18,7 @@
     </div>
 
     {# Article #}
-    <article class="mx-auto px-8 pt-16 pb-32" style="max-width: 640px;">
+    <article class="mx-auto px-4 md:px-8 pt-10 md:pt-16 pb-20 md:pb-32" style="max-width: 640px;">
         <div class="text-[11px] text-fg-3 tracking-[0.1em] uppercase text-center mb-2">
             Розділ {{ chapter.chapter_no }}
         </div>
@@ -57,7 +57,7 @@
                 </button>
             </div>
 
-            <div class="flex justify-between gap-4">
+            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
                 {%- if prev_chapter %}
                 <a href="#" class="flex-1 text-left p-4 rounded-lg border border-white/5" style="background: rgba(255,255,255,0.03);">
                     <div class="text-[11px] text-fg-3 mb-1">← Розділ {{ prev_chapter.no }}</div>
