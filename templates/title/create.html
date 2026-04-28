@@ -2,99 +2,95 @@
 
 {% from "components/genres.html" import genres_select %}
 
-{% macro simple_input(label, name, type="text") %}
-<div>
-    <label for="{{ name }}" class="block mb-1 text-green-400 select-none">{{ label }}</label>
+{% macro labeled_input(label, name, type="text") %}
+<label class="flex flex-col gap-1.5">
+    <span class="text-[12px] text-fg-3">{{ label }}</span>
     <input
-        class="leading-tight w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none h-10"
         type="{{ type }}"
         name="{{ name }}"
-        id="{{ name }}">
-</div>
+        id="{{ name }}"
+        class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition" />
+</label>
 {% endmacro %}
 
 {% block content %}
+<div class="max-w-[640px] mx-auto px-8 py-12 pb-20">
+    <h1 class="font-serif text-3xl font-medium mb-1 tracking-tight">Додати твір</h1>
+    <p class="text-fg-3 text-sm mb-10">Опублікуйте новий переклад або оригінальну новелу.</p>
 
-<h1 class="text-4xl font-bold mb-6">Додати твір</h1>
+    <form
+        x-data="{ original: false }"
+        action=""
+        method="post"
+        enctype="multipart/form-data"
+        class="space-y-5">
 
-<form
-    x-data="{ original: false }"
-    action=""
-    method="post"
-    enctype="multipart/form-data"
-    class="space-y-6 mb-4">
+        <label class="flex items-center gap-2.5 cursor-pointer">
+            <input
+                x-model="original"
+                type="checkbox"
+                id="is-original"
+                name="is-original"
+                class="h-4 w-4 cursor-pointer"
+                style="accent-color: var(--color-accent);" />
+            <span class="text-sm select-none">Оригінальний твір (не переклад)</span>
+        </label>
 
-    <div class="flex items-center gap-2">
-        <input
-            x-model="original"
-            class="h-5 w-5 text-green-500 accent-green-500 rounded cursor-pointer"
-            id="is-original"
-            name="is-original"
-            type="checkbox">
-
-        <label for="is-original" class="select-none cursor-pointer">Оригінальний твір (не переклад)</label>
-    </div>
-
-    <div>
-        {{ simple_input("Назва", "title") }}
-
-        {% if form.title.errors | length > 0 %}
-            <div class="text-red-400 mt-1">{{ form.title.errors[0] }}</div>
-        {% endif %}
-    </div>
-
-    <div x-show="!original">
-        {{ simple_input("Оригінальна назва (JP/KR/CN)", "title-original") }}
-    </div>
-
-    <div>
-        <label for="synopsis" class="block mb-1 text-green-400 select-none">Опис</label>
-        <textarea
-            class="w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none"
-            name="synopsis"
-            id="synopsis"
-            rows="3"></textarea>
-    </div>
-
-    <div class="grid grid-cols-2 gap-6">
         <div>
-            <label class="block mb-1 text-green-400 select-none">Статус</label>
-            <select
-                class="leading-tight w-full bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500 focus-visible:outline-none h-10"
-                name="status">
-                <option>Онґоїнґ</option>
-                <option>Завершено</option>
-                <option>На паузі</option>
-                <option>Закинуто</option>
-            </select>
+            {{ labeled_input("Назва", "title") }}
+            {%- if form.title.errors | length > 0 %}
+            <div class="text-warn text-[12px] mt-1">{{ form.title.errors[0] }}</div>
+            {%- endif %}
         </div>
 
-        {{ simple_input("Рік", "year", "number") }}
-    </div>
+        <div x-show="!original">
+            {{ labeled_input("Оригінальна назва (JP/KR/CN)", "title-original") }}
+        </div>
 
-    <div x-show="!original">
-        {{ simple_input("Автор", "author") }}
-    </div>
+        <label class="flex flex-col gap-1.5">
+            <span class="text-[12px] text-fg-3">Опис</span>
+            <textarea
+                name="synopsis"
+                id="synopsis"
+                rows="4"
+                class="px-3.5 py-2.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition resize-y"></textarea>
+        </label>
 
-    <div>
-        <label class="block mb-1 text-green-400 select-none">Постер</label>
-        <input
-            class="bg-[#0e1e1a]/60 border border-[#13352b] rounded-lg px-4 py-2 w-full h-10"
-            accept="image/*"
-            type="file"
-            name="poster">
-    </div>
+        <div class="grid grid-cols-2 gap-5">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[12px] text-fg-3">Статус</span>
+                <select
+                    name="status"
+                    class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition">
+                    <option>Онґоїнґ</option>
+                    <option>Завершено</option>
+                    <option>На паузі</option>
+                    <option>Закинуто</option>
+                </select>
+            </label>
 
-    <div>
-        <label class="block mb-1 text-green-400 select-none">Жанри</label>
-        {{ genres_select() }}
-    </div>
+            {{ labeled_input("Рік", "year", "number") }}
+        </div>
 
-    <button
-        class="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-400 text-[#0a1713] font-medium transition cursor-pointer"
-        type="submit">
-        Створити
-    </button>
-</form>
+        <div x-show="!original">
+            {{ labeled_input("Автор", "author") }}
+        </div>
 
+        <label class="flex flex-col gap-1.5">
+            <span class="text-[12px] text-fg-3">Постер</span>
+            <input
+                type="file"
+                name="poster"
+                accept="image/*"
+                class="h-10 px-3.5 py-2 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition file:mr-3 file:px-2 file:py-0.5 file:rounded file:border-0 file:bg-bg-2 file:text-fg-1 file:text-xs file:cursor-pointer file:font-medium" />
+        </label>
+
+        <label class="flex flex-col gap-1.5">
+            <span class="text-[12px] text-fg-3">Жанри</span>
+            {{ genres_select() }}
+        </label>
+
+        <button type="submit" class="btn primary mt-2">Створити</button>
+    </form>
+</div>
 {% endblock %}
