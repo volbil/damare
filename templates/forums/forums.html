@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/segmented.html" import segmented %}
+
+{% block content %}
+<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
+    {# Header #}
+    <div class="flex items-end justify-between mb-7 flex-wrap gap-4">
+        <div>
+            <h1 class="font-serif text-[32px] font-medium tracking-tight mb-1">Громада</h1>
+            <div class="text-[13px] text-fg-3">9 820 учасників онлайн · 14 200 тем за тиждень</div>
+        </div>
+        <button type="button" class="btn primary">{{ icon('plus', 13) }} Нова тема</button>
+    </div>
+
+    {# Categories #}
+    <div class="grid grid-cols-3 gap-3.5 mb-8">
+        {%- for c in categories %}
+        <a href="#" class="p-4 bg-bg-1 border border-line-soft rounded-lg flex gap-3 items-start hover:border-line transition">
+            <div class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background: {{ c.color }}22; color: {{ c.color }};">
+                {{ icon(c.icon, 17) }}
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold text-fg-0 mb-0.5">{{ c.name }}</div>
+                <div class="text-xs text-fg-3 leading-[1.45] mb-1.5">{{ c.desc }}</div>
+                <div class="text-[11px] text-fg-4 tabular-nums">{{ c.threads | thousands_uk }} тем</div>
+            </div>
+        </a>
+        {%- endfor %}
+    </div>
+
+    {# Active discussions #}
+    <div class="flex items-baseline justify-between mb-3 flex-wrap gap-2">
+        <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Активні обговорення</h2>
+        {{ segmented(['Усі', 'За підпискою', 'Активні'], 'Усі', small=true) }}
+    </div>
+
+    <div class="rounded-lg overflow-hidden border border-line-soft bg-bg-1">
+        {%- for t in threads %}
+        <a href="#" class="flex gap-3.5 p-4 {% if not loop.last %}border-b border-line-soft{% endif %} hover:bg-bg-2 transition">
+            <div class="avatar w-9 h-9 shrink-0">{{ t.avatar }}</div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <span class="tag" style="font-size: 10px; padding: 2px 8px;">{{ t.cat }}</span>
+                    {%- if t.pinned %}
+                    <span class="text-[10px] text-accent flex items-center gap-1">
+                        {{ icon('bookmark-fill', 10) }} Закріплено
+                    </span>
+                    {%- endif %}
+                    {%- if t.hot %}
+                    <span class="text-[10px] flex items-center gap-1" style="color: #d97a5a;">
+                        {{ icon('flame', 10) }} Гаряче
+                    </span>
+                    {%- endif %}
+                </div>
+                <div class="text-[14.5px] font-medium text-fg-0 leading-[1.3] mb-1">{{ t.title }}</div>
+                <p class="text-[12.5px] text-fg-2 leading-[1.55] m-0 mb-2 line-clamp-2">{{ t.preview }}</p>
+                <div class="stat-row text-[11px] flex-wrap">
+                    <span class="text-fg-2">{{ t.user }}</span>
+                    <span class="stat">{{ icon('message', 11) }}{{ t.replies }}</span>
+                    <span class="stat">{{ icon('eye', 11) }}{{ t.views | thousands_uk }}</span>
+                    <span class="stat">{{ icon('heart', 11) }}{{ t.kudos }}</span>
+                    <span class="ml-auto text-fg-3">{{ t.time }}</span>
+                </div>
+            </div>
+        </a>
+        {%- endfor %}
+    </div>
+</div>
+{% endblock %}

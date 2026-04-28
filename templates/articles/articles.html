@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/segmented.html" import segmented %}
+
+{% block content %}
+<div class="max-w-[1080px] mx-auto px-8 py-6 pb-20">
+    {# Header #}
+    <div class="mb-7">
+        <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-2.5">Damare · Записник</div>
+        <h1 class="font-serif text-4xl font-medium tracking-tight mb-1.5">Есеї, розбори й розмови про літературу</h1>
+        <div class="text-sm text-fg-3 max-w-[540px]">
+            Тексти від авторів, читачів і редакції. Читайте, обговорюйте, пропонуйте свої.
+        </div>
+    </div>
+
+    {# Tag filter #}
+    <div class="flex gap-1.5 mb-7 overflow-x-auto pb-1">
+        {%- for tag in tag_filter %}
+        <a href="?tag={{ tag }}" class="shrink-0 px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border {% if tag == active_tag %}bg-fg-0 text-bg-0 border-fg-0 font-semibold{% else %}bg-bg-1 text-fg-1 border-line-soft hover:border-line{% endif %}">
+            {{ tag }}
+        </a>
+        {%- endfor %}
+    </div>
+
+    {# Featured #}
+    <article class="grid grid-cols-[1.4fr_1fr] gap-8 p-7 mb-10 border border-line-soft rounded-lg" style="background: linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);">
+        <div>
+            <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-3">Есей тижня</div>
+            <h2 class="font-serif text-3xl font-medium leading-[1.15] tracking-tight mb-3">{{ featured.title }}</h2>
+            <p class="text-[14.5px] leading-[1.6] text-fg-2 m-0 mb-4 max-w-[480px]">{{ featured.subtitle }}</p>
+            <div class="flex items-center gap-2.5 mb-4">
+                <div class="avatar w-7 h-7">{{ featured.avatar }}</div>
+                <div>
+                    <div class="text-[13px] text-fg-0 font-medium">{{ featured.author }}</div>
+                    <div class="text-[11.5px] text-fg-3">{{ featured.time }}</div>
+                </div>
+            </div>
+            <div class="flex gap-2.5 items-center flex-wrap">
+                <a href="#" class="btn primary">Читати {{ icon('arrow-r', 13) }}</a>
+                <button type="button" class="btn">{{ icon('bookmark', 13) }} Зберегти</button>
+                <span class="stat-row ml-2 text-xs">
+                    <span class="stat">{{ icon('heart', 12) }}{{ featured.kudos }}</span>
+                    <span class="stat">{{ icon('message', 12) }}{{ featured.comments }}</span>
+                </span>
+            </div>
+        </div>
+        <div class="relative rounded-md overflow-hidden bg-bg-2 min-h-[220px]">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 w-full h-full">
+                <rect width="400" height="300" fill="oklch(0.22 0.02 140)"/>
+                {%- for i in range(20) %}
+                <line x1="{{ i * 22 }}" y1="0" x2="{{ i * 22 + 80 }}" y2="300" stroke="var(--color-accent)" stroke-opacity="0.06" stroke-width="1"/>
+                {%- endfor %}
+                <circle cx="200" cy="150" r="80" fill="var(--color-accent)" opacity="0.15"/>
+                <circle cx="200" cy="150" r="40" fill="var(--color-accent)" opacity="0.85"/>
+                <text x="200" y="158" font-family="Newsreader, Georgia, serif" font-size="48" text-anchor="middle" fill="var(--color-bg-0)">«</text>
+            </svg>
+        </div>
+    </article>
+
+    {# Article grid #}
+    <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+        <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Свіже</h2>
+        {{ segmented(['Найсвіжіші', 'Найпопулярніші', 'Найчитаніші'], 'Найсвіжіші', small=true) }}
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        {%- for a in articles %}
+        <a href="#" class="p-5 bg-bg-1 border border-line-soft rounded-lg cursor-pointer flex flex-col hover:border-line transition">
+            <div class="flex items-center gap-2 mb-3 flex-wrap">
+                <span class="tag" style="font-size: 10px; padding: 2px 8px;">{{ a.cat }}</span>
+                {%- if a.official %}
+                <span class="text-[10px] font-semibold px-1.5 py-0.5 bg-accent-soft text-accent rounded-full tracking-[0.04em] uppercase">Редакція</span>
+                {%- endif %}
+            </div>
+            <h3 class="font-serif text-[19px] font-medium leading-[1.25] mb-3 text-fg-0 line-clamp-3">{{ a.title }}</h3>
+            <div class="mt-auto flex items-center gap-2.5">
+                <div class="avatar w-[22px] h-[22px] text-[10px]">{{ a.avatar }}</div>
+                <span class="text-xs text-fg-2">{{ a.author }}</span>
+                <span class="text-[11.5px] text-fg-3 ml-auto">{{ a.time }}</span>
+            </div>
+            <div class="stat-row text-[11px] mt-2.5">
+                <span class="stat">{{ icon('heart', 11) }}{{ a.kudos }}</span>
+                <span class="stat">{{ icon('message', 11) }}{{ a.comments }}</span>
+            </div>
+        </a>
+        {%- endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -23,6 +23,18 @@
                 {{ label }}
             </a>
             {%- endfor %}
+
+            <div x-data="{ open: false }" class="relative">
+                <button type="button" @click="open = !open" class="flex items-center gap-1 px-3 py-2 rounded-md text-[13px] font-medium {% if _active == 'community' %}bg-bg-2 text-fg-0{% else %}text-fg-2 hover:text-fg-0 hover:bg-bg-2/50{% endif %}">
+                    Спільнота
+                    {{ icon('chevron-d', 12) }}
+                </button>
+                <div x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms class="absolute top-full left-0 mt-1 w-44 bg-bg-1 border border-line-soft rounded-md shadow-lg overflow-hidden z-30" style="display: none;">
+                    <a href="/forums" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Громада</a>
+                    <a href="/articles" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Записник</a>
+                    <a href="/feed" class="block px-3 py-2 text-[13px] text-fg-2 hover:text-fg-0 hover:bg-bg-2">Автори</a>
+                </div>
+            </div>
         </div>
 
         <div class="flex-1"></div>
