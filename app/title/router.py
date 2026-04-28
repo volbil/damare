@@ -424,6 +424,42 @@ async def feed(
     )
 
 
+@router.get("/styleguide")
+async def styleguide(request: Request, user: User | None = Depends(auth_optional)):
+    icon_names = [
+        "search", "home", "compass", "book", "pen", "bookmark", "bookmark-fill",
+        "heart", "heart-fill", "eye", "message", "bell", "user", "settings",
+        "plus", "check", "arrow-r", "arrow-l", "arrow-up", "menu", "filter",
+        "sort", "x", "more", "chevron-d", "chevron-r", "star", "sparkle",
+        "tag", "list", "grid", "type", "sun", "moon", "edit", "flag", "send",
+        "image", "bold", "italic", "quote", "minus", "check-circle", "globe",
+        "flame", "rss", "lock", "mail", "kudos", "calendar", "play", "tv",
+    ]
+
+    tokens = {
+        "colors": [
+            "bg-0", "bg-1", "bg-2", "bg-3", "bg-4",
+            "fg-0", "fg-1", "fg-2", "fg-3", "fg-4",
+            "line", "line-soft",
+            "accent", "accent-soft", "accent-fg",
+            "warn", "love", "info",
+        ],
+    }
+
+    return templates.TemplateResponse(
+        "styleguide/styleguide.html",
+        {
+            "request": request,
+            "user": user,
+            "active": "",
+            "page_title": "Компоненти",
+            "icon_names": icon_names,
+            "tokens": tokens,
+            "demo_novel": NOVELS[0],
+        },
+    )
+
+
 @router.api_route("/create", methods=["GET", "POST"])
 async def create_title(
     request: Request,
