@@ -7,12 +7,16 @@ alembic.ini
 settings.toml
 .venv
 
+# Styles are built on each change so we don't commit them
+static/styles.css
+
 # Linters
 .pytest_cache
 .ruff_cache
 
 # misc
 .DS_STORE
+.claude/
 *.db
 
 # PyRight
