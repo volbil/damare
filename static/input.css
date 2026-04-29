@@ -187,6 +187,7 @@
         background: var(--color-bg-2);
         aspect-ratio: 2 / 3;
         align-self: flex-start;
+        width: 100%;
     }
     .cover.wide { aspect-ratio: 16 / 9; }
 
