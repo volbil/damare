@@ -103,13 +103,65 @@ async def title(
 async def read_chapter(
     request: Request,
     novel_id: str,
+    ch: int | None = None,
+    team: str | None = None,
     user: User | None = Depends(auth_optional),
 ):
     novel = novel_by_id(novel_id) or NOVELS[0]
     chapters = _build_chapters(novel)
-    current_no = READER_CHAPTER["chapter_no"]
-    prev_chapter = chapters[current_no - 2] if current_no > 1 else None
-    next_chapter = chapters[current_no] if current_no < len(chapters) else None
+
+    # Default chapter — primary team's current
+    if ch is None:
+        ch = novel.get("chapters", 1)
+
+    # Find chapter row in the merged list
+    chapter_row = next((c for c in chapters if c["no"] == ch), None)
+    if not chapter_row and chapters:
+        chapter_row = chapters[0]
+        ch = chapter_row["no"]
+
+    # Resolve current team and team-specific chapter title
+    current_team = None
+    current_team_id = None
+    chapter_title = chapter_row["title"] if chapter_row else ""
+    alternate_teams = []
+
+    if novel["type"] == "translation":
+        chapter_full = next(
+            (c for c in novel.get("chapters_full", []) if c["no"] == ch),
+            None,
+        )
+        translations = chapter_full.get("translations", []) if chapter_full else []
+
+        if team:
+            chosen = next((t for t in translations if t["team_id"] == team), None)
+            if not chosen and translations:
+                chosen = translations[0]
+        elif translations:
+            chosen = translations[0]
+        else:
+            chosen = None
+
+        if chosen:
+            current_team_id = chosen["team_id"]
+            current_team = team_by_id(chosen["team_id"])
+            chapter_title = chosen["title"]
+
+        for t in translations:
+            if t["team_id"] != current_team_id:
+                alt_team = team_by_id(t["team_id"])
+                if alt_team:
+                    alternate_teams.append({
+                        "team_id": t["team_id"],
+                        "team": alt_team,
+                        "title": t["title"],
+                        "updated": t.get("updated", ""),
+                    })
+
+    # Prev / next from the merged chapter list
+    current_idx = next((i for i, c in enumerate(chapters) if c["no"] == ch), 0)
+    prev_chapter = chapters[current_idx - 1] if current_idx > 0 else None
+    next_chapter = chapters[current_idx + 1] if current_idx + 1 < len(chapters) else None
 
     return templates.TemplateResponse(
         "reader/reader.html",
@@ -118,6 +170,11 @@ async def read_chapter(
             "user": user,
             "novel": novel,
             "chapter": READER_CHAPTER,
+            "chapter_no": ch,
+            "chapter_title": chapter_title,
+            "current_team": current_team,
+            "current_team_id": current_team_id,
+            "alternate_teams": alternate_teams,
             "prev_chapter": prev_chapter,
             "next_chapter": next_chapter,
         },

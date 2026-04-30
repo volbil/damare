@@ -162,7 +162,7 @@ def _stub_updated(distance):
         return "давно"
 
 
-def _make_translation_chapters(team_coverages, max_to_populate=8):
+def _make_translation_chapters(team_coverages, max_to_populate=50):
     """Build chapters_full for a translation series.
 
     team_coverages: list of dicts: { team_id, chapters_done, titles? }
@@ -198,7 +198,7 @@ def _make_translation_chapters(team_coverages, max_to_populate=8):
     return chapters
 
 
-def _make_original_chapters(titles, max_to_populate=8):
+def _make_original_chapters(titles, max_to_populate=50):
     """Build chapters_full for an original series."""
 
     visible = min(max_to_populate, len(titles))
