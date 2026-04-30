@@ -1,23 +1,328 @@
 """Stub fixtures for the design-stub frontend.
 
-Light-novel translation flavoured (ранобе) — comically long titles, isekai
-clichés, and the occasional existential dread. Will be replaced with SQLAlchemy
-queries once the data layer catches up to the design.
+Light-novel translation site model — a Series can have multiple Translation
+Projects (one per team) sharing source-locked chapter numbering. Originals
+collapse to a single creator.
+
+Schema:
+
+    Series
+      ├─ id, type ('translation' | 'original')
+      ├─ source_language ('ja' | 'ko' | 'zh' | 'uk')
+      ├─ summary, tags, warnings, rating
+      │
+      ├─ (translation only)
+      │     ├─ title_ja, title_romaji
+      │     ├─ original_author
+      │     ├─ original_publisher, original_year, original_status
+      │     └─ teams_active []
+      │           ├─ team_id, title (this team's UA title)
+      │           ├─ status ('active' | 'frozen' | 'completed' | 'dropped')
+      │           ├─ chapters_done, last_update, kudos_total
+      │           └─ translator_notes_excerpt
+      │
+      ├─ (original only)
+      │     └─ author_obj { id, name, avatar, bio? }
+      │
+      ├─ chapters_full []
+      │     ├─ no
+      │     │
+      │     ├─ (translation chapters)
+      │     │     ├─ primary_title  (the row's display title)
+      │     │     └─ translations [{ team_id, title, updated }]
+      │     │
+      │     └─ (original chapters)
+      │           ├─ title
+      │           └─ updated
+      │
+      └─ (backward-compat fields kept on every series so existing card
+         and page templates continue to render before they're updated
+         phase-by-phase: title, author, chapters, chapter_count, kudos,
+         bookmarks, comments, hits, summary, tags, warnings, rating,
+         updated, status, progress, words, fandom, author_handle,
+         title_en)
+
+    Team — entity with profile, members, list of projects
 """
 
 
+# ────────────────────────────────────────────────────────────────────────
+# Teams
+# ────────────────────────────────────────────────────────────────────────
+
+TEAMS = [
+    {
+        "id": "team_tysha",
+        "name": "Тиша",
+        "avatar": "Т",
+        "kind": "group",
+        "members_count": 4,
+        "members": [
+            {"name": "Маринка К.", "role": "редакторка"},
+            {"name": "Іван Б.", "role": "перекладач"},
+            {"name": "Юлія", "role": "перекладачка"},
+            {"name": "Богдан", "role": "коректор"},
+        ],
+        "joined": "лютого 2024",
+        "bio": "Переклад японської повільної прози. Любимо тишу, листи й зимові настрої.",
+    },
+    {
+        "id": "team_snih",
+        "name": "Сніг",
+        "avatar": "С",
+        "kind": "group",
+        "members_count": 2,
+        "members": [
+            {"name": "Олекса", "role": "перекладач"},
+            {"name": "Дарка", "role": "редакторка"},
+        ],
+        "joined": "вересня 2023",
+        "bio": "Команда у заморозці. Колись повернемося — обіцяємо.",
+    },
+    {
+        "id": "team_sim_tinei",
+        "name": "Сім тіней",
+        "avatar": "СТ",
+        "kind": "group",
+        "members_count": 6,
+        "members": [
+            {"name": "Тарас В.", "role": "перекладач"},
+            {"name": "Світлана", "role": "редакторка"},
+            {"name": "Андрій К.", "role": "перекладач"},
+            {"name": "Олена", "role": "коректорка"},
+            {"name": "Михайло", "role": "перекладач"},
+            {"name": "Юрій", "role": "оформлення"},
+        ],
+        "joined": "березня 2023",
+        "bio": "Великий колектив, велика амбіція. Беремо великі серіали й доводимо до кінця.",
+    },
+    {
+        "id": "solo_lesyk",
+        "name": "Лесик",
+        "avatar": "Л",
+        "kind": "solo",
+        "members_count": 1,
+        "members": [{"name": "Лесик", "role": "усе зразу"}],
+        "joined": "січня 2025",
+        "bio": "Соло-перекладач. Перекладаю те, що подобається, у власному темпі.",
+    },
+    {
+        "id": "solo_anna_maria",
+        "name": "Анна-Марія",
+        "avatar": "АМ",
+        "kind": "solo",
+        "members_count": 1,
+        "members": [{"name": "Анна-Марія", "role": "перекладачка"}],
+        "joined": "червня 2024",
+        "bio": "Перекладаю комедійні ранобе. У вільний час пишу рецензії.",
+    },
+    {
+        "id": "team_hryf",
+        "name": "Гриф",
+        "avatar": "Г",
+        "kind": "group",
+        "members_count": 3,
+        "members": [
+            {"name": "Антон", "role": "перекладач"},
+            {"name": "Кіра", "role": "редакторка"},
+            {"name": "Гліб", "role": "коректор"},
+        ],
+        "joined": "грудня 2024",
+        "bio": "Свіжий колектив, фокус на романтичних ранобе.",
+    },
+]
+
+
+def team_by_id(team_id):
+    """Return a team dict by its id, or None if not found."""
+
+    return next((t for t in TEAMS if t["id"] == team_id), None)
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Helpers for chapter list construction
+# ────────────────────────────────────────────────────────────────────────
+
+def _stub_updated(distance):
+    """Fake 'updated' timestamp for a chapter, by distance from team's latest."""
+
+    if distance <= 0:
+        return "вчора"
+    elif distance == 1:
+        return "5 днів тому"
+    elif distance == 2:
+        return "тиждень тому"
+    elif distance == 3:
+        return "2 тижні тому"
+    elif distance <= 5:
+        return "3 тижні тому"
+    elif distance <= 10:
+        return "місяць тому"
+    else:
+        return "давно"
+
+
+def _make_translation_chapters(team_coverages, max_to_populate=8):
+    """Build chapters_full for a translation series.
+
+    team_coverages: list of dicts: { team_id, chapters_done, titles? }
+    Order matters — the first team in the list is treated as primary.
+    """
+
+    if not team_coverages:
+        return []
+
+    visible = min(max_to_populate, max(c["chapters_done"] for c in team_coverages))
+    chapters = []
+
+    for i in range(visible):
+        translations = []
+
+        for c in team_coverages:
+            if i < c["chapters_done"]:
+                titles = c.get("titles", [])
+                title = titles[i] if i < len(titles) else f"Розділ {i + 1}"
+                translations.append({
+                    "team_id": c["team_id"],
+                    "title": title,
+                    "updated": _stub_updated(c["chapters_done"] - i - 1),
+                })
+
+        if translations:
+            chapters.append({
+                "no": i + 1,
+                "primary_title": translations[0]["title"],
+                "translations": translations,
+            })
+
+    return chapters
+
+
+def _make_original_chapters(titles, max_to_populate=8):
+    """Build chapters_full for an original series."""
+
+    visible = min(max_to_populate, len(titles))
+    return [
+        {
+            "no": i + 1,
+            "title": titles[i],
+            "updated": _stub_updated(visible - i - 1),
+        }
+        for i in range(visible)
+    ]
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Per-series chapter title pools (only specified where it matters)
+# ────────────────────────────────────────────────────────────────────────
+
+# n1 — multi-team showcase. Two teams, divergent translations.
+_N1_TYSHA_TITLES = [
+    "Я помер. Знову.",
+    "Прокинулась у дівочому тілі",
+    "Хвіст. Чому хвіст?",
+    "Аптекаря не існує — це я",
+    "Принцеса повертається з могили",
+    "Перший пацієнт — генерал",
+    "Що це за магія, я ж хімік",
+    "Дисертація знайшла мене",
+    "Бал, на якому всі помирають",
+    "Тітка Степанида знає більше",
+    "Хвіст — це політична проблема",
+    "Імператор має нежить",
+    "Лабораторія в підвалі замку",
+    "Я отруїв міністра (ненавмисне)",
+]
+
+_N1_SNIH_TITLES = [
+    "Я знов помер.",
+    "Жінкою прокидаюсь",
+    "Хвіст? Серйозно?",
+    "Я і є аптекар?",
+    "Принцеса воскресла",
+    "Генерал — пацієнт перший",
+    "Магія чи хімія?",
+    "Дисертація мене знайшла",
+]
+
+_N5_TITLES = [
+    "Перша зустріч на сходах",
+    "Газовий рахунок",
+    "Чай з мохом",
+    "Дерево у вікні",
+    "Літо, що лишилось",
+]
+
+_N8_TITLES = [
+    "Понеділок, 7:23",
+    "Спроба перша",
+    "Спроба третя (друга не вийшла)",
+    "Космічний об'єкт у новинах",
+    "Я знаю, де мої ключі",
+    "Світ закінчиться у четвер",
+    "Сорок п'ятий понеділок",
+    "Я просто залишусь у ліжку",
+]
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Series — translations (6) + originals (2)
+# ────────────────────────────────────────────────────────────────────────
+
 NOVELS = [
+    # ════════════ n1 — toxicologist princess (multi-team showcase) ════════════
     {
         "id": "n1",
+        "type": "translation",
+
+        # Source-level
+        "title_ja": "毒物学者だった私が、目覚めたら謎の薬師、しかも尻尾がある",
+        "title_romaji": "Dokubutsugakusha datta watashi ga…",
+        "original_author": "Хіросі Канесакі",
+        "source_language": "ja",
+        "original_publisher": "Shogakukan",
+        "original_year": 2024,
+        "original_status": "У процесі",
+
+        # Universal
+        "summary": "Помер від перевтоми за робочим столом — прокинувся в дівочому тілі у фентезі-світі. Стандартне ізекай. Чого не очікував — бути принцесою-аптекарем, яку всі вважають мертвою. І мати хвіст. Принаймні фінансова стабільність.",
+        "tags": ["ізекай", "перевтілення", "комедія", "магія", "повільне горіння"],
+        "warnings": [],
+        "rating": "T",
+
+        # Teams
+        "teams_active": [
+            {
+                "team_id": "team_tysha",
+                "title": "Я був звичайним токсикологом у п'ятницю ввечері, але прокинувся загадковим лікарем-аптекарем у тілі двадцятилітньої принцеси, та чомусь у мене з'явився довгий хвіст",
+                "status": "active",
+                "chapters_done": 14,
+                "last_update": "2 дні тому",
+                "kudos_total": 4128,
+                "translator_notes_excerpt": "Цей перекладач любить хвіст не менше за вас. Сподіваюсь, читається із задоволенням.",
+            },
+            {
+                "team_id": "team_snih",
+                "title": "Принцеса з хвостом",
+                "status": "frozen",
+                "chapters_done": 8,
+                "last_update": "місяць тому",
+                "kudos_total": 412,
+                "translator_notes_excerpt": "Команда у тимчасовій паузі. Повернемося, коли стане час.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "team_tysha", "chapters_done": 14, "titles": _N1_TYSHA_TITLES},
+            {"team_id": "team_snih", "chapters_done": 8, "titles": _N1_SNIH_TITLES},
+        ]),
+
+        # Backward-compat
         "title": "Я був звичайним токсикологом у п'ятницю ввечері, але прокинувся загадковим лікарем-аптекарем у тілі двадцятилітньої принцеси, та чомусь у мене з'явився довгий хвіст",
         "title_en": "I Was Just a Toxicologist Friday Night, but I Woke Up as a Mysterious Apothecary in the Body of a 20-Year-Old Princess, and for Some Reason I Have a Long Tail Now",
         "author": "Хіросі Канесакі",
         "author_handle": "kanesaki_h",
         "fandom": "金崎 浩 (Kanesaki Hiroshi)",
-        "rating": "T",
-        "summary": "Помер від перевтоми за робочим столом — прокинувся в дівочому тілі у фентезі-світі. Стандартне ізекай. Чого не очікував — бути принцесою-аптекарем, яку всі вважають мертвою. І мати хвіст. Принаймні фінансова стабільність.",
-        "tags": ["ізекай", "перевтілення", "комедія", "магія", "повільне горіння"],
-        "warnings": [],
         "chapters": 14,
         "chapter_count": 18,
         "words": 47280,
@@ -29,17 +334,46 @@ NOVELS = [
         "status": "У процесі",
         "progress": 48,
     },
+
+    # ════════════ n2 — angel utility (single team, completed) ════════════
     {
         "id": "n2",
+        "type": "translation",
+
+        "title_ja": "隣のアパートの天使が私の電気を全部使う",
+        "title_romaji": "Tonari no apaato no tenshi ga watashi no denki o zenbu tsukau",
+        "original_author": "Кенджі Накагава",
+        "source_language": "ja",
+        "original_publisher": "Kadokawa",
+        "original_year": 2023,
+        "original_status": "Завершено",
+
+        "summary": "До київської п'ятиповерхівки переселяється тиха дівчина-янгол. Тільки одна проблема — вона генерує електрику просто від того, що жива, і КП через місяць приходить з претензіями. Маленька історія про любов і дотації.",
+        "tags": ["повсякденність", "комедія", "затишне", "магічний реалізм"],
+        "warnings": [],
+        "rating": "G",
+
+        "teams_active": [
+            {
+                "team_id": "team_tysha",
+                "title": "Янгол із сусідньої квартири споживає всю мою електроенергію",
+                "status": "completed",
+                "chapters_done": 8,
+                "last_update": "тиждень тому",
+                "kudos_total": 1892,
+                "translator_notes_excerpt": "Любим це ранобе. Дякуємо всім, хто читав.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "team_tysha", "chapters_done": 8},
+        ]),
+
         "title": "Янгол із сусідньої квартири споживає всю мою електроенергію",
         "title_en": "The Angel from the Apartment Next Door Uses All My Electricity",
         "author": "Кенджі Накагава",
         "author_handle": "nakagawa_k",
         "fandom": "中川 健司 (Nakagawa Kenji)",
-        "rating": "G",
-        "summary": "До київської п'ятиповерхівки переселяється тиха дівчина-янгол. Тільки одна проблема — вона генерує електрику просто від того, що жива, і КП через місяць приходить з претензіями. Маленька історія про любов і дотації.",
-        "tags": ["повсякденність", "комедія", "затишне", "магічний реалізм"],
-        "warnings": [],
         "chapters": 8,
         "chapter_count": 8,
         "words": 22150,
@@ -51,17 +385,56 @@ NOVELS = [
         "status": "Завершено",
         "progress": 100,
     },
+
+    # ════════════ n3 — otome bakery (multi-team) ════════════
     {
         "id": "n3",
+        "type": "translation",
+
+        "title_ja": "私はオトメゲームの悪役令嬢に転生したけれど、登場人物全員が阿呆だったので、ただパン屋を開いた",
+        "title_romaji": "Watashi wa otome geemu no akuyaku reijou ni tensei shita keredo…",
+        "original_author": "Сакура Хошіно",
+        "source_language": "ja",
+        "original_publisher": "Hakusensha",
+        "original_year": 2024,
+        "original_status": "У процесі",
+
+        "summary": "Аліна знала свою долю: померти від рук головної героїні в третьому акті. Але після зустрічі з принцом-«головним героєм», який не може назвати власну столицю, вона зрозуміла — ці дурні нікого не врятують. Краще пекти круасани.",
+        "tags": ["перевтілення", "отоме", "комедія", "повільне горіння", "романтика"],
+        "warnings": [],
+        "rating": "T",
+
+        "teams_active": [
+            {
+                "team_id": "team_sim_tinei",
+                "title": "Я перевтілилась у злодійку отоме-гри, але всі персонажі — ідіоти, тому я просто відкрила пекарню",
+                "status": "active",
+                "chapters_done": 22,
+                "last_update": "вчора",
+                "kudos_total": 3200,
+                "translator_notes_excerpt": "Великий проєкт, доводимо до кінця. Дякуємо за підтримку.",
+            },
+            {
+                "team_id": "solo_lesyk",
+                "title": "Я — злодійка, але вирішила пекти",
+                "status": "active",
+                "chapters_done": 15,
+                "last_update": "5 днів тому",
+                "kudos_total": 691,
+                "translator_notes_excerpt": "Я переклав це бо люблю круасани.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "team_sim_tinei", "chapters_done": 22},
+            {"team_id": "solo_lesyk", "chapters_done": 15},
+        ]),
+
         "title": "Я перевтілилась у злодійку отоме-гри, але всі персонажі — ідіоти, тому я просто відкрила пекарню",
         "title_en": "I Reincarnated as the Villainess of an Otome Game, but All the Characters Are Idiots, So I Just Opened a Bakery",
         "author": "Сакура Хошіно",
         "author_handle": "hoshino_s",
         "fandom": "星野 さくら (Hoshino Sakura)",
-        "rating": "T",
-        "summary": "Аліна знала свою долю: померти від рук головної героїні в третьому акті. Але після зустрічі з принцом-«головним героєм», який не може назвати власну столицю, вона зрозуміла — ці дурні нікого не врятують. Краще пекти круасани.",
-        "tags": ["перевтілення", "отоме", "комедія", "повільне горіння", "романтика"],
-        "warnings": [],
         "chapters": 22,
         "chapter_count": 24,
         "words": 89120,
@@ -73,17 +446,46 @@ NOVELS = [
         "status": "У процесі",
         "progress": 62,
     },
+
+    # ════════════ n4 — girlfriend's older sister (single team) ════════════
     {
         "id": "n4",
+        "type": "translation",
+
+        "title_ja": "私の彼女の姉も私の彼女だが、まだ誰も知らない、私自身も含めて",
+        "title_romaji": "Watashi no kanojo no ane mo watashi no kanojo da ga…",
+        "original_author": "Кента Аояма",
+        "source_language": "ja",
+        "original_publisher": "Kodansha",
+        "original_year": 2025,
+        "original_status": "У процесі",
+
+        "summary": "Іто-кун закохався в Юку. Юка любить його. Старша сестра Юки, Айя, теж його любить — і чомусь Іто-кун теж її любить, але не знає чому. Можливо, йому стерли пам'ять. Можливо, це історія про амнезію. Або пара ідіотів.",
+        "tags": ["романтика", "комедія", "школа", "гарем", "повільне горіння"],
+        "warnings": [],
+        "rating": "T",
+
+        "teams_active": [
+            {
+                "team_id": "team_hryf",
+                "title": "Старша сестра моєї дівчини теж моя дівчина, але про це поки ніхто не знає, включно зі мною",
+                "status": "active",
+                "chapters_done": 11,
+                "last_update": "5 днів тому",
+                "kudos_total": 1620,
+                "translator_notes_excerpt": "Романтичний хаос — наш профіль. Чекайте на нові розділи.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "team_hryf", "chapters_done": 11},
+        ]),
+
         "title": "Старша сестра моєї дівчини теж моя дівчина, але про це поки ніхто не знає, включно зі мною",
         "title_en": "My Girlfriend's Older Sister Is Also My Girlfriend, but Nobody Knows Yet, Including Me",
         "author": "Кента Аояма",
         "author_handle": "aoyama_k",
         "fandom": "青山 健太 (Aoyama Kenta)",
-        "rating": "T",
-        "summary": "Іто-кун закохався в Юку. Юка любить його. Старша сестра Юки, Айя, теж його любить — і чомусь Іто-кун теж її любить, але не знає чому. Можливо, йому стерли пам'ять. Можливо, це історія про амнезію. Або пара ідіотів.",
-        "tags": ["романтика", "комедія", "школа", "гарем", "повільне горіння"],
-        "warnings": [],
         "chapters": 11,
         "chapter_count": 16,
         "words": 38400,
@@ -95,17 +497,32 @@ NOVELS = [
         "status": "У процесі",
         "progress": 0,
     },
+
+    # ════════════ n5 — forest spirit (ORIGINAL) ════════════
     {
         "id": "n5",
-        "title": "Сусідка з третього поверху — лісовий дух, який не вміє платити за газ",
-        "title_en": "The Neighbour on the Third Floor Is a Forest Spirit Who Doesn't Know How to Pay for Gas",
-        "author": "Норіко Куросава",
-        "author_handle": "kurosawa_n",
-        "fandom": "黒沢 紀子 (Kurosawa Noriko)",
-        "rating": "G",
+        "type": "original",
+
+        "author_obj": {
+            "id": "olena_h",
+            "name": "Олена Гуцалюк",
+            "avatar": "ОГ",
+            "bio": "Пишу про маленькі міста та дивних сусідів. Магічний реалізм у затишних формах.",
+        },
+        "source_language": "uk",
+
         "summary": "Інженер з Києва на 35-му році життя дізнається, що його сусідка — справжній лісовий дух. Тепер він допомагає їй розібратися з комунальними рахунками, а вона за це не дає йому помирати від стресу. Чесна угода.",
         "tags": ["повсякденність", "магічний реалізм", "комедія", "затишне"],
         "warnings": [],
+        "rating": "G",
+
+        "chapters_full": _make_original_chapters(_N5_TITLES),
+
+        "title": "Сусідка з третього поверху — лісовий дух, який не вміє платити за газ",
+        "title_en": "The Neighbour on the Third Floor Is a Forest Spirit Who Doesn't Know How to Pay for Gas",
+        "author": "Олена Гуцалюк",
+        "author_handle": "olena_h",
+        "fandom": "Original",
         "chapters": 5,
         "chapter_count": 5,
         "words": 12200,
@@ -117,17 +534,66 @@ NOVELS = [
         "status": "Завершено",
         "progress": 100,
     },
+
+    # ════════════ n6 — banished pumpkin (three-team series) ════════════
     {
         "id": "n6",
+        "type": "translation",
+
+        "title_ja": "ギルドから「弱い」と追放されたが、実は礼儀正しいだけだった、今は田舎で皆を狂わせるカボチャを育てている",
+        "title_romaji": "Girudo kara 'yowai' to tsuihou sareta ga…",
+        "original_author": "Юкі Танака",
+        "source_language": "ja",
+        "original_publisher": "Shogakukan",
+        "original_year": 2023,
+        "original_status": "У процесі",
+
+        "summary": "Колишнього рейнджера S-рангу вигнали з гільдії за «низький бойовий потенціал». Виявилось, його ввічливе «не хочу нікого вбивати» вважали слабкістю. Тепер вирощує гарбузи. Гарбузи мають побічні ефекти. Король хоче поговорити.",
+        "tags": ["фентезі", "ізекай", "комедія", "темне фентезі", "сільське життя"],
+        "warnings": ["насильство"],
+        "rating": "M",
+
+        "teams_active": [
+            {
+                "team_id": "team_sim_tinei",
+                "title": "Мене вигнали з гільдії за «слабкість», але я просто був ввічливий, тепер живу в селі і вирощую гарбузи (від яких всі божеволіють)",
+                "status": "active",
+                "chapters_done": 31,
+                "last_update": "вчора",
+                "kudos_total": 4100,
+                "translator_notes_excerpt": "Епічний роман про гарбузи. Доводимо до 40 розділу.",
+            },
+            {
+                "team_id": "team_tysha",
+                "title": "Вигнаний рейнджер і його гарбузи",
+                "status": "frozen",
+                "chapters_done": 12,
+                "last_update": "місяць тому",
+                "kudos_total": 580,
+                "translator_notes_excerpt": "Перейшли на інший проєкт. Цей може повернеться.",
+            },
+            {
+                "team_id": "solo_lesyk",
+                "title": "Гарбузи, що зводять з розуму",
+                "status": "active",
+                "chapters_done": 25,
+                "last_update": "2 дні тому",
+                "kudos_total": 530,
+                "translator_notes_excerpt": "Третій рік перекладаю. Залишилось небагато.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "team_sim_tinei", "chapters_done": 31},
+            {"team_id": "team_tysha", "chapters_done": 12},
+            {"team_id": "solo_lesyk", "chapters_done": 25},
+        ]),
+
         "title": "Мене вигнали з гільдії за «слабкість», але я просто був ввічливий, тепер живу в селі і вирощую гарбузи (від яких всі божеволіють)",
         "title_en": "I Was Kicked Out of the Guild for Being 'Weak,' but I Was Just Polite. Now I Live in a Village Growing Pumpkins (Which Drive Everyone Insane)",
         "author": "Юкі Танака",
         "author_handle": "tanaka_y",
         "fandom": "田中 雪 (Tanaka Yuki)",
-        "rating": "M",
-        "summary": "Колишнього рейнджера S-рангу вигнали з гільдії за «низький бойовий потенціал». Виявилось, його ввічливе «не хочу нікого вбивати» вважали слабкістю. Тепер вирощує гарбузи. Гарбузи мають побічні ефекти. Король хоче поговорити.",
-        "tags": ["фентезі", "ізекай", "комедія", "темне фентезі", "сільське життя"],
-        "warnings": ["насильство"],
         "chapters": 31,
         "chapter_count": 40,
         "words": 142800,
@@ -139,17 +605,46 @@ NOVELS = [
         "status": "У процесі",
         "progress": 22,
     },
+
+    # ════════════ n7 — necromancer grandma (single team, completed) ════════════
     {
         "id": "n7",
+        "type": "translation",
+
+        "title_ja": "私は大陸最強の死霊術師だが、唯一の死霊術は死んだ親戚と話すことだ",
+        "title_romaji": "Watashi wa tairiku saikyou no shireijutsushi da ga…",
+        "original_author": "Дайскі Огата",
+        "source_language": "ja",
+        "original_publisher": "Kadokawa",
+        "original_year": 2025,
+        "original_status": "Завершено",
+
+        "summary": "Імперія платить мені цілий статок як «найгрізнішому некроманту епохи». Технічно я один — все, що я вмію, це викликати привид баби Степаниди для життєвих порад. Але вона дає дуже гарні поради. Імперія ніколи не дізнається.",
+        "tags": ["комедія", "фентезі", "темне фентезі", "повільне горіння"],
+        "warnings": [],
+        "rating": "T",
+
+        "teams_active": [
+            {
+                "team_id": "solo_anna_maria",
+                "title": "Я — найсильніший некромант на континенті, але мій єдиний некромантський трюк — це говорити з мертвими родичами",
+                "status": "completed",
+                "chapters_done": 12,
+                "last_update": "тиждень тому",
+                "kudos_total": 1102,
+                "translator_notes_excerpt": "Завершено. Спасибі що читали.",
+            },
+        ],
+
+        "chapters_full": _make_translation_chapters([
+            {"team_id": "solo_anna_maria", "chapters_done": 12},
+        ]),
+
         "title": "Я — найсильніший некромант на континенті, але мій єдиний некромантський трюк — це говорити з мертвими родичами",
         "title_en": "I'm the Strongest Necromancer on the Continent, but My Only Necromancy Trick Is Talking to Dead Relatives",
         "author": "Дайскі Огата",
         "author_handle": "ogata_d",
         "fandom": "尾形 大樹 (Ogata Daiki)",
-        "rating": "T",
-        "summary": "Імперія платить мені цілий статок як «найгрізнішому некроманту епохи». Технічно я один — все, що я вмію, це викликати привид баби Степаниди для життєвих порад. Але вона дає дуже гарні поради. Імперія ніколи не дізнається.",
-        "tags": ["комедія", "фентезі", "темне фентезі", "повільне горіння"],
-        "warnings": [],
         "chapters": 12,
         "chapter_count": 12,
         "words": 31000,
@@ -161,17 +656,32 @@ NOVELS = [
         "status": "Завершено",
         "progress": 0,
     },
+
+    # ════════════ n8 — time loop (ORIGINAL) ════════════
     {
         "id": "n8",
-        "title": "Кожного разу, коли я помираю, я повертаюся в той самий ранок понеділка з усіма спогадами, але зовсім без бажання щось робити",
-        "title_en": "Every Time I Die, I Return to the Same Monday Morning with All My Memories but No Will to Do Anything",
-        "author": "Юдзуру Танігучі",
-        "author_handle": "taniguchi_y",
-        "fandom": "谷口 譲 (Taniguchi Yuzuru)",
-        "rating": "M",
+        "type": "original",
+
+        "author_obj": {
+            "id": "zoryana_k",
+            "name": "Зоряна Кобилянська",
+            "avatar": "ЗК",
+            "bio": "Пишу психологічні трилери. Цикліки. Понеділки. Тривога загорнута у наратив.",
+        },
+        "source_language": "uk",
+
         "summary": "Оля помирає вже 47-й раз. Часова петля повертає її в ранок понеділка о 7:23. Вона знає, що завтра впаде космічний об'єкт. Знає, як його зупинити. Знає, де її ключі. Просто залишається в ліжку. Світ закінчиться у четвер.",
         "tags": ["трилер", "часова петля", "темне", "психологічне"],
         "warnings": ["екзистенційна криза"],
+        "rating": "M",
+
+        "chapters_full": _make_original_chapters(_N8_TITLES),
+
+        "title": "Кожного разу, коли я помираю, я повертаюся в той самий ранок понеділка з усіма спогадами, але зовсім без бажання щось робити",
+        "title_en": "Every Time I Die, I Return to the Same Monday Morning with All My Memories but No Will to Do Anything",
+        "author": "Зоряна Кобилянська",
+        "author_handle": "zoryana_k",
+        "fandom": "Original",
         "chapters": 9,
         "chapter_count": 15,
         "words": 33500,
@@ -185,6 +695,10 @@ NOVELS = [
     },
 ]
 
+
+# ────────────────────────────────────────────────────────────────────────
+# Tags, reader chapter, comments, notifications (mostly unchanged)
+# ────────────────────────────────────────────────────────────────────────
 
 TAGS = [
     {"name": "ізекай", "count": 8420},
@@ -239,7 +753,11 @@ NOTIFICATIONS = [
 ]
 
 
+# ────────────────────────────────────────────────────────────────────────
+# Lookups
+# ────────────────────────────────────────────────────────────────────────
+
 def novel_by_id(novel_id):
-    """Return a novel dict by its id, or None if not found."""
+    """Return a series dict by its id, or None if not found."""
 
     return next((n for n in NOVELS if n["id"] == novel_id), None)

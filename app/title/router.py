@@ -11,43 +11,31 @@ from app import templates
 router = APIRouter()
 
 
-CHAPTER_TITLES = [
-    "Я помер. Знову.",
-    "Прокинулась у дівочому тілі",
-    "Хвіст. Чому хвіст?",
-    "Аптекаря не існує — це я",
-    "Принцеса повертається з могили",
-    "Перший пацієнт — генерал",
-    "Що це за магія, я ж хімік",
-    "Дисертація знайшла мене",
-    "Бал, на якому всі помирають",
-    "Тітка Степанида знає більше",
-    "Хвіст — це політична проблема",
-    "Імператор має нежить",
-    "Лабораторія в підвалі замку",
-    "Я отруїв міністра (ненавмисне)",
-    "Чи могла я просто не помирати?",
-    "Принц, що ставить незручні питання",
-    "Стара академія, нові правила",
-    "Хімія — це теж магія",
-]
-
-CHAPTER_DATES = [
-    "2 дні тому", "5 днів тому", "тиждень тому", "2 тижні тому", "місяць тому",
-]
-
-
 def _build_chapters(novel):
+    """Build the title-page chapter list from the series' chapters_full.
+
+    For translations, uses each row's primary_title and primary translation's
+    updated timestamp. For originals, uses title and updated directly.
+    """
+
     chapters = []
 
-    for i in range(novel["chapter_count"]):
+    for ch in novel.get("chapters_full", []):
+        if novel["type"] == "translation":
+            title = ch.get("primary_title", f"Розділ {ch['no']}")
+            primary = (ch.get("translations") or [{}])[0]
+            date = primary.get("updated", "")
+        else:
+            title = ch.get("title", f"Розділ {ch['no']}")
+            date = ch.get("updated", "")
+
         chapters.append({
-            "no": i + 1,
-            "title": CHAPTER_TITLES[i] if i < len(CHAPTER_TITLES) else f"Розділ {i + 1}",
-            "words": 1800 + ((i * 137) % 1400),
-            "date": CHAPTER_DATES[i % len(CHAPTER_DATES)],
-            "read": i < novel["chapters"] - 1,
-            "current": i == novel["chapters"] - 1,
+            "no": ch["no"],
+            "title": title,
+            "words": 1800 + ((ch["no"] * 137) % 1400),
+            "date": date,
+            "read": ch["no"] < novel["chapters"],
+            "current": ch["no"] == novel["chapters"],
         })
 
     return chapters
