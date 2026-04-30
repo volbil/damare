@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/novel_card.html" import novel_card %}
+
+{% block content %}
+<div class="bg-bg-0">
+    {# Banner #}
+    <div class="h-[100px] md:h-[140px] border-b border-line-soft" style="background: linear-gradient(120deg, oklch(0.28 0.04 140) 0%, oklch(0.22 0.02 130) 50%, oklch(0.20 0.03 120) 100%);"></div>
+
+    <div class="max-w-[1080px] mx-auto px-4 md:px-8 pb-16 md:pb-20">
+        {# Header #}
+        <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5 -mt-[40px] md:-mt-[52px] mb-7">
+            <div class="avatar border-4 border-bg-0 bg-accent text-accent-fg shrink-0 w-20 h-20 md:w-[104px] md:h-[104px] text-2xl md:text-[36px]">
+                {{ team.avatar }}
+            </div>
+            <div class="flex-1 sm:pb-2 min-w-0">
+                <h1 class="text-2xl font-semibold mb-0.5">{{ team.name }}</h1>
+                <div class="text-[13px] text-fg-3">
+                    @{{ team.id | replace('team_', '') | replace('solo_', '') }}
+                    {%- if team.kind == 'solo' %}
+                    · соло-перекладач
+                    {%- else %}
+                    · {{ team.members_count }}
+                    {%- if team.members_count == 1 %} учасник
+                    {%- elif team.members_count < 5 %} учасники
+                    {%- else %} учасників
+                    {%- endif %}
+                    {%- endif %}
+                    · з {{ team.joined }}
+                </div>
+            </div>
+            <div class="flex gap-2 sm:pb-2 flex-wrap">
+                <button type="button" class="btn">{{ icon('mail', 14) }} Повідомлення</button>
+                <button type="button" class="btn primary">{{ icon('plus', 13) }} Стежити</button>
+            </div>
+        </div>
+
+        {# Bio + stats #}
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 md:gap-8 mb-8">
+            <p class="text-sm leading-[1.65] text-fg-1 max-w-[600px] m-0">{{ team.bio }}</p>
+            <div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden">
+                <div class="bg-bg-1 px-2.5 py-3 text-center">
+                    <div class="text-[17px] font-semibold text-fg-0 tabular-nums">{{ stats.project_count }}</div>
+                    <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">серій</div>
+                </div>
+                <div class="bg-bg-1 px-2.5 py-3 text-center">
+                    <div class="text-[17px] font-semibold text-fg-0 tabular-nums">{{ stats.total_chapters }}</div>
+                    <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">розділів</div>
+                </div>
+                <div class="bg-bg-1 px-2.5 py-3 text-center">
+                    <div class="text-[17px] font-semibold text-fg-0 tabular-nums">{{ stats.active_count }}</div>
+                    <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">активних</div>
+                </div>
+            </div>
+        </div>
+
+        {# Tabs #}
+        <div class="border-b border-line-soft mb-7 -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto">
+            <div class="flex gap-1 min-w-max">
+                <a href="/team/{{ team.id }}"
+                   class="px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition whitespace-nowrap {% if active_tab == 'overview' %}border-accent text-fg-0{% else %}border-transparent text-fg-3 hover:text-fg-1{% endif %}">
+                    Огляд
+                </a>
+                <a href="/team/{{ team.id }}?tab=projects"
+                   class="px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition whitespace-nowrap {% if active_tab == 'projects' %}border-accent text-fg-0{% else %}border-transparent text-fg-3 hover:text-fg-1{% endif %}">
+                    Серії · {{ projects | length }}
+                </a>
+                <a href="/team/{{ team.id }}?tab=activity"
+                   class="px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition whitespace-nowrap {% if active_tab == 'activity' %}border-accent text-fg-0{% else %}border-transparent text-fg-3 hover:text-fg-1{% endif %}">
+                    Активність
+                </a>
+            </div>
+        </div>
+
+        {%- if active_tab == 'overview' %}
+        {# ─────── Серії (preview) ─────── #}
+        <section class="mb-10">
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 class="text-[11px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Серії · {{ projects | length }}
+                </h3>
+                {%- if projects | length > 4 %}
+                <a href="/team/{{ team.id }}?tab=projects" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
+                {%- endif %}
+            </div>
+            {%- if projects %}
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
+                {%- for n in projects[:4] %}
+                {{ novel_card(n) }}
+                {%- endfor %}
+            </div>
+            {%- else %}
+            <div class="text-fg-3 text-sm py-6 text-center bg-bg-1 border border-line-soft rounded-md">Команда ще не має проєктів.</div>
+            {%- endif %}
+        </section>
+
+        {# ─────── Учасники (groups only) ─────── #}
+        {%- if team.kind == 'group' %}
+        <section class="mb-10">
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 class="text-[11px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Учасники · {{ team.members_count }}
+                </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {%- for m in team.members %}
+                <a href="/profile" class="flex items-center gap-3 p-4 bg-bg-1 border border-line-soft rounded-md hover:border-line transition">
+                    <div class="avatar w-10 h-10 shrink-0">{{ m.name | initials }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-fg-0 truncate">{{ m.name }}</div>
+                        <div class="text-xs text-fg-3 truncate">{{ m.role }}</div>
+                    </div>
+                </a>
+                {%- endfor %}
+            </div>
+        </section>
+        {%- endif %}
+
+        {# ─────── Активність (preview) ─────── #}
+        {%- if activity %}
+        <section class="mb-10">
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 class="text-[11px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Активність
+                </h3>
+                {%- if activity | length > 3 %}
+                <a href="/team/{{ team.id }}?tab=activity" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
+                {%- endif %}
+            </div>
+            <div class="flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
+                {%- for entry in activity[:3] %}
+                <div class="flex gap-3 px-[18px] py-3.5 {% if not loop.last %}border-b border-line-soft{% endif %}">
+                    <div class="w-7 h-7 shrink-0 rounded-md bg-bg-2 flex items-center justify-center text-accent">
+                        {{ icon('book', 13) }}
+                    </div>
+                    <div class="flex-1 text-[13px] text-fg-1 min-w-0">
+                        оновили <span class="text-fg-0 font-medium">розділ {{ entry.chapter_no }}: «{{ entry.chapter_title }}»</span> у
+                        <a href="/title/{{ entry.novel_id }}" class="text-accent">{{ entry.novel_title | truncate(50) }}</a>
+                        <div class="text-[11px] text-fg-3 mt-0.5">{{ entry.time }}</div>
+                    </div>
+                </div>
+                {%- endfor %}
+            </div>
+        </section>
+        {%- endif %}
+
+        {%- elif active_tab == 'projects' %}
+        {# ─────── All series ─────── #}
+        <section class="mb-10">
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 class="text-[11px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Усі серії · {{ projects | length }}
+                </h3>
+            </div>
+            {%- if projects %}
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
+                {%- for n in projects %}
+                {{ novel_card(n) }}
+                {%- endfor %}
+            </div>
+            {%- else %}
+            <div class="text-fg-3 text-sm py-6 text-center bg-bg-1 border border-line-soft rounded-md">Команда ще не має проєктів.</div>
+            {%- endif %}
+        </section>
+
+        {%- elif active_tab == 'activity' %}
+        {# ─────── All activity ─────── #}
+        <section class="mb-10">
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 class="text-[11px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Уся активність · {{ activity | length }}
+                </h3>
+            </div>
+            {%- if activity %}
+            <div class="flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
+                {%- for entry in activity %}
+                <div class="flex gap-3 px-[18px] py-3.5 {% if not loop.last %}border-b border-line-soft{% endif %}">
+                    <div class="w-7 h-7 shrink-0 rounded-md bg-bg-2 flex items-center justify-center text-accent">
+                        {{ icon('book', 13) }}
+                    </div>
+                    <div class="flex-1 text-[13px] text-fg-1 min-w-0">
+                        оновили <span class="text-fg-0 font-medium">розділ {{ entry.chapter_no }}: «{{ entry.chapter_title }}»</span> у
+                        <a href="/title/{{ entry.novel_id }}" class="text-accent">{{ entry.novel_title | truncate(50) }}</a>
+                        <div class="text-[11px] text-fg-3 mt-0.5">{{ entry.time }}</div>
+                    </div>
+                </div>
+                {%- endfor %}
+            </div>
+            {%- else %}
+            <div class="text-fg-3 text-sm py-6 text-center bg-bg-1 border border-line-soft rounded-md">Поки що тиша.</div>
+            {%- endif %}
+        </section>
+        {%- endif %}
+    </div>
+</div>
+{% endblock %}

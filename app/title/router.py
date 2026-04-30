@@ -540,6 +540,86 @@ async def styleguide(request: Request, user: User | None = Depends(auth_optional
     )
 
 
+@router.get("/team/{team_id}")
+async def team_profile(
+    request: Request,
+    team_id: str,
+    tab: str = "overview",
+    user: User | None = Depends(auth_optional),
+):
+    team = team_by_id(team_id)
+    if not team:
+        return templates.TemplateResponse(
+            "team/team.html",
+            {
+                "request": request,
+                "user": user,
+                "active": "",
+                "page_title": "Команда не знайдена",
+                "team": None,
+            },
+            status_code=404,
+        )
+
+    if tab not in {"overview", "projects", "activity"}:
+        tab = "overview"
+
+    # Find all series this team works on + compute stats + activity entries
+    projects = []
+    total_chapters = 0
+    active_count = 0
+    activity = []
+
+    for novel in NOVELS:
+        if novel.get("type") != "translation":
+            continue
+        for ta in novel.get("teams_active", []):
+            if ta["team_id"] != team["id"]:
+                continue
+            projects.append(novel)
+            total_chapters += ta.get("chapters_done", 0)
+            if ta.get("status") == "active":
+                active_count += 1
+            # Take up to 3 most-recent chapters this team did on this project
+            project_activity = []
+            for ch in reversed(novel.get("chapters_full", [])):
+                found = next(
+                    (t for t in ch.get("translations", []) if t["team_id"] == team["id"]),
+                    None,
+                )
+                if found:
+                    project_activity.append({
+                        "chapter_no": ch["no"],
+                        "chapter_title": found["title"],
+                        "novel_id": novel["id"],
+                        "novel_title": novel["title"],
+                        "time": found.get("updated", ""),
+                    })
+                    if len(project_activity) >= 3:
+                        break
+            activity.extend(project_activity)
+            break
+
+    return templates.TemplateResponse(
+        "team/team.html",
+        {
+            "request": request,
+            "user": user,
+            "active": "",
+            "page_title": team["name"],
+            "team": team,
+            "projects": projects,
+            "stats": {
+                "project_count": len(projects),
+                "total_chapters": total_chapters,
+                "active_count": active_count,
+            },
+            "activity": activity,
+            "active_tab": tab,
+        },
+    )
+
+
 @router.api_route("/create", methods=["GET", "POST"])
 async def create_title(
     request: Request,

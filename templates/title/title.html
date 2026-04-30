@@ -84,29 +84,34 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {%- for ta in novel.teams_active %}
                 {%- set team = team_by_id(ta.team_id) %}
-                <a href="/title/{{ novel.id }}/read?team={{ ta.team_id }}" class="flex gap-3 p-3 bg-bg-1 border border-line-soft rounded-lg hover:border-line transition">
-                    <div class="avatar w-10 h-10 shrink-0">{{ team.avatar }}</div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap mb-1">
-                            <span class="text-sm font-medium text-fg-0">{{ team.name }}</span>
-                            {%- if ta.status == 'active' %}
-                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-accent">Активна</span>
-                            {%- elif ta.status == 'frozen' %}
-                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-3">Заморожена</span>
-                            {%- elif ta.status == 'completed' %}
-                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-2">Завершена</span>
-                            {%- elif ta.status == 'dropped' %}
-                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-warn">Закинута</span>
-                            {%- endif %}
+                <div class="flex items-center gap-3 p-3 bg-bg-1 border border-line-soft rounded-lg hover:border-line transition">
+                    <a href="/team/{{ ta.team_id }}" class="flex-1 flex gap-3 min-w-0" title="Профіль команди {{ team.name }}">
+                        <div class="avatar w-10 h-10 shrink-0">{{ team.avatar }}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <span class="text-sm font-medium text-fg-0">{{ team.name }}</span>
+                                {%- if ta.status == 'active' %}
+                                <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-accent">Активна</span>
+                                {%- elif ta.status == 'frozen' %}
+                                <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-3">Заморожена</span>
+                                {%- elif ta.status == 'completed' %}
+                                <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-2">Завершена</span>
+                                {%- elif ta.status == 'dropped' %}
+                                <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-warn">Закинута</span>
+                                {%- endif %}
+                            </div>
+                            <div class="text-[12px] text-fg-3 mb-1.5">
+                                {{ ta.chapters_done }}/{{ novel.chapter_count }} р. · {{ ta.last_update }}
+                            </div>
+                            <div class="h-0.5 bg-bg-3 overflow-hidden">
+                                <div class="h-full bg-accent" style="width: {{ (ta.chapters_done / novel.chapter_count) * 100 }}%;"></div>
+                            </div>
                         </div>
-                        <div class="text-[12px] text-fg-3 mb-1.5">
-                            {{ ta.chapters_done }}/{{ novel.chapter_count }} р. · {{ ta.last_update }}
-                        </div>
-                        <div class="h-0.5 bg-bg-3 overflow-hidden">
-                            <div class="h-full bg-accent" style="width: {{ (ta.chapters_done / novel.chapter_count) * 100 }}%;"></div>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                    <a href="/title/{{ novel.id }}/read?team={{ ta.team_id }}" class="btn sm shrink-0" title="Читати в перекладі від {{ team.name }}">
+                        Читати {{ icon('arrow-r', 12) }}
+                    </a>
+                </div>
                 {%- endfor %}
             </div>
         </div>

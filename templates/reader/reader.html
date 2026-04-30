@@ -12,7 +12,7 @@
 
         <div class="flex-1 flex items-center justify-center gap-2 text-[11px] text-fg-3 px-2 min-w-0">
             {%- if current_team %}
-            <a href="#" class="flex items-center gap-1.5 hover:text-fg-1 shrink-0" title="{{ current_team.name }}">
+            <a href="/team/{{ current_team_id }}" class="flex items-center gap-1.5 hover:text-fg-1 shrink-0" title="{{ current_team.name }}">
                 <div class="avatar w-5 h-5 text-[9px]">{{ current_team.avatar }}</div>
                 <span class="hidden sm:inline">{{ current_team.name }}</span>
             </a>
@@ -38,7 +38,7 @@
             {%- if novel.type == 'translation' %}
             {{ novel.original_author }}
             {%- if current_team %}
-            · переклад: <a href="#" class="text-accent">{{ current_team.name }}</a>
+            · переклад: <a href="/team/{{ current_team_id }}" class="text-accent">{{ current_team.name }}</a>
             {%- endif %}
             {%- else %}
             {{ novel.author_obj.name }}
