@@ -463,11 +463,11 @@
         <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Композити</h2>
         <p class="text-sm text-fg-3 mb-8">Складніші компоненти, зібрані з атомів.</p>
 
-        {% call entry("Картка з обкладинкою", "Сітковий варіант — постер зверху, заголовок (clamp 2 рядки + min-h щоб картки вирівнювались), автор, статистика.") %}
+        {% call entry("Картка з обкладинкою", "Сітковий варіант — постер зверху, заголовок (clamp 2 рядки + min-h щоб картки вирівнювались), автор, статистика. Лівий-верхній кут постера показує мітку походження: мова-джерело (JP, KR, ZH) для перекладів, акцентна «ОРИГ» для оригіналів.") %}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6 bg-bg-1 border border-line-soft rounded-md">
-            {{ novel_card_cover(demo_novel) }}
-            {{ novel_card_cover(demo_novel) }}
-            {{ novel_card_cover(demo_novel) }}
+            {{ novel_card_cover(demo_translation) }}
+            {{ novel_card_cover(demo_original) }}
+            {{ novel_card_cover(demo_translation) }}
         </div>
         {% call code_block() %}{% raw %}{% from "components/novel_card.html" import novel_card %}
 
@@ -478,9 +478,10 @@
 </div>{% endraw %}{% endcall %}
         {% endcall %}
 
-        {% call entry("Картка-рядок", "Горизонтальний варіант — мала обкладинка + повний опис + теги + статистика.") %}
-        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
-            {{ novel_card_list(demo_novel) }}
+        {% call entry("Картка-рядок", "Горизонтальний варіант — мала обкладинка + повний опис + теги + статистика. Заголовний ряд містить мітку типу («JP · ПЕРЕКЛАД» або «ОРИГІНАЛ») поряд із рейтингом. Для перекладів під автором додається рядок «перекладає [команда]».") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md flex flex-col gap-3">
+            {{ novel_card_list(demo_translation) }}
+            {{ novel_card_list(demo_original) }}
         </div>
         {% call code_block() %}{% raw %}{{ novel_card(novel, with_covers=false) }}{% endraw %}{% endcall %}
         {% endcall %}

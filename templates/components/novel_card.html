@@ -1,7 +1,11 @@
-{# Novel card variants, ported from frontend_reference/novel-card.jsx.
-   - novel_card_cover: poster-first grid card
-   - novel_card_list: horizontal row card with metadata
-   - novel_card: dispatcher chooses cover/list based on with_covers flag #}
+{# Novel card variants, ported from frontend_reference/novel-card.jsx and
+   extended with type-awareness (translation vs original).
+
+   - novel_card_cover: poster-first grid card, with origin badge on cover
+   - novel_card_list:  horizontal row card, with type tag in title row
+                       and translator team attribution under author
+   - novel_card:       dispatcher chooses cover/list based on with_covers flag
+#}
 
 {% from "components/icon.html" import icon %}
 {% from "components/cover.html" import cover %}
@@ -12,13 +16,20 @@
     <article class="cursor-pointer flex flex-col gap-2.5">
         <div class="cover shadow-sm">
             {{ cover(novel.title, novel.author, novel.id) }}
+            {# Origin badge (top-left) — source-language code for translations,
+               accent "ОРИГ" for originals so they pop visually. #}
+            {%- if novel.type == 'translation' %}
+            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">{{ novel.source_language | upper }}</span>
+            {%- else %}
+            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-accent text-accent-fg px-[7px] py-[3px]">ОРИГ</span>
+            {%- endif %}
             {%- if novel.progress > 0 and novel.progress < 100 %}
             <div class="absolute left-0 right-0 bottom-0 h-[3px] bg-black/40">
                 <div class="h-full bg-accent" style="width: {{ novel.progress }}%;"></div>
             </div>
             {%- endif %}
             {%- if novel.status == 'Завершено' %}
-            <span class="absolute top-2 right-2 text-[9.5px] font-semibold tracking-[0.06em] uppercase bg-black/50 backdrop-blur-md text-white px-[7px] py-[3px] rounded-full">Завершено</span>
+            <span class="absolute top-2 right-2 text-[9.5px] font-semibold tracking-[0.06em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">Завершено</span>
             {%- endif %}
         </div>
         <div>
@@ -46,10 +57,21 @@
         <div class="flex-1 min-w-0 flex flex-col gap-1.5">
             <div class="flex items-baseline justify-between gap-3">
                 <h3 class="text-[15px] font-serif font-medium leading-tight line-clamp-2">{{ novel.title }}</h3>
-                <span class="tag rating">{{ novel.rating }}</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    {%- if novel.type == 'translation' %}
+                    <span class="tag">{{ novel.source_language | upper }} · ПЕРЕКЛАД</span>
+                    {%- else %}
+                    <span class="tag fandom">ОРИГІНАЛ</span>
+                    {%- endif %}
+                    <span class="tag rating">{{ novel.rating }}</span>
+                </div>
             </div>
             <div class="text-xs text-fg-3">
-                <span class="text-fg-2">{{ novel.author }}</span> · {{ novel.updated }}
+                <span class="text-fg-2">{{ novel.author }}</span>
+                {%- if novel.type == 'translation' and novel.teams_active %}
+                · перекладає <span class="text-fg-2">{{ team_by_id(novel.teams_active[0].team_id).name }}</span>
+                {%- endif %}
+                · {{ novel.updated }}
             </div>
             <p class="text-[12.5px] text-fg-2 leading-relaxed m-0 line-clamp-2">{{ novel.summary }}</p>
             <div class="flex gap-1.5 flex-wrap mt-0.5">

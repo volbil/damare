@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="bg-bg-0">
-    {# Hero #}
+    {# ────────────────────────── Hero ────────────────────────── #}
     <div class="relative border-b border-line-soft">
         <div class="absolute inset-0 opacity-30 overflow-hidden">
             {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
@@ -15,7 +15,13 @@
                 {{ cover(novel.title, novel.author, novel.id) }}
             </div>
             <div class="flex-1 pt-3">
+                {# Type / rating / status tags #}
                 <div class="flex gap-1.5 mb-3 flex-wrap">
+                    {%- if novel.type == 'translation' %}
+                    <span class="tag">{{ novel.source_language | upper }} · ПЕРЕКЛАД</span>
+                    {%- else %}
+                    <span class="tag fandom">ОРИГІНАЛ</span>
+                    {%- endif %}
                     {%- if novel.rating == 'G' %}
                     <span class="tag rating">Загальна</span>
                     {%- elif novel.rating == 'T' %}
@@ -24,19 +30,39 @@
                     <span class="tag rating">Дорослий</span>
                     {%- endif %}
                     <span class="tag bg-transparent" style="border-color: var(--color-line);">{{ novel.status }}</span>
-                    <span class="tag bg-transparent" style="border-color: var(--color-line);">Українська</span>
                 </div>
+
+                {# Romaji subtitle for translations #}
+                {%- if novel.type == 'translation' %}
+                <div class="text-[11px] text-fg-3 font-mono uppercase tracking-[0.06em] mb-1.5 line-clamp-1">
+                    {{ novel.title_romaji }}
+                </div>
+                {%- endif %}
+
+                {# Series title #}
                 <h1 class="font-serif text-[40px] font-medium leading-[1.05] mb-2 tracking-tight line-clamp-2">{{ novel.title }}</h1>
+
+                {# Author / source line #}
                 <div class="text-sm text-fg-2 mb-4">
-                    від <a href="#" class="text-accent underline underline-offset-[3px]">{{ novel.author }}</a>
+                    {%- if novel.type == 'translation' %}
+                    {{ novel.original_author }}{%- if novel.original_publisher %} · <span class="text-fg-3">{{ novel.original_publisher }}, {{ novel.original_year }}</span>{%- endif %}
+                    {%- else %}
+                    від <a href="#" class="text-accent underline underline-offset-[3px]">{{ novel.author_obj.name }}</a>
+                    {%- endif %}
                 </div>
+
+                {# Summary #}
                 <p class="text-sm leading-[1.65] text-fg-1 max-w-[560px] mb-5">{{ novel.summary }}</p>
+
+                {# Action buttons #}
                 <div class="flex gap-2.5 mb-5 flex-wrap">
                     <a href="/title/{{ novel.id }}/read" class="btn primary">{{ icon('book', 14) }} Почати читати</a>
-                    <button class="btn">{{ icon('bookmark', 14) }} Зберегти</button>
-                    <button class="btn">{{ icon('heart', 14) }} {{ novel.kudos | thousands_uk }}</button>
-                    <button class="btn icon">{{ icon('more', 15) }}</button>
+                    <button type="button" class="btn">{{ icon('bookmark', 14) }} Зберегти</button>
+                    <button type="button" class="btn">{{ icon('heart', 14) }} {{ novel.kudos | thousands_uk }}</button>
+                    <button type="button" class="btn icon">{{ icon('more', 15) }}</button>
                 </div>
+
+                {# Stat row #}
                 <div class="stat-row text-xs text-fg-2 flex-wrap">
                     <span class="stat">{{ icon('eye', 12) }}{{ novel.hits | thousands_uk }} переглядів</span>
                     <span class="stat">{{ icon('heart', 12) }}{{ novel.kudos | thousands_uk }} kudos</span>
@@ -47,7 +73,47 @@
         </div>
     </div>
 
-    {# Body #}
+    {# ────────────────────────── Active teams strip ────────────────────────── #}
+    {%- if novel.type == 'translation' and novel.teams_active %}
+    <section class="border-b border-line-soft py-6 bg-bg-0">
+        <div class="max-w-[1080px] mx-auto px-4 md:px-8">
+            <h3 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3 inline-flex items-center gap-2">
+                <span class="redact-bar text-accent"></span>
+                Команди ({{ novel.teams_active | length }})
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {%- for ta in novel.teams_active %}
+                {%- set team = team_by_id(ta.team_id) %}
+                <a href="/title/{{ novel.id }}/read?team={{ ta.team_id }}" class="flex gap-3 p-3 bg-bg-1 border border-line-soft rounded-lg hover:border-line transition">
+                    <div class="avatar w-10 h-10 shrink-0">{{ team.avatar }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="text-sm font-medium text-fg-0">{{ team.name }}</span>
+                            {%- if ta.status == 'active' %}
+                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-accent">Активна</span>
+                            {%- elif ta.status == 'frozen' %}
+                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-3">Заморожена</span>
+                            {%- elif ta.status == 'completed' %}
+                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-fg-2">Завершена</span>
+                            {%- elif ta.status == 'dropped' %}
+                            <span class="text-[9.5px] font-mono uppercase tracking-[0.06em] text-warn">Закинута</span>
+                            {%- endif %}
+                        </div>
+                        <div class="text-[12px] text-fg-3 mb-1.5">
+                            {{ ta.chapters_done }}/{{ novel.chapter_count }} р. · {{ ta.last_update }}
+                        </div>
+                        <div class="h-0.5 bg-bg-3 overflow-hidden">
+                            <div class="h-full bg-accent" style="width: {{ (ta.chapters_done / novel.chapter_count) * 100 }}%;"></div>
+                        </div>
+                    </div>
+                </a>
+                {%- endfor %}
+            </div>
+        </div>
+    </section>
+    {%- endif %}
+
+    {# ────────────────────────── Body ────────────────────────── #}
     <div class="max-w-[1080px] mx-auto px-4 md:px-8 pt-8 pb-16 md:pb-20 grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8 lg:gap-10">
         <div>
             {# Tags #}
@@ -60,31 +126,46 @@
                     {%- for t in novel.tags %}
                     <span class="tag">{{ t }}</span>
                     {%- endfor %}
-                    <span class="tag bg-transparent" style="border-color: var(--color-line);">+ ще 4</span>
                 </div>
             </section>
 
-            {# Chapters #}
+            {# Chapter list #}
             <section>
                 <div class="flex items-baseline justify-between mb-3.5">
-                    <h3 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3">Розділи · {{ novel.chapter_count }}</h3>
-                    <button class="text-xs text-fg-3 inline-flex items-center gap-1 hover:text-fg-1">{{ icon('sort', 11) }} Найновіші</button>
+                    <h3 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3">
+                        Розділи · {{ novel.chapter_count }}
+                        {%- if novel.type == 'translation' and novel.teams_active|length > 1 %}
+                        · {{ novel.teams_active|length }} команди
+                        {%- endif %}
+                    </h3>
+                    <button type="button" class="text-xs text-fg-3 inline-flex items-center gap-1 hover:text-fg-1">{{ icon('sort', 11) }} Найновіші</button>
                 </div>
                 <ol class="m-0 p-0 list-none border border-line-soft rounded-lg overflow-hidden bg-bg-1">
                     {%- for ch in chapters[:8] %}
-                    <li class="border-b border-line-soft" {% if ch.current %}style="background: var(--color-accent-soft);"{% endif %}>
-                        <a href="{% if ch.current %}/title/{{ novel.id }}/read{% else %}#{% endif %}" class="flex items-center gap-3.5 px-4 py-3 {% if ch.current %}cursor-pointer{% endif %}">
-                            <span class="w-7 text-xs text-fg-3 tabular-nums text-right">{{ "%02d"|format(ch.no) }}</span>
-                            <div class="flex-1">
-                                <div class="text-[13.5px] mb-0.5 {% if ch.current %}text-accent font-medium{% else %}text-fg-0{% endif %}">{{ ch.title }}</div>
+                    {%- set base_url = "/title/" ~ novel.id ~ "/read?ch=" ~ ch.no %}
+                    {%- set primary_url = base_url ~ ("&team=" ~ ch.primary_team_id if ch.primary_team_id else "") %}
+                    <li class="border-b border-line-soft flex items-center gap-3 px-4 py-3 hover:bg-bg-2 transition" {% if ch.current %}style="background: var(--color-accent-soft);"{% endif %}>
+                        <a href="{{ primary_url }}" class="flex-1 min-w-0 flex items-center gap-3.5">
+                            <span class="w-7 text-xs text-fg-3 tabular-nums text-right shrink-0">{{ "%02d"|format(ch.no) }}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[13.5px] mb-0.5 line-clamp-1 {% if ch.current %}text-accent font-medium{% else %}text-fg-0{% endif %}">{{ ch.title }}</div>
                                 <div class="text-[11px] text-fg-3">{{ ch.words | thousands_uk }} слів · {{ ch.date }}</div>
                             </div>
-                            {%- if ch.read %}
-                            <span class="text-fg-3">{{ icon('check', 13) }}</span>
-                            {%- elif ch.current %}
-                            <span class="text-[10px] text-accent font-semibold tracking-[0.06em] uppercase">Зараз</span>
-                            {%- endif %}
                         </a>
+                        {%- if ch.has_alternates %}
+                        <div class="flex items-center gap-1 shrink-0">
+                            {%- for alt in ch.alternates %}
+                            <a href="{{ base_url }}&team={{ alt.team_id }}"
+                               class="avatar w-6 h-6 text-[10px] hover:bg-bg-4 transition"
+                               title="{{ alt.team.name }}: {{ alt.title }}">{{ alt.team.avatar }}</a>
+                            {%- endfor %}
+                        </div>
+                        {%- endif %}
+                        {%- if ch.read %}
+                        <span class="text-fg-3 shrink-0">{{ icon('check', 13) }}</span>
+                        {%- elif ch.current %}
+                        <span class="text-[10px] text-accent font-semibold tracking-[0.06em] uppercase shrink-0">Зараз</span>
+                        {%- endif %}
                     </li>
                     {%- endfor %}
                     {%- if novel.chapter_count > 8 %}
@@ -94,19 +175,39 @@
             </section>
         </div>
 
+        {# ────────────────────────── Aside ────────────────────────── #}
         <aside class="flex flex-col gap-6">
-            {# Author card #}
+            {%- if novel.type == 'translation' %}
+            {# Original work card #}
+            <section class="p-4 border border-line-soft rounded-lg bg-bg-1">
+                <h4 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Оригінал</h4>
+                <div class="text-[12px] font-mono text-fg-3 mb-1.5 line-clamp-2 break-all">{{ novel.title_ja }}</div>
+                <div class="text-[11px] text-fg-3 mb-3 italic font-mono line-clamp-1">{{ novel.title_romaji }}</div>
+                <div class="text-[13px] text-fg-1 font-medium mb-1">{{ novel.original_author }}</div>
+                <div class="text-[11px] text-fg-3 mb-1">
+                    {%- if novel.source_language == 'ja' %}японська{% elif novel.source_language == 'ko' %}корейська{% elif novel.source_language == 'zh' %}китайська{% else %}{{ novel.source_language }}{%- endif %}
+                </div>
+                <div class="text-[11px] text-fg-3">
+                    {{ novel.original_publisher }} · {{ novel.original_year }} · {{ novel.original_status }}
+                </div>
+            </section>
+            {%- else %}
+            {# Author card for originals #}
             <section class="p-4 border border-line-soft rounded-lg bg-bg-1">
                 <h4 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Автор</h4>
                 <div class="flex gap-2.5 items-center mb-3">
-                    <div class="avatar w-9 h-9">{{ novel.author | initials }}</div>
-                    <div class="flex-1">
-                        <div class="text-[13px] text-fg-0 font-medium">{{ novel.author }}</div>
-                        <div class="text-[11px] text-fg-3">12 творів · 4.2k читачів</div>
+                    <div class="avatar w-9 h-9 bg-accent text-accent-fg">{{ novel.author_obj.name | initials }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13px] text-fg-0 font-medium">{{ novel.author_obj.name }}</div>
+                        <div class="text-[11px] text-fg-3 truncate">@{{ novel.author_obj.id }}</div>
                     </div>
                 </div>
-                <button class="btn sm w-full">{{ icon('plus', 11) }} Стежити</button>
+                {%- if novel.author_obj.bio %}
+                <p class="text-[12px] text-fg-2 leading-relaxed mb-3 m-0">{{ novel.author_obj.bio }}</p>
+                {%- endif %}
+                <button type="button" class="btn sm w-full">{{ icon('plus', 11) }} Стежити</button>
             </section>
+            {%- endif %}
 
             {# Similar #}
             <section>
@@ -118,7 +219,7 @@
                             {{ cover(nv.title, nv.author, nv.id, show_text=false) }}
                         </div>
                         <div class="min-w-0">
-                            <div class="text-[12.5px] font-serif truncate">{{ nv.title }}</div>
+                            <div class="font-serif text-[12.5px] leading-[1.25] text-fg-0 line-clamp-2">{{ nv.title }}</div>
                             <div class="text-[11px] text-fg-3 truncate">{{ nv.author }}</div>
                         </div>
                     </a>

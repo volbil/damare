@@ -4,6 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 from app.database import sessionmanager
 from app.utils import get_settings, cover_palette, cover_layout
+from app.stub_data import team_by_id
 from fastapi import FastAPI
 import arel
 
@@ -12,9 +13,10 @@ settings = get_settings()
 templates = Jinja2Templates(directory="templates")
 
 
-# Expose cover helpers to Jinja templates
+# Expose helpers to Jinja templates
 templates.env.globals["cover_palette"] = cover_palette
 templates.env.globals["cover_layout"] = cover_layout
+templates.env.globals["team_by_id"] = team_by_id
 
 
 def _thousands_uk(n):

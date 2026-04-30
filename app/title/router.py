@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from .dependencies import validate_title_create
 from app.dependencies import auth_mandatory
 from app.dependencies import auth_optional
-from app.stub_data import NOVELS, NOTIFICATIONS, READER_CHAPTER, TAGS, novel_by_id, READER_CHAPTER
+from app.stub_data import NOVELS, NOTIFICATIONS, READER_CHAPTER, TAGS, novel_by_id, team_by_id, READER_CHAPTER
 from app.schemas import FormResult
 from app.models import User
 from app import templates
@@ -12,31 +12,65 @@ router = APIRouter()
 
 
 def _build_chapters(novel):
-    """Build the title-page chapter list from the series' chapters_full.
+    """Build chapter rows for the Series page, enriched with team metadata.
 
-    For translations, uses each row's primary_title and primary translation's
-    updated timestamp. For originals, uses title and updated directly.
+    For translations: each row includes primary_team (full team dict),
+    alternates (list of {team_id, team, title} for non-primary teams that
+    translated this chapter), and has_alternates flag. The first translation
+    in chapters_full[].translations is treated as primary.
+
+    For originals: team fields are None and has_alternates is False.
     """
 
     chapters = []
 
     for ch in novel.get("chapters_full", []):
         if novel["type"] == "translation":
-            title = ch.get("primary_title", f"Розділ {ch['no']}")
-            primary = (ch.get("translations") or [{}])[0]
-            date = primary.get("updated", "")
-        else:
-            title = ch.get("title", f"Розділ {ch['no']}")
-            date = ch.get("updated", "")
+            translations = ch.get("translations") or []
 
-        chapters.append({
-            "no": ch["no"],
-            "title": title,
-            "words": 1800 + ((ch["no"] * 137) % 1400),
-            "date": date,
-            "read": ch["no"] < novel["chapters"],
-            "current": ch["no"] == novel["chapters"],
-        })
+            if not translations:
+                continue
+
+            primary_t = translations[0]
+            primary_team = team_by_id(primary_t["team_id"])
+
+            alternates = []
+            for t in translations[1:]:
+                alt_team = team_by_id(t["team_id"])
+                if alt_team:
+                    alternates.append({
+                        "team_id": t["team_id"],
+                        "team": alt_team,
+                        "title": t["title"],
+                    })
+
+            row = {
+                "no": ch["no"],
+                "title": primary_t["title"],
+                "primary_team_id": primary_t["team_id"],
+                "primary_team": primary_team,
+                "alternates": alternates,
+                "has_alternates": len(translations) > 1,
+                "date": primary_t.get("updated", ""),
+                "words": 1800 + ((ch["no"] * 137) % 1400),
+                "read": ch["no"] < novel["chapters"],
+                "current": ch["no"] == novel["chapters"],
+            }
+        else:
+            row = {
+                "no": ch["no"],
+                "title": ch.get("title", f"Розділ {ch['no']}"),
+                "primary_team_id": None,
+                "primary_team": None,
+                "alternates": [],
+                "has_alternates": False,
+                "date": ch.get("updated", ""),
+                "words": 1800 + ((ch["no"] * 137) % 1400),
+                "read": ch["no"] < novel["chapters"],
+                "current": ch["no"] == novel["chapters"],
+            }
+
+        chapters.append(row)
 
     return chapters
 
@@ -443,7 +477,8 @@ async def styleguide(request: Request, user: User | None = Depends(auth_optional
             "page_title": "Компоненти",
             "icon_names": icon_names,
             "tokens": tokens,
-            "demo_novel": NOVELS[0],
+            "demo_translation": NOVELS[0],
+            "demo_original": next((n for n in NOVELS if n["type"] == "original"), None),
         },
     )
 
