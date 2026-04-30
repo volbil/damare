@@ -9,3 +9,15 @@
     {%- endfor %}
 </div>
 {%- endmacro %}
+
+
+{# Link-based segmented — same chrome, but each option is an <a> with href.
+   Pass a list of {label, href, active} dicts. #}
+
+{% macro segmented_links(filters, small=false) -%}
+<div class="inline-flex bg-bg-1 rounded-md p-0.5 border border-line-soft w-fit max-w-full">
+    {%- for f in filters %}
+    <a href="{{ f.href }}" class="{% if small %}h-6 text-[11px]{% else %}h-7 text-xs{% endif %} px-2.5 rounded-sm inline-flex items-center whitespace-nowrap {% if f.active %}bg-bg-3 text-fg-0 font-medium{% else %}text-fg-3 hover:text-fg-1{% endif %}">{{ f.label }}</a>
+    {%- endfor %}
+</div>
+{%- endmacro %}

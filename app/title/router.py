@@ -1,8 +1,18 @@
-from fastapi import APIRouter, Request, Depends
+from urllib.parse import urlencode
+
+from fastapi import APIRouter, Request, Depends, Query
 from .dependencies import validate_title_create
 from app.dependencies import auth_mandatory
 from app.dependencies import auth_optional
-from app.stub_data import NOVELS, NOTIFICATIONS, READER_CHAPTER, TAGS, novel_by_id, team_by_id, READER_CHAPTER
+from app.stub_data import (
+    NOVELS,
+    NOTIFICATIONS,
+    READER_CHAPTER,
+    TAGS,
+    TEAMS,
+    novel_by_id,
+    team_by_id,
+)
 from app.schemas import FormResult
 from app.models import User
 from app import templates
@@ -182,7 +192,82 @@ async def read_chapter(
 
 
 @router.get("/search")
-async def search(request: Request, user: User | None = Depends(auth_optional)):
+async def search(
+    request: Request,
+    user: User | None = Depends(auth_optional),
+    q: str = "",
+    kind: str = Query("all", alias="type"),
+    lang: str = "all",
+    team: str = "all",
+):
+    valid_kinds = {"all", "translation", "original"}
+    if kind not in valid_kinds:
+        kind = "all"
+
+    valid_team_ids = {"all"} | {t["id"] for t in TEAMS}
+    if team not in valid_team_ids:
+        team = "all"
+
+    # Apply filters
+    results = list(NOVELS)
+    if kind == "translation":
+        results = [n for n in results if n.get("type") == "translation"]
+    elif kind == "original":
+        results = [n for n in results if n.get("type") == "original"]
+
+    if lang != "all":
+        results = [n for n in results if n.get("source_language") == lang]
+
+    if team != "all":
+        results = [
+            n for n in results
+            if any(ta.get("team_id") == team for ta in n.get("teams_active", []))
+        ]
+
+    # Source languages found in actual translation data — keeps filter honest
+    available_langs = sorted({
+        n.get("source_language")
+        for n in NOVELS
+        if n.get("type") == "translation" and n.get("source_language")
+    })
+
+    def search_url(**overrides):
+        params = {"q": q, "type": kind, "lang": lang, "team": team}
+        params.update(overrides)
+        # Strip defaults so URLs stay tidy
+        params = {k: v for k, v in params.items() if v and v != "all"}
+        if not params:
+            return "/search"
+        return "/search?" + urlencode(params)
+
+    type_filters = [
+        {"label": "Усі", "active": kind == "all", "href": search_url(type="all")},
+        {"label": "Переклади", "active": kind == "translation", "href": search_url(type="translation")},
+        {"label": "Оригінали", "active": kind == "original", "href": search_url(type="original")},
+    ]
+
+    lang_labels = {"ja": "Японська", "ko": "Корейська", "zh": "Китайська"}
+    lang_filters = [
+        {"label": "Усі", "active": lang == "all", "href": search_url(lang="all")},
+    ]
+    for code in available_langs:
+        lang_filters.append({
+            "label": lang_labels.get(code, code.upper()),
+            "active": lang == code,
+            "href": search_url(lang=code),
+        })
+
+    team_filters = [
+        {"label": "Усі команди", "active": team == "all", "href": search_url(team="all")},
+    ]
+    for t in TEAMS:
+        team_filters.append({
+            "label": t["name"],
+            "avatar": t["avatar"],
+            "active": team == t["id"],
+            "href": search_url(team=t["id"]),
+        })
+
     return templates.TemplateResponse(
         "search/search.html",
         {
@@ -190,12 +275,19 @@ async def search(request: Request, user: User | None = Depends(auth_optional)):
             "user": user,
             "active": "discover",
             "page_title": "Пошук",
-            "query": "зимові",
-            "active_tags": ["містика", "повільне горіння"],
-            "excluded_tags": ["насильство", "смерть персонажа"],
+            "query": q,
+            "active_tags": [],
+            "excluded_tags": [],
             "popular_tags": TAGS,
-            "result_count": 1284,
-            "results": NOVELS[:5],
+            "result_count": len(results),
+            "results": results,
+            "type_filters": type_filters,
+            "lang_filters": lang_filters,
+            "team_filters": team_filters,
+            "show_lang_filter": kind != "original",
+            "current_kind": kind,
+            "current_lang": lang,
+            "current_team": team,
         },
     )
 
