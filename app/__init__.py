@@ -39,8 +39,29 @@ def _initials(name, max_chars=2):
     return name[:max_chars].upper()
 
 
+def plural_uk(n, sing, few, many):
+    """Pick the right Ukrainian noun form for a count.
+
+    - 1, 21, 31, … (except 11) → sing  (твір)
+    - 2-4, 22-24, … (except 12-14) → few (твори)
+    - everything else → many (творів)
+    """
+
+    n = abs(int(n))
+    last_two = n % 100
+    last = n % 10
+    if 11 <= last_two <= 14:
+        return many
+    if last == 1:
+        return sing
+    if 2 <= last <= 4:
+        return few
+    return many
+
+
 templates.env.filters["thousands_uk"] = _thousands_uk
 templates.env.filters["initials"] = _initials
+templates.env.filters["plural_uk"] = plural_uk
 
 
 def create_app(init_db: bool = True) -> FastAPI:

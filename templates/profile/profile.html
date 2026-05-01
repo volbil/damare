@@ -12,11 +12,23 @@
         {# Header #}
         <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5 -mt-[40px] md:-mt-[52px] mb-7">
             <div class="avatar border-4 border-bg-0 bg-accent text-accent-fg shrink-0 w-20 h-20 md:w-[104px] md:h-[104px] text-2xl md:text-[36px]">
-                {{ profile.name | initials }}
+                {{ profile.avatar or (profile.name | initials) }}
             </div>
-            <div class="flex-1 sm:pb-2">
-                <h1 class="text-2xl font-semibold mb-0.5">{{ profile.name }}</h1>
-                <div class="text-[13px] text-fg-3">@{{ profile.handle }} · {{ profile.location }} · з {{ profile.joined }}</div>
+            <div class="flex-1 sm:pb-2 min-w-0">
+                <div class="flex items-center gap-2.5 flex-wrap mb-0.5">
+                    <h1 class="text-2xl font-semibold m-0">{{ profile.name }}</h1>
+                    {%- for role in profile.roles %}
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] uppercase tracking-[0.06em] text-fg-2 border border-line-soft rounded-sm bg-bg-1">
+                        <span class="w-1 h-2.5 bg-accent rounded-[1px]"></span>
+                        {{ role }}
+                    </span>
+                    {%- endfor %}
+                </div>
+                <div class="text-[13px] text-fg-3">
+                    @{{ profile.handle }}
+                    {%- if profile.location %} · {{ profile.location }}{%- endif %}
+                    {%- if profile.joined %} · з {{ profile.joined }}{%- endif %}
+                </div>
             </div>
             <div class="flex gap-2 sm:pb-2 flex-wrap">
                 <button type="button" class="btn">{{ icon('mail', 14) }} Повідомлення</button>
@@ -25,7 +37,7 @@
         </div>
 
         {# Bio + stats #}
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 md:gap-8 mb-7">
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 md:gap-8 mb-6">
             <p class="text-sm leading-[1.65] text-fg-1 max-w-[600px] m-0">{{ profile.bio }}</p>
             <div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden">
                 {%- for stat in profile.stats %}
@@ -36,6 +48,29 @@
                 {%- endfor %}
             </div>
         </div>
+
+        {# Team memberships #}
+        {%- if user_teams %}
+        <div class="flex items-center gap-3 mb-7 flex-wrap">
+            <div class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 shrink-0">
+                {%- if user_teams | length == 1 and user_teams[0].team.kind == 'solo' %}
+                Соло-команда
+                {%- else %}
+                Команди
+                {%- endif %}
+            </div>
+            <div class="flex flex-wrap gap-2">
+                {%- for ut in user_teams %}
+                <a href="/team/{{ ut.team.id }}" class="inline-flex items-center gap-2 px-2.5 py-1 bg-bg-1 border border-line-soft rounded-sm text-xs hover:border-line transition">
+                    <div class="avatar w-4 h-4 text-[9px] shrink-0">{{ ut.team.avatar }}</div>
+                    <span class="text-fg-0">{{ ut.team.name }}</span>
+                    <span class="text-fg-3">·</span>
+                    <span class="text-fg-2">{{ ut.role }}</span>
+                </a>
+                {%- endfor %}
+            </div>
+        </div>
+        {%- endif %}
 
         {# Tabs #}
         <div class="flex border-b border-line-soft mb-6 overflow-x-auto">
@@ -75,6 +110,40 @@
                     </div>
                 </div>
                 <span class="btn sm">Продовжити</span>
+            </a>
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'translations' %}
+        <div class="flex flex-col gap-2.5">
+            {%- for w in translation_works %}
+            <a href="/title/{{ w.novel.id }}?team={{ w.team.id }}" class="flex items-start gap-4 p-3.5 bg-bg-1 border border-line-soft rounded-lg hover:border-line transition">
+                <div class="cover w-14 shrink-0">
+                    {{ cover(w.team_active.title, w.novel.original_author or '', w.novel.id, show_text=false) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-serif text-[15px] mb-0.5 line-clamp-2">{{ w.team_active.title }}</div>
+                    <div class="text-xs text-fg-3 mb-2 truncate">{{ w.novel.original_author }}</div>
+                    <div class="flex items-center gap-2 text-[11px] text-fg-3 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5">
+                            <div class="avatar w-4 h-4 text-[9px]">{{ w.team.avatar }}</div>
+                            <span class="text-fg-2">{{ w.team.name }}</span>
+                        </span>
+                        <span class="text-fg-4">·</span>
+                        <span class="{% if w.team_active.status == 'active' %}text-fg-1{% elif w.team_active.status == 'frozen' %}text-fg-3{% endif %}">
+                            {%- if w.team_active.status == 'active' %}активний
+                            {%- elif w.team_active.status == 'frozen' %}заморожений
+                            {%- elif w.team_active.status == 'completed' %}завершений
+                            {%- elif w.team_active.status == 'dropped' %}покинутий
+                            {%- endif %}
+                        </span>
+                        <span class="text-fg-4">·</span>
+                        <span class="text-fg-2 tabular-nums">{{ w.team_active.chapters_done }} {{ w.team_active.chapters_done | plural_uk('розділ', 'розділи', 'розділів') }}</span>
+                        <span class="text-fg-4">·</span>
+                        <span>{{ w.team_active.last_update }}</span>
+                    </div>
+                </div>
+                <span class="hidden sm:inline-flex shrink-0 px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-[0.06em] text-fg-3 border border-line-soft self-start">{{ w.user_role }}</span>
             </a>
             {%- endfor %}
         </div>
@@ -124,6 +193,32 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-accent self-center"></span>
                 {%- endif %}
             </div>
+            {%- endfor %}
+        </div>
+
+        {%- elif active_tab == 'followers' or active_tab == 'following' %}
+        {%- set people = followers if active_tab == 'followers' else following %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {%- for u in people %}
+            <a href="/profile/{{ u.handle }}" class="flex items-start gap-3 p-4 bg-bg-1 border border-line-soft rounded-md hover:border-line transition">
+                <div class="avatar w-10 h-10 shrink-0">{{ u.avatar or (u.name | initials) }}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span class="text-sm font-medium text-fg-0 truncate">{{ u.name }}</span>
+                        {%- for role in u.roles %}
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0 text-[9px] uppercase tracking-[0.06em] text-fg-2 border border-line-soft rounded-sm bg-bg-2 shrink-0">
+                            <span class="w-0.5 h-2 bg-accent rounded-[1px]"></span>
+                            {{ role }}
+                        </span>
+                        {%- endfor %}
+                    </div>
+                    <div class="text-xs text-fg-3 truncate">@{{ u.handle }}</div>
+                    {%- if u.bio %}
+                    <div class="text-[12px] text-fg-2 line-clamp-2 mt-1">{{ u.bio }}</div>
+                    {%- endif %}
+                </div>
+                <button type="button" class="btn sm shrink-0" onclick="event.preventDefault();">Стежити</button>
+            </a>
             {%- endfor %}
         </div>
         {%- endif %}

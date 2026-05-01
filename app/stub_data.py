@@ -58,10 +58,10 @@ TEAMS = [
         "kind": "group",
         "members_count": 4,
         "members": [
-            {"name": "Маринка К.", "role": "редакторка"},
-            {"name": "Іван Б.", "role": "перекладач"},
-            {"name": "Юлія", "role": "перекладачка"},
-            {"name": "Богдан", "role": "коректор"},
+            {"name": "Маринка К.", "handle": "marinka_k", "role": "редакторка"},
+            {"name": "Іван Б.", "handle": "ivan_b", "role": "перекладач"},
+            {"name": "Юлія", "handle": "yulia", "role": "перекладачка"},
+            {"name": "Богдан", "handle": "bohdan", "role": "коректор"},
         ],
         "joined": "лютого 2024",
         "bio": "Переклад японської повільної прози. Любимо тишу, листи й зимові настрої.",
@@ -73,8 +73,8 @@ TEAMS = [
         "kind": "group",
         "members_count": 2,
         "members": [
-            {"name": "Олекса", "role": "перекладач"},
-            {"name": "Дарка", "role": "редакторка"},
+            {"name": "Олекса", "handle": "oleksa", "role": "перекладач"},
+            {"name": "Дарка", "handle": "darka", "role": "редакторка"},
         ],
         "joined": "вересня 2023",
         "bio": "Команда у заморозці. Колись повернемося — обіцяємо.",
@@ -86,12 +86,12 @@ TEAMS = [
         "kind": "group",
         "members_count": 6,
         "members": [
-            {"name": "Тарас В.", "role": "перекладач"},
-            {"name": "Світлана", "role": "редакторка"},
-            {"name": "Андрій К.", "role": "перекладач"},
-            {"name": "Олена", "role": "коректорка"},
-            {"name": "Михайло", "role": "перекладач"},
-            {"name": "Юрій", "role": "оформлення"},
+            {"name": "Тарас В.", "handle": "taras_v", "role": "перекладач"},
+            {"name": "Світлана", "handle": "svitlana", "role": "редакторка"},
+            {"name": "Андрій К.", "handle": "andriy_k", "role": "перекладач"},
+            {"name": "Олена", "handle": "olena_t", "role": "коректорка"},
+            {"name": "Михайло", "handle": "mykhailo", "role": "перекладач"},
+            {"name": "Юрій", "handle": "yuriy", "role": "оформлення"},
         ],
         "joined": "березня 2023",
         "bio": "Великий колектив, велика амбіція. Беремо великі серіали й доводимо до кінця.",
@@ -102,7 +102,7 @@ TEAMS = [
         "avatar": "Л",
         "kind": "solo",
         "members_count": 1,
-        "members": [{"name": "Лесик", "role": "усе зразу"}],
+        "members": [{"name": "Лесик", "handle": "lesyk", "role": "усе зразу"}],
         "joined": "січня 2025",
         "bio": "Соло-перекладач. Перекладаю те, що подобається, у власному темпі.",
     },
@@ -112,7 +112,7 @@ TEAMS = [
         "avatar": "АМ",
         "kind": "solo",
         "members_count": 1,
-        "members": [{"name": "Анна-Марія", "role": "перекладачка"}],
+        "members": [{"name": "Анна-Марія", "handle": "anna_maria", "role": "перекладачка"}],
         "joined": "червня 2024",
         "bio": "Перекладаю комедійні ранобе. У вільний час пишу рецензії.",
     },
@@ -123,9 +123,9 @@ TEAMS = [
         "kind": "group",
         "members_count": 3,
         "members": [
-            {"name": "Антон", "role": "перекладач"},
-            {"name": "Кіра", "role": "редакторка"},
-            {"name": "Гліб", "role": "коректор"},
+            {"name": "Антон", "handle": "anton", "role": "перекладач"},
+            {"name": "Кіра", "handle": "kira", "role": "редакторка"},
+            {"name": "Гліб", "handle": "hlib", "role": "коректор"},
         ],
         "joined": "грудня 2024",
         "bio": "Свіжий колектив, фокус на романтичних ранобе.",
@@ -137,6 +137,140 @@ def team_by_id(team_id):
     """Return a team dict by its id, or None if not found."""
 
     return next((t for t in TEAMS if t["id"] == team_id), None)
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Users — fixtures for the profile page
+# ────────────────────────────────────────────────────────────────────────
+#
+# Three archetypes worth demoing:
+#   - kalyna_l : reader (default profile, no team membership, no own works)
+#   - olena_h  : original-fiction author (writes n5)
+#   - marinka_k: team translator (Тиша · редакторка)
+#   - lesyk    : solo translator (runs solo_lesyk)
+#
+# Other team members reference handles that don't have a USERS fixture.
+# user_by_handle returns None for those; the profile route falls back to
+# a minimal derived profile from team membership.
+
+USERS = [
+    {
+        "handle": "kalyna_l",
+        "name": "Калина Левчук",
+        "avatar": None,  # falls back to initials
+        "location": "Київ",
+        "joined": "березня 2024",
+        "bio": "Читачка-всеїдна. Збираю списки, лишаю kudos, інколи коментую. Працюю в архіві.",
+        "team_memberships": [],
+        "original_handles": [],
+        "roles": [],
+        "following": ["olena_h", "marinka_k", "lesyk", "ivan_b"],
+    },
+    {
+        "handle": "olena_h",
+        "name": "Олена Гуцалюк",
+        "avatar": "ОГ",
+        "location": "Львів",
+        "joined": "листопада 2023",
+        "bio": "Пишу про маленькі міста та дивних сусідів. Магічний реалізм у затишних формах.",
+        "team_memberships": [],
+        "original_handles": ["n5"],
+        "roles": ["авторка"],
+        "following": ["marinka_k"],
+    },
+    {
+        "handle": "marinka_k",
+        "name": "Маринка К.",
+        "avatar": "МК",
+        "location": "Київ",
+        "joined": "лютого 2024",
+        "bio": "Редагую переклади з японської. Люблю крапки в кінці речень. Інколи лишаю занадто багато коментарів на полях.",
+        "team_memberships": [{"team_id": "team_tysha", "role": "редакторка"}],
+        "original_handles": [],
+        "roles": ["редакторка"],
+        "following": ["olena_h", "ivan_b", "lesyk"],
+    },
+    {
+        "handle": "lesyk",
+        "name": "Лесик",
+        "avatar": "Л",
+        "location": "Чернігів",
+        "joined": "січня 2025",
+        "bio": "Соло-перекладач. Беру те, що ніхто не береться, і доводжу до кінця у власному темпі. Командну роботу не люблю — занадто багато перемовин.",
+        "team_memberships": [{"team_id": "solo_lesyk", "role": "усе зразу"}],
+        "original_handles": [],
+        "roles": ["соло-перекладач"],
+        "following": ["marinka_k", "olena_h"],
+    },
+]
+
+
+def user_by_handle(handle):
+    """Return a USERS fixture by handle, or None if no fixture exists."""
+
+    return next((u for u in USERS if u["handle"] == handle), None)
+
+
+def team_member_by_handle(handle):
+    """Find a team member by handle across all teams.
+
+    Returns (team, member) tuple, or (None, None) if not found. Useful for
+    deriving a minimal profile when a handle isn't in USERS but the person
+    is listed as a team member somewhere.
+    """
+
+    for team in TEAMS:
+        for member in team.get("members", []):
+            if member.get("handle") == handle:
+                return team, member
+    return None, None
+
+
+def followers_of(handle):
+    """Return list of handles that follow the given handle.
+
+    Derived from each USER's `following` list — single source of truth.
+    """
+
+    return [u["handle"] for u in USERS if handle in u.get("following", [])]
+
+
+def following_of(handle):
+    """Return list of handles that the given handle follows."""
+
+    user = user_by_handle(handle)
+    return list(user.get("following", [])) if user else []
+
+
+def user_brief(handle):
+    """Return a lightweight display dict for a handle.
+
+    Resolves through USERS first, then team membership. Used for rendering
+    follower / following / mention lists without paying for full profile
+    resolution each iteration. Returns None if the handle is unknown.
+    """
+
+    fixture = user_by_handle(handle)
+    if fixture:
+        return {
+            "handle": fixture["handle"],
+            "name": fixture["name"],
+            "avatar": fixture.get("avatar"),
+            "bio": fixture.get("bio", ""),
+            "roles": fixture.get("roles", []),
+        }
+
+    team, member = team_member_by_handle(handle)
+    if team and member:
+        return {
+            "handle": member["handle"],
+            "name": member["name"],
+            "avatar": None,
+            "bio": f"{member['role'].capitalize()} у команді {team['name']}.",
+            "roles": [member["role"]],
+        }
+
+    return None
 
 
 # ────────────────────────────────────────────────────────────────────────

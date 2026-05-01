@@ -10,12 +10,18 @@ from app.stub_data import (
     READER_CHAPTER,
     TAGS,
     TEAMS,
+    USERS,
+    followers_of,
+    following_of,
     novel_by_id,
     team_by_id,
+    team_member_by_handle,
+    user_brief,
+    user_by_handle,
 )
 from app.schemas import FormResult
 from app.models import User
-from app import templates
+from app import plural_uk, templates
 
 
 router = APIRouter()
@@ -292,20 +298,100 @@ async def search(
     )
 
 
+def _resolve_profile(handle: str | None):
+    """Resolve a profile by handle.
+
+    Returns a dict with the user data plus origin metadata. Resolution
+    chain: USERS fixture → team member with derived minimal profile →
+    fallback to kalyna_l.
+    """
+
+    if not handle:
+        return user_by_handle("kalyna_l"), "default"
+
+    fixture = user_by_handle(handle)
+    if fixture:
+        return fixture, "fixture"
+
+    team, member = team_member_by_handle(handle)
+    if team and member:
+        derived = {
+            "handle": member["handle"],
+            "name": member["name"],
+            "avatar": None,
+            "location": "",
+            "joined": team.get("joined", ""),
+            "bio": f"{member['role'].capitalize()} у команді {team['name']}.",
+            "team_memberships": [{"team_id": team["id"], "role": member["role"]}],
+            "original_handles": [],
+            "roles": [member["role"]],
+        }
+        return derived, "derived"
+
+    return user_by_handle("kalyna_l"), "fallback"
+
+
 @router.get("/profile")
+@router.get("/profile/{handle}")
 async def profile(
     request: Request,
+    handle: str | None = None,
     user: User | None = Depends(auth_optional),
     tab: str = "works",
 ):
-    valid_tabs = {"works", "reading", "finished", "lists", "activity"}
-    if tab not in valid_tabs:
-        tab = "works"
+    # Tab is validated against the dynamic tab list at the end of this
+    # function — tabs depend on what the user actually has (own works,
+    # translations, social graph). The legacy hardcoded check used to
+    # silently downgrade unknown tabs here; that broke /profile?tab=
+    # for everything new (translations, followers, following).
 
-    own_works = NOVELS[:3]
+    profile_user, origin = _resolve_profile(handle)
+
+    # Team memberships, hydrated with full team data
+    user_teams = []
+    for membership in profile_user.get("team_memberships", []):
+        team = team_by_id(membership["team_id"])
+        if team:
+            user_teams.append({
+                "team": team,
+                "role": membership["role"],
+            })
+
+    # The user's own original works (only authors have these)
+    own_works = [
+        n for n in NOVELS
+        if n.get("id") in profile_user.get("original_handles", [])
+    ]
+
+    # Translation works — for each team this user belongs to, find the
+    # series they translate and which row in teams_active is theirs.
+    translation_works = []
+    seen_novel_ids = set()
+    total_chapters_translated = 0
+    for ut in user_teams:
+        team_id = ut["team"]["id"]
+        for novel in NOVELS:
+            if novel.get("type") != "translation":
+                continue
+            for ta in novel.get("teams_active", []):
+                if ta["team_id"] == team_id:
+                    translation_works.append({
+                        "novel": novel,
+                        "team_active": ta,
+                        "team": ut["team"],
+                        "user_role": ut["role"],
+                    })
+                    seen_novel_ids.add(novel["id"])
+                    total_chapters_translated += ta.get("chapters_done", 0)
+                    break
+
+    # Social graph — followers + following, hydrated with display data.
+    follower_briefs = [b for b in (user_brief(h) for h in followers_of(profile_user["handle"])) if b]
+    following_briefs = [b for b in (user_brief(h) for h in following_of(profile_user["handle"])) if b]
+
+    # Generic library data for now — per-user reading is out of Phase A/B/C scope
     reading = NOVELS[:4]
     finished = [NOVELS[1], NOVELS[4], NOVELS[6]]
-
     lists = [
         {"name": "Зимове читання", "count": 12, "novels": NOVELS[:4]},
         {"name": "Перечитати", "count": 8, "novels": NOVELS[2:6]},
@@ -313,26 +399,76 @@ async def profile(
         {"name": "Ще не торкалась", "count": 6, "novels": NOVELS[1:5]},
     ]
 
-    profile_data = {
-        "name": "Калина Левчук",
-        "handle": "kalyna_l",
-        "location": "Київ",
-        "joined": "березня 2024",
-        "bio": "Пишу про маленькі міста, листи, які не дійшли, і людей, що повертаються. Магічний реалізм, повільне горіння, зимові настрої. Інколи борщ.",
-        "stats": [
-            {"value": "12", "label": "творів"},
+    # Archetype-aware stats
+    has_originals = bool(own_works)
+    has_translations = bool(translation_works)
+    series_count = len(seen_novel_ids)
+
+    if has_originals and has_translations:
+        # Hybrid: writes own + translates with a team
+        stats = [
+            {"value": str(len(own_works)), "label": plural_uk(len(own_works), "твір", "твори", "творів")},
+            {"value": str(series_count), "label": plural_uk(series_count, "серія", "серії", "серій")},
+            {"value": "38k", "label": "kudos"},
+        ]
+    elif has_translations:
+        # Translator
+        stats = [
+            {"value": str(series_count), "label": plural_uk(series_count, "серія", "серії", "серій")},
+            {"value": str(total_chapters_translated), "label": plural_uk(total_chapters_translated, "розділ", "розділи", "розділів")},
+            {"value": "38k", "label": "kudos"},
+        ]
+    elif has_originals:
+        # Author
+        stats = [
+            {"value": str(len(own_works)), "label": plural_uk(len(own_works), "твір", "твори", "творів")},
             {"value": "4.2k", "label": "читачів"},
             {"value": "38k", "label": "kudos"},
-        ],
+        ]
+    else:
+        # Reader / default
+        stats = [
+            {"value": "127", "label": plural_uk(127, "прочитане", "прочитаних", "прочитаних")},
+            {"value": "12", "label": plural_uk(12, "колекція", "колекції", "колекцій")},
+            {"value": "38k", "label": "kudos"},
+        ]
+
+    profile_data = {
+        "name": profile_user["name"],
+        "handle": profile_user["handle"],
+        "avatar": profile_user.get("avatar"),
+        "location": profile_user.get("location", ""),
+        "joined": profile_user.get("joined", ""),
+        "bio": profile_user.get("bio", ""),
+        "stats": stats,
+        "roles": profile_user.get("roles", []),
+        "origin": origin,
     }
 
-    tabs = [
-        {"id": "works", "label": "Твори", "count": len(own_works)},
-        {"id": "reading", "label": "Зараз читає", "count": len(reading)},
-        {"id": "finished", "label": "Прочитано", "count": len(finished)},
-        {"id": "lists", "label": "Колекції", "count": len(lists)},
-        {"id": "activity", "label": "Активність", "count": None},
-    ]
+    # Build tab list dynamically — only show what's relevant
+    tabs = []
+    if has_originals:
+        tabs.append({"id": "works", "label": "Твори", "count": len(own_works)})
+    if has_translations:
+        tabs.append({"id": "translations", "label": "Переклади", "count": series_count})
+    tabs.append({"id": "reading", "label": "Зараз читає", "count": len(reading)})
+    tabs.append({"id": "finished", "label": "Прочитано", "count": len(finished)})
+    tabs.append({"id": "lists", "label": "Колекції", "count": len(lists)})
+    tabs.append({"id": "activity", "label": "Активність", "count": None})
+    if follower_briefs:
+        tabs.append({"id": "followers", "label": "Підписники", "count": len(follower_briefs)})
+    if following_briefs:
+        tabs.append({"id": "following", "label": "Підписки", "count": len(following_briefs)})
+
+    valid_tab_ids = {t["id"] for t in tabs}
+    if tab not in valid_tab_ids:
+        # Pick the user's most "primary" tab — works > translations > reading
+        if "works" in valid_tab_ids:
+            tab = "works"
+        elif "translations" in valid_tab_ids:
+            tab = "translations"
+        else:
+            tab = "reading"
 
     return templates.TemplateResponse(
         "profile/profile.html",
@@ -340,15 +476,19 @@ async def profile(
             "request": request,
             "user": user,
             "active": "library",
-            "page_title": "Профіль",
+            "page_title": profile_data["name"],
             "active_tab": tab,
             "profile": profile_data,
             "own_works": own_works,
+            "translation_works": translation_works,
             "reading": reading,
             "finished": finished,
             "lists": lists,
             "notifications": NOTIFICATIONS,
             "tabs": tabs,
+            "user_teams": user_teams,
+            "followers": follower_briefs,
+            "following": following_briefs,
         },
     )
 

@@ -47,7 +47,7 @@
                     {%- if novel.type == 'translation' %}
                     {{ novel.original_author }}{%- if novel.original_publisher %} · <span class="text-fg-3">{{ novel.original_publisher }}, {{ novel.original_year }}</span>{%- endif %}
                     {%- else %}
-                    від <a href="#" class="text-accent underline underline-offset-[3px]">{{ novel.author_obj.name }}</a>
+                    від <a href="/profile/{{ novel.author_obj.id }}" class="text-accent underline underline-offset-[3px]">{{ novel.author_obj.name }}</a>
                     {%- endif %}
                 </div>
 
@@ -200,13 +200,13 @@
             {# Author card for originals #}
             <section class="p-4 border border-line-soft rounded-lg bg-bg-1">
                 <h4 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Автор</h4>
-                <div class="flex gap-2.5 items-center mb-3">
+                <a href="/profile/{{ novel.author_obj.id }}" class="flex gap-2.5 items-center mb-3 hover:opacity-90">
                     <div class="avatar w-9 h-9 bg-accent text-accent-fg">{{ novel.author_obj.name | initials }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[13px] text-fg-0 font-medium">{{ novel.author_obj.name }}</div>
                         <div class="text-[11px] text-fg-3 truncate">@{{ novel.author_obj.id }}</div>
                     </div>
-                </div>
+                </a>
                 {%- if novel.author_obj.bio %}
                 <p class="text-[12px] text-fg-2 leading-relaxed mb-3 m-0">{{ novel.author_obj.bio }}</p>
                 {%- endif %}
