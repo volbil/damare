@@ -63,11 +63,64 @@
             <kbd class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-fg-3 font-mono bg-bg-2 px-[5px] py-px rounded-xs">⌘K</kbd>
         </div>
 
-        {# Bell (md+ only) #}
-        <button type="button" class="hidden md:inline-flex btn ghost icon sm relative" title="Сповіщення">
-            {{ icon('bell', 15) }}
-            <span class="absolute top-[5px] right-[5px] w-1.5 h-1.5 rounded-full bg-accent"></span>
-        </button>
+        {# Notifications bell + dropdown (md+ only) #}
+        {%- set _unread_count = NOTIFICATIONS | selectattr('read', 'eq', false) | list | length %}
+        <div x-data="{ open: false }" class="relative hidden md:block">
+            <button type="button" @click="open = !open" class="btn ghost icon sm relative" :class="open && 'bg-bg-2'" title="Сповіщення">
+                {{ icon('bell', 15) }}
+                {%- if _unread_count > 0 %}
+                <span class="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 rounded-full bg-accent text-accent-fg text-[9px] font-bold flex items-center justify-center tabular-nums">{{ _unread_count }}</span>
+                {%- endif %}
+            </button>
+
+            <div x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms class="absolute top-full right-0 mt-3 w-[360px] max-w-[calc(100vw-32px)] bg-bg-1 border border-line-soft rounded-md shadow-lg z-30 overflow-hidden flex flex-col" style="display: none;">
+                {# Header #}
+                <div class="flex items-center justify-between px-4 py-3 border-b border-line-soft">
+                    <div class="text-[13px] font-semibold text-fg-0">
+                        Сповіщення
+                        {%- if _unread_count > 0 %}
+                        <span class="text-fg-3 font-normal ml-1">· {{ _unread_count }} непрочитан{{ _unread_count | plural_uk('е', 'их', 'их') }}</span>
+                        {%- endif %}
+                    </div>
+                    {%- if _unread_count > 0 %}
+                    <button type="button" class="text-[11px] text-fg-3 hover:text-fg-1">Позначити все</button>
+                    {%- endif %}
+                </div>
+
+                {# List #}
+                <div class="flex flex-col max-h-[400px] overflow-y-auto">
+                    {%- if NOTIFICATIONS %}
+                    {%- for n in NOTIFICATIONS %}
+                    <a href="#" class="flex gap-3 px-4 py-3 {% if not loop.last %}border-b border-line-soft{% endif %} {% if not n.read %}bg-accent/5{% endif %} hover:bg-bg-2/50 transition">
+                        <div class="w-7 h-7 shrink-0 rounded-full bg-bg-2 flex items-center justify-center {% if n.type == 'kudos' %}text-love{% elif n.type == 'comment' %}text-info{% elif n.type == 'follow' %}text-accent{% elif n.type == 'update' %}text-fg-1{% else %}text-fg-2{% endif %}">
+                            {%- if n.type == 'kudos' %}{{ icon('heart-fill', 13) }}
+                            {%- elif n.type == 'comment' %}{{ icon('message', 13) }}
+                            {%- elif n.type == 'follow' %}{{ icon('plus', 13) }}
+                            {%- elif n.type == 'update' %}{{ icon('rss', 13) }}
+                            {%- else %}{{ icon('bookmark', 13) }}
+                            {%- endif %}
+                        </div>
+                        <div class="flex-1 min-w-0 text-[12.5px] leading-[1.45] text-fg-1">
+                            <span class="text-fg-0 font-medium">{{ n.user }}</span>
+                            {{ n.text }}{% if n.target %} <span class="text-accent">«{{ n.target | truncate(40) }}»</span>{% endif %}
+                            <div class="text-[11px] text-fg-3 mt-0.5">{{ n.time }}</div>
+                        </div>
+                        {%- if not n.read %}
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent self-center shrink-0"></span>
+                        {%- endif %}
+                    </a>
+                    {%- endfor %}
+                    {%- else %}
+                    <div class="px-4 py-12 text-center text-fg-3 text-sm">Жодних сповіщень — поки що тиша.</div>
+                    {%- endif %}
+                </div>
+
+                {# Footer #}
+                <a href="/profile?tab=activity" class="px-4 py-2.5 text-center text-[12px] text-fg-2 hover:text-fg-0 border-t border-line-soft hover:bg-bg-2/50 transition">
+                    Усі сповіщення →
+                </a>
+            </div>
+        </div>
 
         {# Написати CTA (icon-only on <sm) #}
         <a href="/editor" class="btn primary sm">

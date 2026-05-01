@@ -2,6 +2,7 @@ from functools import lru_cache
 from datetime import datetime, UTC
 from dynaconf import Dynaconf
 import secrets
+import os
 
 
 # Replacement for deprecated datetime's utcnow
@@ -44,7 +45,7 @@ COVER_PALETTES = [
 
 
 # Replicates JS `(h * mult + s.charCodeAt(i)) | 0` accumulator (signed 32-bit)
-def _hash32(s, multiplier):
+def hash32(s, multiplier):
     h = 0
     for ch in s:
         h = (h * multiplier + ord(ch)) & 0xFFFFFFFF
@@ -56,12 +57,26 @@ def _hash32(s, multiplier):
 def cover_palette(seed):
     """Pick a cover palette tuple deterministically by seed."""
 
-    h = _hash32(seed, 31)
+    h = hash32(seed, 31)
     return COVER_PALETTES[abs(h) % len(COVER_PALETTES)]
 
 
 def cover_layout(seed, title=""):
     """Pick one of 6 cover layouts deterministically by seed + title."""
 
-    h = _hash32(seed + title, 33)
+    h = hash32(seed + title, 33)
     return abs(h) % 6
+
+
+def css_mtime():
+    """Return the modification time of static/styles.css as an int.
+
+    Used as a cache buster in templates. Auto-invalidates the browser
+    cache whenever Tailwind's watcher rewrites the file, while staying
+    stable across requests in production.
+    """
+
+    try:
+        return int(os.stat("static/styles.css").st_mtime)
+    except FileNotFoundError:
+        return 0

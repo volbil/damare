@@ -3,8 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 from app.database import sessionmanager
-from app.utils import get_settings, cover_palette, cover_layout
-from app.stub_data import team_by_id
+from app.utils import get_settings, cover_palette, cover_layout, css_mtime
+from app.stub_data import NOTIFICATIONS, team_by_id
 from fastapi import FastAPI
 import arel
 
@@ -17,15 +17,17 @@ templates = Jinja2Templates(directory="templates")
 templates.env.globals["cover_palette"] = cover_palette
 templates.env.globals["cover_layout"] = cover_layout
 templates.env.globals["team_by_id"] = team_by_id
+templates.env.globals["NOTIFICATIONS"] = NOTIFICATIONS
+templates.env.globals["css_mtime"] = css_mtime
 
 
-def _thousands_uk(n):
+def thousands_uk(n):
     """Format an int with space as thousand separator (Ukrainian style)."""
 
     return "{:,}".format(int(n)).replace(",", " ")
 
 
-def _initials(name, max_chars=2):
+def initials(name, max_chars=2):
     """Return up to max_chars initials from a name (first letter of each word)."""
 
     if not name:
@@ -59,8 +61,8 @@ def plural_uk(n, sing, few, many):
     return many
 
 
-templates.env.filters["thousands_uk"] = _thousands_uk
-templates.env.filters["initials"] = _initials
+templates.env.filters["thousands_uk"] = thousands_uk
+templates.env.filters["initials"] = initials
 templates.env.filters["plural_uk"] = plural_uk
 
 
