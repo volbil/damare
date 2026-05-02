@@ -26,7 +26,7 @@
 {% endmacro %}
 
 {% block content %}
-<div class="max-w-[1080px] mx-auto px-4 md:px-8 pt-10 pb-20">
+<div class="max-w-[1140px] mx-auto px-4 md:px-8 pt-10 pb-20">
     {# Header #}
     <header class="mb-8">
         <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-2">Damare · Devtools</div>
@@ -104,7 +104,7 @@
 
         {% call entry("Контейнери", "Стандартизовані ширини контенту. Кожна ширина має конкретне призначення — не змішуй.") %}
         <div class="space-y-2 p-6 bg-bg-1 border border-line-soft rounded-md">
-            {%- for w, label in [(1280, 'Navbar / chrome — найширше'), (1080, 'Discovery — home, search, profile, title, forums, articles, feed, styleguide'), (760, 'Discussion — comments'), (640, 'Reading + forms — reader, login, create')] %}
+            {%- for w, label in [(1280, 'Navbar / chrome — найширше'), (1140, 'Discovery — home, search, profile, title, forums, articles, feed, styleguide'), (760, 'Discussion — comments'), (640, 'Reading + forms — reader, login, create')] %}
             <div class="flex items-center gap-3">
                 <div class="font-mono text-[12px] text-fg-1 w-16 text-right tabular-nums shrink-0">{{ w }}px</div>
                 <div class="bg-bg-3 h-6 rounded-xs shrink-0" style="width: {{ (w / 1280) * 100 }}%;"></div>
@@ -112,7 +112,7 @@
             </div>
             {%- endfor %}
         </div>
-        {% call code_block() %}<div class="max-w-[1080px] mx-auto px-4 md:px-8">…</div>{% endcall %}
+        {% call code_block() %}<div class="max-w-[1140px] mx-auto px-4 md:px-8">…</div>{% endcall %}
         {% endcall %}
 
         {% call entry("Бректкпоінти", "Стандартні Tailwind v4. Префікси sm:, md:, lg: вмикаються від відповідної ширини.") %}

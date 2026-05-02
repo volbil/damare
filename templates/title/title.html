@@ -10,7 +10,7 @@
             {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
             <div class="absolute inset-0" style="background: linear-gradient(180deg, transparent 0%, var(--color-bg-0) 90%);"></div>
         </div>
-        <div class="relative max-w-[1080px] mx-auto px-4 md:px-8 pt-8 md:pt-10 pb-8 flex flex-col md:flex-row gap-5 md:gap-7">
+        <div class="relative max-w-[1140px] mx-auto px-4 md:px-8 pt-8 md:pt-10 pb-8 flex flex-col md:flex-row gap-5 md:gap-7">
             <div class="cover w-[200px] shrink-0 shadow-lg">
                 {{ cover(novel.title, novel.author, novel.id) }}
             </div>
@@ -76,7 +76,7 @@
     {# ────────────────────────── Active teams strip ────────────────────────── #}
     {%- if novel.type == 'translation' and novel.teams_active %}
     <section class="border-b border-line-soft py-6 bg-bg-0">
-        <div class="max-w-[1080px] mx-auto px-4 md:px-8">
+        <div class="max-w-[1140px] mx-auto px-4 md:px-8">
             <h3 class="text-[11px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3 inline-flex items-center gap-2">
                 <span class="redact-bar text-accent"></span>
                 Команди ({{ novel.teams_active | length }})
@@ -119,7 +119,7 @@
     {%- endif %}
 
     {# ────────────────────────── Body ────────────────────────── #}
-    <div class="max-w-[1080px] mx-auto px-4 md:px-8 pt-8 pb-16 md:pb-20 grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8 lg:gap-10">
+    <div class="max-w-[1140px] mx-auto px-4 md:px-8 pt-8 pb-16 md:pb-20 grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8 lg:gap-10">
         <div>
             {# Tags #}
             <section class="mb-7">
