@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block app %}
+<div class="flex h-screen items-center justify-center bg-bg-0 px-6">
+    <div class="w-full max-w-sm">
+        <h1 class="font-serif text-3xl font-medium mb-2 text-fg-0">Увійти до Damare</h1>
+        <p class="text-fg-2 text-sm mb-8">Платформа для читання та публікації українських новел.</p>
+        <a
+            href="https://hikka.io/oauth?reference={{ hikka_app_id }}&scope=read:user-details"
+            class="btn primary w-full">
+            Авторизуватись через Hikka.io
+        </a>
+    </div>
+</div>
+{% endblock %}

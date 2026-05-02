@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "components/icon.html" import icon %}
-{% from "components/segmented.html" import segmented %}
+{% from "components/segmented.html" import segmented_links %}
 
 {% block content %}
 <div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
@@ -15,9 +15,9 @@
 
     {# Tag filter #}
     <div class="flex gap-1.5 mb-7 overflow-x-auto pb-1">
-        {%- for tag in tag_filter %}
-        <a href="?tag={{ tag }}" class="shrink-0 px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border {% if tag == active_tag %}bg-fg-0 text-bg-0 border-fg-0 font-semibold{% else %}bg-bg-1 text-fg-1 border-line-soft hover:border-line{% endif %}">
-            {{ tag }}
+        {%- for f in tag_filters %}
+        <a href="{{ f.href }}" class="shrink-0 px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border {% if f.active %}bg-fg-0 text-bg-0 border-fg-0 font-semibold{% else %}bg-bg-1 text-fg-1 border-line-soft hover:border-line{% endif %}">
+            {{ f.label }}
         </a>
         {%- endfor %}
     </div>
@@ -59,10 +59,15 @@
 
     {# Article grid #}
     <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Свіже</h2>
-        {{ segmented(['Найсвіжіші', 'Найпопулярніші', 'Найчитаніші'], 'Найсвіжіші', small=true) }}
+        <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">
+            {%- if active_tag == 'Усі' %}Свіже
+            {%- else %}{{ active_tag }}{% endif %}
+            <span class="text-fg-4 font-normal ml-1">· {{ articles | length }}</span>
+        </h2>
+        {{ segmented_links(sort_filters, small=true) }}
     </div>
 
+    {%- if articles %}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {%- for a in articles %}
         <a href="#" class="p-5 bg-bg-1 border border-line-soft rounded-lg cursor-pointer flex flex-col hover:border-line transition">
@@ -85,5 +90,11 @@
         </a>
         {%- endfor %}
     </div>
+    {%- else %}
+    <div class="text-fg-3 text-sm py-12 text-center bg-bg-1 border border-line-soft rounded-md">
+        <div class="text-fg-1 mb-1">У цій рубриці поки що порожньо.</div>
+        <div class="text-xs">Спробуйте іншу категорію або напишіть першим.</div>
+    </div>
+    {%- endif %}
 </div>
 {% endblock %}

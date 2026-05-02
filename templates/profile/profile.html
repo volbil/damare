@@ -2,6 +2,7 @@
 {% from "components/icon.html" import icon %}
 {% from "components/cover.html" import cover %}
 {% from "components/novel_card.html" import novel_card %}
+{% from "components/toggle.html" import follow_button %}
 
 {% block content %}
 <div class="bg-bg-0">
@@ -32,7 +33,7 @@
             </div>
             <div class="flex gap-2 sm:pb-2 flex-wrap">
                 <button type="button" class="btn">{{ icon('mail', 14) }} Повідомлення</button>
-                <button type="button" class="btn primary">{{ icon('plus', 13) }} Стежити</button>
+                {{ follow_button() }}
             </div>
         </div>
 

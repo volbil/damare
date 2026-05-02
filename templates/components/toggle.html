@@ -1,0 +1,44 @@
+{# Reusable toggle buttons with local Alpine state.
+   No backend — optimistic UI for the stub. Each button maintains its own
+   isolated state via x-data, so multiple instances don't interfere. #}
+
+{% from "components/icon.html" import icon %}
+
+
+{# Kudos toggle — outlined heart turns filled, count increments. #}
+{% macro kudos_button(count, size=14) -%}
+<button type="button"
+        x-data="{ liked: false, count: {{ count }} }"
+        @click.prevent.stop="liked = !liked; count += liked ? 1 : -1"
+        :class="liked && 'text-love'"
+        class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0 transition">
+    <span x-show="!liked">{{ icon('heart', size) }}</span>
+    <span x-show="liked" x-cloak>{{ icon('heart-fill', size) }}</span>
+    <span x-text="count"></span>
+</button>
+{%- endmacro %}
+
+
+{# Bookmark toggle — outlined bookmark turns accent-filled. #}
+{% macro bookmark_button(saved=false, size=14, extra_class='') -%}
+<button type="button"
+        x-data="{ saved: {{ 'true' if saved else 'false' }} }"
+        @click.prevent.stop="saved = !saved"
+        :class="saved && 'text-accent'"
+        class="text-fg-3 p-1 hover:text-fg-1 transition {{ extra_class }}">
+    <span x-show="!saved">{{ icon('bookmark', size) }}</span>
+    <span x-show="saved" x-cloak>{{ icon('bookmark-fill', size) }}</span>
+</button>
+{%- endmacro %}
+
+
+{# Follow toggle — flips between primary "Стежити" and outlined "Стежу". #}
+{% macro follow_button(followed=false) -%}
+<button type="button"
+        x-data="{ followed: {{ 'true' if followed else 'false' }} }"
+        @click.prevent.stop="followed = !followed"
+        :class="followed ? 'btn' : 'btn primary'">
+    <span x-show="!followed" class="flex items-center gap-1">{{ icon('plus', 13) }} Стежити</span>
+    <span x-show="followed" x-cloak class="flex items-center gap-1">{{ icon('check', 13) }} Стежу</span>
+</button>
+{%- endmacro %}

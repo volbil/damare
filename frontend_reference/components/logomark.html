@@ -1,0 +1,8 @@
+{# Damare "D" logomark, ported from frontend_reference/chrome.jsx. #}
+
+{% macro logomark(size=24) -%}
+<svg width="{{ size }}" height="{{ size }}" viewBox="0 0 32 32" fill="none">
+    <rect width="32" height="32" rx="8" fill="var(--color-accent)"/>
+    <path d="M9 8h7c4 0 7 3.5 7 8s-3 8-7 8H9V8Z M14 13v6h2c1.5 0 3-1.2 3-3s-1.5-3-3-3h-2Z" fill="var(--color-bg-0)" fill-rule="evenodd"/>
+</svg>
+{%- endmacro %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+
+{% block app %}
+<div class="h-screen overflow-auto bg-bg-0 relative">
+    {# ────────────────────── Sticky mini-bar ────────────────────── #}
+    <div class="sticky top-0 z-10 backdrop-blur-md border-b border-white/5 bg-bg-0/95 px-4 md:px-6 py-3 flex items-center gap-3 md:gap-4">
+        <a href="/title/{{ novel.id }}" class="flex items-center gap-1.5 text-fg-3 text-xs hover:text-fg-1 max-w-[180px] md:max-w-[280px] shrink-0">
+            {{ icon('arrow-l', 13) }}
+            <span class="truncate">{{ novel.title | truncate(30) }}</span>
+        </a>
+
+        <div class="flex-1 flex items-center justify-center gap-2 text-[11px] text-fg-3 px-2 min-w-0">
+            {%- if current_team %}
+            <a href="/team/{{ current_team_id }}" class="flex items-center gap-1.5 hover:text-fg-1 shrink-0" title="{{ current_team.name }}">
+                <div class="avatar w-5 h-5 text-[9px]">{{ current_team.avatar }}</div>
+                <span class="hidden sm:inline">{{ current_team.name }}</span>
+            </a>
+            <span class="text-fg-4 shrink-0">·</span>
+            {%- endif %}
+            <span class="truncate">Розділ {{ chapter_no }} з {{ novel.chapter_count }}{%- if chapter_title %} · {{ chapter_title }}{%- endif %}</span>
+        </div>
+
+        <button type="button" class="text-fg-1 p-1.5 rounded-md hover:bg-white/5 shrink-0" title="Зберегти">
+            {{ icon('bookmark', 15) }}
+        </button>
+    </div>
+
+    {# ────────────────────── Article ────────────────────── #}
+    <article class="mx-auto px-4 md:px-8 pt-10 md:pt-16 pb-20 md:pb-32" style="max-width: 640px;">
+        <div class="text-[11px] text-fg-3 tracking-[0.1em] uppercase text-center mb-2">
+            Розділ {{ chapter_no }}
+        </div>
+        <h1 class="font-serif text-center font-medium text-[32px] leading-[1.15] mb-2 text-fg-0 tracking-tight">
+            {{ chapter_title }}
+        </h1>
+        <div class="text-center text-xs text-fg-3 mb-14">
+            {%- if novel.type == 'translation' %}
+            {{ novel.original_author }}
+            {%- if current_team %}
+            · переклад: <a href="/team/{{ current_team_id }}" class="text-accent">{{ current_team.name }}</a>
+            {%- endif %}
+            {%- else %}
+            {{ novel.author_obj.name }}
+            {%- endif %}
+            · 8 хв читання
+        </div>
+
+        <div class="font-serif text-[18px] leading-[1.75] text-fg-1">
+            {%- for p in chapter.paragraphs %}
+            <p class="m-0 text-pretty {% if loop.first %}mb-[1.4em]{% else %}mb-[1.2em] indent-[1.4em]{% endif %}">
+                {%- if loop.first -%}
+                <span class="font-serif float-left pr-2.5 pt-2 text-accent" style="font-size: 61px; line-height: 0.85;">{{ p[0] }}</span>{{ p[1:] }}
+                {%- else -%}
+                {{ p }}
+                {%- endif -%}
+            </p>
+            {%- endfor %}
+            <div class="text-center text-[18px] text-fg-3 my-10">· · ·</div>
+            <p class="m-0 text-fg-3 italic text-[16px]">Далі буде…</p>
+        </div>
+
+        {# ────────────────────── Footer ────────────────────── #}
+        <div class="mt-16 pt-8 border-t border-white/5">
+            {# Engagement actions #}
+            <div class="flex justify-center gap-3 mb-8 flex-wrap">
+                <button type="button" class="btn" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
+                    {{ icon('heart', 14) }} Залишити kudos
+                </button>
+                <a href="/title/{{ novel.id }}/comments" class="btn" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
+                    {{ icon('message', 14) }} Прокоментувати
+                </a>
+                <button type="button" class="btn icon" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
+                    {{ icon('bookmark', 14) }}
+                </button>
+            </div>
+
+            {# Alternate translations of the same chapter #}
+            {%- if alternate_teams %}
+            <div class="mt-4 pt-6 border-t border-white/5 mb-8">
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-3 inline-flex items-center gap-2">
+                    <span class="redact-bar text-accent"></span>
+                    Інші переклади цього розділу
+                </div>
+                <div class="flex flex-col gap-2">
+                    {%- for alt in alternate_teams %}
+                    <a href="/title/{{ novel.id }}/read?ch={{ chapter_no }}&team={{ alt.team_id }}"
+                       class="flex gap-3 p-3 rounded-md border border-white/5 hover:border-white/10 transition"
+                       style="background: rgba(255,255,255,0.03);">
+                        <div class="avatar w-8 h-8 shrink-0">{{ alt.team.avatar }}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[12px] text-fg-3 mb-0.5">{{ alt.team.name }}</div>
+                            <div class="font-serif text-[14px] text-fg-0 line-clamp-1">{{ alt.title }}</div>
+                        </div>
+                        <div class="text-[11px] text-fg-3 shrink-0 self-center">{{ alt.updated }}</div>
+                    </a>
+                    {%- endfor %}
+                </div>
+            </div>
+            {%- endif %}
+
+            {# Prev / next chapter #}
+            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+                {%- if prev_chapter %}
+                <a href="/title/{{ novel.id }}/read?ch={{ prev_chapter.no }}{% if current_team_id %}&team={{ current_team_id }}{% endif %}"
+                   class="flex-1 text-left p-4 rounded-lg border border-white/5"
+                   style="background: rgba(255,255,255,0.03);">
+                    <div class="text-[11px] text-fg-3 mb-1">← Розділ {{ prev_chapter.no }}</div>
+                    <div class="font-serif text-[15px] text-fg-0">{{ prev_chapter.title }}</div>
+                </a>
+                {%- else %}
+                <div class="flex-1"></div>
+                {%- endif %}
+                {%- if next_chapter %}
+                <a href="/title/{{ novel.id }}/read?ch={{ next_chapter.no }}{% if current_team_id %}&team={{ current_team_id }}{% endif %}"
+                   class="btn primary flex-1 flex flex-col items-end h-auto p-4 text-right">
+                    <div class="text-[11px] opacity-80 mb-1">Розділ {{ next_chapter.no }} →</div>
+                    <div class="font-serif text-[15px]">{{ next_chapter.title }}</div>
+                </a>
+                {%- else %}
+                <div class="flex-1"></div>
+                {%- endif %}
+            </div>
+        </div>
+    </article>
+
+    {# ────────────────────── Reading progress (placeholder) ────────────────────── #}
+    <div class="sticky bottom-0 h-0.5 bg-white/5 z-10">
+        <div class="h-full bg-accent" style="width: 34%;"></div>
+    </div>
+</div>
+{% endblock %}

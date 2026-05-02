@@ -78,6 +78,9 @@
         background: var(--color-accent);
         color: var(--color-accent-fg);
     }
+
+    /* Hide x-cloak elements until Alpine has initialized */
+    [x-cloak] { display: none !important; }
 }
 
 @layer components {

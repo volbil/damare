@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from app.dependencies import auth_optional
-from app.stub_data import NOVELS, team_by_id
+from app.stub_data import HOT_NOW, NOVELS, RECENT_COMMENTS, TOP_WEEK, team_by_id
 from app.models import User
 from app import templates
 
@@ -48,10 +48,24 @@ async def home(request: Request, user: User | None = Depends(auth_optional)):
             "time": "2 год тому",
         },
         {
+            "novel": NOVELS[3],
+            "team": team_by_id("team_sim_tinei"),
+            "chapter_no": 22,
+            "chapter_title": "Я не сестра, а мама",
+            "time": "4 год тому",
+        },
+        {
             "novel": NOVELS[7],
             "team": None,  # original — author publishes directly
             "chapter_no": 9,
             "chapter_title": "Понеділок, 7:23",
+            "time": "вчора",
+        },
+        {
+            "novel": NOVELS[6],
+            "team": team_by_id("solo_anna_maria"),
+            "chapter_no": 7,
+            "chapter_title": "Хімічна реакція на серце",
             "time": "вчора",
         },
         {
@@ -72,8 +86,11 @@ async def home(request: Request, user: User | None = Depends(auth_optional)):
             "page_title": "Стрічка",
             "continue_reading_list": continue_reading_list,
             "fresh_updates": fresh_updates,
-            "featured": NOVELS[5],
+            "top_week": TOP_WEEK[:7],
+            "hot_now": HOT_NOW,
+            "recent_comments": RECENT_COMMENTS,
             "trending": NOVELS[2:7],
             "new_releases": NOVELS[:5],
+            "hot_now_updated": "оновлено 2 хв тому",
         },
     )

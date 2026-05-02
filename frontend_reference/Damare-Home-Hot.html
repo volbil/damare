@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>Damare — Гаряче зараз</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          'bg-0': 'oklch(0.13 0 0)',
+          'bg-1': 'oklch(0.18 0 0)',
+          'bg-2': 'oklch(0.22 0 0)',
+          'bg-3': 'oklch(0.27 0 0)',
+          'bg-4': 'oklch(0.32 0 0)',
+          'line':      'oklch(0.42 0 0 / 0.7)',
+          'line-soft': 'oklch(0.42 0 0 / 0.35)',
+          'fg-0': 'oklch(0.96 0.005 80)',
+          'fg-1': 'oklch(0.85 0.006 80)',
+          'fg-2': 'oklch(0.66 0.008 75)',
+          'fg-3': 'oklch(0.50 0.008 70)',
+          'fg-4': 'oklch(0.38 0.008 65)',
+          'accent':      'oklch(0.60 0.13 155)',
+          'accent-soft': 'oklch(0.60 0.13 155 / 0.18)',
+          'accent-fg':   'oklch(0.14 0.02 155)',
+          'warn': 'oklch(0.72 0.14 35)',
+          'love': 'oklch(0.74 0.14 20)',
+          'info': 'oklch(0.74 0.08 220)',
+        },
+        fontFamily: {
+          sans:  ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          serif: ['"IBM Plex Serif"', '"Iowan Old Style"', 'Georgia', 'serif'],
+          mono:  ['"IBM Plex Mono"', 'ui-monospace', 'SF Mono', 'Menlo', 'monospace'],
+        },
+        borderRadius: { xs: '0', sm: '2px', md: '4px', lg: '6px', xl: '10px' },
+      }
+    }
+  }
+</script>
+<style>
+  body { background: oklch(0.13 0 0); color: oklch(0.85 0.006 80); font-family: "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; margin: 0; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.02em;
+    border-radius: 0;
+    background: oklch(0.22 0 0);
+    color: oklch(0.85 0.006 80);
+    border: 1px solid oklch(0.42 0 0 / 0.35);
+    white-space: nowrap;
+  }
+  .tag.fandom { background: oklch(0.60 0.13 155 / 0.18); color: oklch(0.60 0.13 155); border-color: transparent; }
+  .tag.warn { background: oklch(0.72 0.14 35 / 0.16); color: oklch(0.72 0.14 35); border-color: transparent; }
+  .tag.love { background: oklch(0.74 0.14 20 / 0.18); color: oklch(0.74 0.14 20); border-color: transparent; }
+  .tag.rating { background: oklch(0.22 0 0); color: oklch(0.66 0.008 75); font-variant: small-caps; letter-spacing: 0.08em; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 34px; padding: 0 14px;
+    border-radius: 4px; font-size: 13px; font-weight: 500;
+    background: oklch(0.22 0 0); color: oklch(0.96 0.005 80);
+    border: 1px solid oklch(0.42 0 0 / 0.35);
+    white-space: nowrap; cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  .btn:hover { background: oklch(0.27 0 0); }
+  .btn.primary { background: oklch(0.60 0.13 155); color: oklch(0.14 0.02 155); border-color: transparent; font-weight: 600; }
+  .btn.ghost { background: transparent; border-color: transparent; }
+  .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  .btn.icon { width: 34px; padding: 0; }
+  .btn.icon.sm { width: 28px; }
+
+  .stat-row { display: flex; gap: 16px; color: oklch(0.66 0.008 75); font-size: 12px; align-items: center; }
+  .stat-row .stat { display: inline-flex; align-items: center; gap: 5px; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+    background: oklch(0.27 0 0); color: oklch(0.85 0.006 80);
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 12px;
+    letter-spacing: 0.02em; flex-shrink: 0; user-select: none;
+  }
+
+  .cover {
+    position: relative; border-radius: 2px; overflow: hidden;
+    background: oklch(0.22 0 0); aspect-ratio: 2 / 3;
+    align-self: flex-start; width: 100%;
+  }
+
+  .redact-bar {
+    display: inline-block; width: 0.7em; height: 0.85em;
+    background: currentColor; vertical-align: -0.08em; flex-shrink: 0;
+  }
+</style>
+</head>
+<body class="dmr">
+  <div id="root" class="max-w-[1280px] mx-auto"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="hot/data.jsx"></script>
+  <script type="text/babel" src="hot/cover.jsx"></script>
+  <script type="text/babel" src="hot/icon.jsx"></script>
+  <script type="text/babel" src="hot/shared.jsx"></script>
+  <script type="text/babel" src="hot/hot-data.jsx"></script>
+  <script type="text/babel" src="hot/hot-home.jsx"></script>
+  <script type="text/babel">
+    ReactDOM.createRoot(document.getElementById('root')).render(<HotHome />);
+  </script>
+</body>
+</html>

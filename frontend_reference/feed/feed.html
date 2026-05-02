@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+
+{% block content %}
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-[1fr_240px] gap-6 md:gap-8">
+    <div>
+        {# Composer #}
+        <div class="flex gap-3 p-4 bg-bg-1 border border-line-soft rounded-lg mb-6">
+            <div class="avatar w-9 h-9">{% if user %}{{ user.username[:2]|upper }}{% else %}МК{% endif %}</div>
+            <div class="flex-1">
+                <textarea placeholder="Поділіться чимось — нотаткою, цитатою, посиланням на розділ…" class="w-full min-h-[50px] p-2 bg-transparent border-0 outline-none resize-none text-fg-1 text-sm leading-relaxed"></textarea>
+                <div class="flex items-center mt-1.5 pt-2 border-t border-line-soft">
+                    <div class="flex gap-1">
+                        <button type="button" class="btn ghost icon sm" title="Прикріпити твір">{{ icon('book', 14) }}</button>
+                        <button type="button" class="btn ghost icon sm" title="Зображення">{{ icon('image', 14) }}</button>
+                        <button type="button" class="btn ghost icon sm" title="Цитата">{{ icon('quote', 14) }}</button>
+                        <button type="button" class="btn ghost icon sm" title="Опитування">{{ icon('list', 14) }}</button>
+                    </div>
+                    <div class="flex-1"></div>
+                    <button type="button" class="btn primary sm">Опублікувати</button>
+                </div>
+            </div>
+        </div>
+
+        {# Tabs #}
+        <div class="flex gap-1 mb-4 flex-wrap">
+            {%- for tab in tabs %}
+            <a href="?tab={{ tab.id }}" class="px-3.5 py-2 text-[13px] rounded-md {% if tab.id == active_tab %}text-fg-0 font-medium bg-bg-2{% else %}text-fg-3 hover:text-fg-1{% endif %}">{{ tab.label }}</a>
+            {%- endfor %}
+        </div>
+
+        {# Feed #}
+        <div class="flex flex-col gap-3">
+            {%- for post in posts %}
+            <article class="p-[18px] bg-bg-1 border border-line-soft rounded-lg">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="avatar w-9 h-9">{{ post.avatar }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13.5px] text-fg-0 font-medium flex items-center gap-2 flex-wrap">
+                            <span>{{ post.user }}</span>
+                            {%- if post.is_following %}
+                            <span class="text-[10px] font-medium px-1.5 py-px bg-bg-2 text-fg-3 rounded-full tracking-[0.02em]">ви стежите</span>
+                            {%- endif %}
+                        </div>
+                        <div class="text-[11.5px] text-fg-3">@{{ post.handle }} · {{ post.time }}</div>
+                    </div>
+                    <button type="button" class="text-fg-3 p-1 hover:text-fg-1">{{ icon('more', 14) }}</button>
+                </div>
+
+                <p class="text-sm leading-[1.6] text-fg-1 m-0 mb-3 text-pretty">{{ post.text }}</p>
+
+                {%- if post.type == 'rec' and post.attached %}
+                <a href="/title/{{ post.attached.id }}" class="flex gap-3 p-3 mb-3 bg-bg-0 border border-line-soft rounded-md hover:border-line transition">
+                    <div class="cover w-[50px] shrink-0">
+                        {{ cover(post.attached.title, post.attached.author, post.attached.id, show_text=false) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-serif text-sm text-fg-0 line-clamp-2">{{ post.attached.title }}</div>
+                        <div class="text-[11.5px] text-fg-3 mb-1">{{ post.attached.author }}</div>
+                        <div class="stat-row text-[10.5px]" style="gap: 10px;">
+                            <span class="stat">{{ icon('heart', 10) }}{{ post.attached.kudos | thousands_uk }}</span>
+                            <span class="stat">{{ icon('eye', 10) }}{{ "%.1f"|format(post.attached.hits / 1000) }}k</span>
+                        </div>
+                    </div>
+                </a>
+                {%- endif %}
+
+                {%- if post.type == 'milestone' and post.milestone %}
+                <div class="flex items-center gap-2.5 px-3.5 py-2.5 bg-accent-soft rounded-md mb-3">
+                    <span class="text-accent">{{ icon('rss', 14) }}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[10px] text-accent tracking-[0.06em] uppercase font-semibold">{{ post.milestone.label }}</div>
+                        <div class="text-[13px] text-fg-0 truncate">{{ post.milestone.target }}</div>
+                    </div>
+                    <a href="#" class="btn sm">Читати</a>
+                </div>
+                {%- endif %}
+
+                {%- if post.type == 'poll' and post.poll %}
+                <div class="flex flex-col gap-1.5 mb-3">
+                    {%- for opt in post.poll %}
+                    <div class="relative px-3 py-2.5 bg-bg-0 border border-line-soft rounded-md overflow-hidden cursor-pointer">
+                        <div class="absolute inset-0 bg-accent-soft" style="width: {{ opt.pct }}%;"></div>
+                        <div class="relative flex justify-between text-[13px]">
+                            <span class="text-fg-1">{{ opt.label }}</span>
+                            <span class="text-fg-2 tabular-nums font-medium">{{ opt.pct }}%</span>
+                        </div>
+                    </div>
+                    {%- endfor %}
+                    <div class="text-[11px] text-fg-3 mt-1">1 248 голосів · опитування завершено</div>
+                </div>
+                {%- endif %}
+
+                {%- if post.type == 'quote' %}
+                <blockquote class="m-0 mb-3 px-[18px] py-3.5 border-l-[3px] border-accent bg-bg-0 rounded-r-md">
+                    <p class="font-serif text-[17px] leading-[1.5] text-fg-0 m-0">{{ post.quote }}</p>
+                    <div class="text-xs text-fg-3 mt-2 italic">{{ post.quote_source }}</div>
+                </blockquote>
+                {%- endif %}
+
+                {# Actions #}
+                <div class="flex gap-[18px] pt-2 border-t border-line-soft">
+                    <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
+                        {{ icon('heart', 14) }} {{ post.kudos }}
+                    </button>
+                    <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
+                        {{ icon('message', 14) }} {{ post.comments }}
+                    </button>
+                    <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
+                        {{ icon('rss', 14) }} {{ post.reposts }}
+                    </button>
+                    <button type="button" class="ml-auto text-fg-3 p-1 hover:text-fg-1">
+                        {{ icon('bookmark', 14) }}
+                    </button>
+                </div>
+            </article>
+            {%- endfor %}
+        </div>
+    </div>
+
+    <aside class="flex flex-col gap-6">
+        <section>
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Хто пише зараз</h4>
+            <div class="flex flex-col gap-3">
+                {%- for w in writing_now %}
+                <div class="flex items-center gap-2.5 text-xs">
+                    <div class="relative">
+                        <div class="avatar w-7 h-7">{{ w.name | initials }}</div>
+                        <span class="absolute -right-px -bottom-px w-2.5 h-2.5 rounded-full border-2 border-bg-0" style="background: #7cb98a;"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[12.5px] text-fg-0 font-medium truncate">{{ w.name }}</div>
+                        <div class="text-[11px] text-fg-3 truncate">{{ w.status }}</div>
+                    </div>
+                </div>
+                {%- endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Рекомендації</h4>
+            <div class="flex flex-col gap-3">
+                {%- for n in recommendations %}
+                <a href="/title/{{ n.id }}" class="flex gap-2.5">
+                    <div class="cover w-9 shrink-0">
+                        {{ cover(n.title, n.author, n.id, show_text=false) }}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-serif text-[12.5px] leading-[1.25] text-fg-0 line-clamp-2">{{ n.title }}</div>
+                        <div class="text-[10.5px] text-fg-3 truncate">{{ n.author }}</div>
+                    </div>
+                </a>
+                {%- endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-3">Популярні теги</h4>
+            <div class="flex gap-1 flex-wrap">
+                {%- for t in tags %}
+                <span class="tag text-[11px]">#{{ t.name }}</span>
+                {%- endfor %}
+            </div>
+        </section>
+    </aside>
+</div>
+{% endblock %}

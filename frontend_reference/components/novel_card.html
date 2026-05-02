@@ -1,0 +1,100 @@
+{# Novel card variants, ported from frontend_reference/novel-card.jsx and
+   extended with type-awareness (translation vs original).
+
+   - novel_card_cover: poster-first grid card, with origin badge on cover
+   - novel_card_list:  horizontal row card, with type tag in title row
+                       and translator team attribution under author
+   - novel_card:       dispatcher chooses cover/list based on with_covers flag
+#}
+
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+
+
+{% macro novel_card_cover(novel) -%}
+<a href="/title/{{ novel.id }}" class="block">
+    <article class="cursor-pointer flex flex-col gap-2.5">
+        <div class="cover shadow-sm">
+            {{ cover(novel.title, novel.author, novel.id) }}
+            {# Origin badge (top-left) — source-language code for translations,
+               accent "ОРИГ" for originals so they pop visually. #}
+            {%- if novel.type == 'translation' %}
+            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">{{ novel.source_language | upper }}</span>
+            {%- else %}
+            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-accent text-accent-fg px-[7px] py-[3px]">ОРИГ</span>
+            {%- endif %}
+            {%- if novel.progress > 0 and novel.progress < 100 %}
+            <div class="absolute left-0 right-0 bottom-0 h-[3px] bg-black/40">
+                <div class="h-full bg-accent" style="width: {{ novel.progress }}%;"></div>
+            </div>
+            {%- endif %}
+            {%- if novel.status == 'Завершено' %}
+            <span class="absolute top-2 right-2 text-[9.5px] font-semibold tracking-[0.06em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">Завершено</span>
+            {%- endif %}
+        </div>
+        <div>
+            <h3 class="text-sm font-serif font-medium leading-tight mb-[3px] line-clamp-2 min-h-[2.5em]">{{ novel.title }}</h3>
+            <div class="text-[11.5px] text-fg-3">{{ novel.author }}</div>
+            <div class="stat-row mt-2 text-[11px]">
+                <span class="stat">{{ icon('heart', 11) }}{{ novel.kudos | thousands_uk }}</span>
+                <span class="stat">{{ icon('message', 11) }}{{ novel.comments }}</span>
+                <span class="stat">{{ icon('eye', 11) }}{{ "%.1f"|format(novel.hits / 1000) }}k</span>
+            </div>
+        </div>
+    </article>
+</a>
+{%- endmacro %}
+
+
+{% macro novel_card_list(novel, show_cover=true) -%}
+<a href="/title/{{ novel.id }}" class="block">
+    <article class="cursor-pointer flex items-start gap-3.5 p-4 rounded-lg bg-bg-1 border border-line-soft">
+        {%- if show_cover %}
+        <div class="cover w-[76px] flex-shrink-0">
+            {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
+        </div>
+        {%- endif %}
+        <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+            <div class="flex items-baseline justify-between gap-3">
+                <h3 class="text-[15px] font-serif font-medium leading-tight line-clamp-2">{{ novel.title }}</h3>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    {%- if novel.type == 'translation' %}
+                    <span class="tag">{{ novel.source_language | upper }} · ПЕРЕКЛАД</span>
+                    {%- else %}
+                    <span class="tag fandom">ОРИГІНАЛ</span>
+                    {%- endif %}
+                    <span class="tag rating">{{ novel.rating }}</span>
+                </div>
+            </div>
+            <div class="text-xs text-fg-3">
+                <span class="text-fg-2">{{ novel.author }}</span>
+                {%- if novel.type == 'translation' and novel.teams_active %}
+                · перекладає <span class="text-fg-2">{{ team_by_id(novel.teams_active[0].team_id).name }}</span>
+                {%- endif %}
+                · {{ novel.updated }}
+            </div>
+            <p class="text-[12.5px] text-fg-2 leading-relaxed m-0 line-clamp-2">{{ novel.summary }}</p>
+            <div class="flex gap-1.5 flex-wrap mt-0.5">
+                {%- for w in novel.warnings %}
+                <span class="tag warn">{{ w }}</span>
+                {%- endfor %}
+                {%- for t in novel.tags[:3] %}
+                <span class="tag">{{ t }}</span>
+                {%- endfor %}
+            </div>
+            <div class="stat-row mt-1">
+                <span class="stat">{{ icon('heart', 12) }}{{ novel.kudos | thousands_uk }}</span>
+                <span class="stat">{{ icon('bookmark', 12) }}{{ novel.bookmarks }}</span>
+                <span class="stat">{{ icon('message', 12) }}{{ novel.comments }}</span>
+                <span class="stat">{{ icon('eye', 12) }}{{ "%.1f"|format(novel.hits / 1000) }}k</span>
+                <span class="ml-auto text-fg-3 text-[11px]">{{ novel.chapters }}/{{ novel.chapter_count }} р. · {{ "%.1f"|format(novel.words / 1000) }}k слів</span>
+            </div>
+        </div>
+    </article>
+</a>
+{%- endmacro %}
+
+
+{% macro novel_card(novel, with_covers=true) -%}
+{%- if with_covers -%}{{ novel_card_cover(novel) }}{%- else -%}{{ novel_card_list(novel) }}{%- endif -%}
+{%- endmacro %}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "components/icon.html" import icon %}
+{% from "components/toggle.html" import bookmark_button %}
 
 {% block app %}
 <div class="h-screen overflow-auto bg-bg-0 relative">
@@ -21,9 +22,7 @@
             <span class="truncate">Розділ {{ chapter_no }} з {{ novel.chapter_count }}{%- if chapter_title %} · {{ chapter_title }}{%- endif %}</span>
         </div>
 
-        <button type="button" class="text-fg-1 p-1.5 rounded-md hover:bg-white/5 shrink-0" title="Зберегти">
-            {{ icon('bookmark', 15) }}
-        </button>
+        <span title="Зберегти" class="shrink-0">{{ bookmark_button(size=15, extra_class='text-fg-1 p-1.5 rounded-md hover:bg-white/5') }}</span>
     </div>
 
     {# ────────────────────── Article ────────────────────── #}

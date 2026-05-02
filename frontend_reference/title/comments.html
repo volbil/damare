@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/segmented.html" import segmented %}
+
+{% macro comment_block(c) %}
+<div class="flex gap-3"{% if c.spoiler %} x-data="{ revealed: false }"{% endif %}>
+    <div class="avatar w-8 h-8 shrink-0 {% if c.is_author %}bg-accent text-accent-fg{% endif %}">{{ c.avatar }}</div>
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="text-[13px] font-medium text-fg-0">{{ c.user }}</span>
+            {%- if c.is_author %}
+            <span class="text-[9.5px] font-semibold px-1.5 py-0.5 bg-accent-soft text-accent rounded-full tracking-[0.04em] uppercase">Автор</span>
+            {%- endif %}
+            {%- if c.pinned %}
+            <span class="text-[10px] text-fg-3 flex items-center gap-1">
+                {{ icon('bookmark-fill', 10) }} Закріплено
+            </span>
+            {%- endif %}
+            <span class="text-[11.5px] text-fg-3">· {{ c.time }}</span>
+        </div>
+        {%- if c.spoiler %}
+        <button type="button" x-show="!revealed" @click="revealed = true" class="text-xs px-3 py-2 bg-bg-2 rounded-md text-fg-2 border border-line-soft mb-2">
+            ⚠ Спойлер · натисніть, щоб показати
+        </button>
+        <p x-show="revealed" class="text-[13.5px] leading-[1.6] text-fg-1 m-0 mb-2 text-pretty" style="display: none;">{{ c.text }}</p>
+        {%- else %}
+        <p class="text-[13.5px] leading-[1.6] text-fg-1 m-0 mb-2 text-pretty">{{ c.text }}</p>
+        {%- endif %}
+        <div class="flex items-center gap-3.5 text-[11.5px] text-fg-3">
+            <button type="button" class="flex items-center gap-1 text-fg-2 hover:text-fg-0">
+                {{ icon('heart', 12) }} {{ c.kudos }}
+            </button>
+            <button type="button" class="flex items-center gap-1 text-fg-2 hover:text-fg-0">
+                {{ icon('message', 12) }} Відповісти
+            </button>
+            <button type="button" class="text-fg-3 hover:text-fg-1">Поскаржитись</button>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="max-w-[760px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
+    {# Breadcrumb #}
+    <div class="text-xs text-fg-3 flex items-center gap-1.5 mb-3 flex-wrap">
+        <a href="/title/{{ novel.id }}" class="hover:text-fg-1 truncate max-w-[300px]">{{ novel.title | truncate(40) }}</a>
+        {{ icon('chevron-r', 11) }}
+        <a href="/title/{{ novel.id }}/read" class="hover:text-fg-1">Розділ {{ chapter.chapter_no }}</a>
+        {{ icon('chevron-r', 11) }}
+        <span class="text-fg-1">Обговорення</span>
+    </div>
+
+    <h1 class="font-serif text-[28px] font-medium mb-1">{{ chapter.title }}</h1>
+    <div class="flex items-center gap-4 mb-6 flex-wrap">
+        <span class="text-[13px] text-fg-2">
+            <span class="text-fg-0 font-semibold">148</span> коментарів
+        </span>
+        <span class="text-[13px] text-fg-2">
+            <span class="text-fg-0 font-semibold">1.2k</span> kudos
+        </span>
+        <div class="flex-1"></div>
+        {{ segmented(['Найкращі', 'Найновіші', 'Автор'], 'Найкращі', small=true) }}
+    </div>
+
+    {# Composer #}
+    <div class="flex gap-3 p-3.5 bg-bg-1 border border-line-soft rounded-lg mb-7">
+        <div class="avatar w-8 h-8">{% if user %}{{ user.username[:2]|upper }}{% else %}МК{% endif %}</div>
+        <div class="flex-1">
+            <textarea placeholder="Поділіться думкою про розділ…" class="w-full min-h-[64px] p-2.5 bg-bg-0 border border-line-soft rounded-md text-fg-1 text-[13.5px] leading-[1.55] resize-y outline-none focus:border-line"></textarea>
+            <div class="flex items-center mt-2 flex-wrap gap-2">
+                <div class="flex gap-1">
+                    <button type="button" class="btn ghost icon sm">{{ icon('bold', 13) }}</button>
+                    <button type="button" class="btn ghost icon sm">{{ icon('italic', 13) }}</button>
+                    <button type="button" class="btn ghost icon sm">{{ icon('quote', 13) }}</button>
+                </div>
+                <span class="flex-1 text-[11px] text-fg-3 ml-3 min-w-0">Markdown підтримується · спойлери у &lt;spoiler&gt;</span>
+                <button type="button" class="btn primary sm">{{ icon('send', 12) }} Опублікувати</button>
+            </div>
+        </div>
+    </div>
+
+    {# Threads #}
+    <div class="flex flex-col gap-6">
+        {%- for thread in threads %}
+        <div>
+            {{ comment_block(thread) }}
+            {%- if thread.replies %}
+            <div class="ml-11 mt-3.5 border-l-2 border-line-soft pl-4 flex flex-col gap-3.5">
+                {%- for reply in thread.replies %}
+                {{ comment_block(reply) }}
+                {%- endfor %}
+            </div>
+            {%- endif %}
+        </div>
+        {%- endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+        <button type="button" class="btn">Завантажити ще 144 коментарі</button>
+    </div>
+</div>
+{% endblock %}

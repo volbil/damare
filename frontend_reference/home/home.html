@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+{% from "components/novel_card.html" import novel_card %}
+
+{% block content %}
+<div class="max-w-[1280px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20">
+
+    {# ───────── Continue reading — multiple in-progress, compact ───────── #}
+    {%- if continue_reading_list %}
+    <section class="mb-7">
+        <div class="flex items-baseline justify-between mb-3">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">
+                Продовжити читати · {{ continue_reading_list | length }}
+            </h2>
+            <a href="/profile?tab=reading" class="text-xs text-fg-3 hover:text-fg-1">Уся бібліотека →</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {%- for item in continue_reading_list %}
+            <a href="/title/{{ item.novel.id }}/read" class="flex gap-3 p-3 bg-bg-1 border border-line-soft rounded-md hover:border-line transition">
+                <div class="cover w-[60px] shrink-0">
+                    {{ cover(item.novel.title, item.novel.author, item.novel.id, show_text=false) }}
+                </div>
+                <div class="flex-1 min-w-0 flex flex-col">
+                    <div class="text-[10px] text-fg-3 uppercase tracking-[0.06em] mb-1">Розділ {{ item.chapter_no }} з {{ item.novel.chapter_count }}</div>
+                    <div class="font-serif text-[14px] leading-[1.25] text-fg-0 mb-1 line-clamp-2">{{ item.novel.title }}</div>
+                    <div class="text-[11px] text-fg-3 truncate">{{ item.novel.author }}</div>
+                    <div class="flex items-center gap-2 mt-auto pt-2">
+                        <div class="flex-1 h-0.5 bg-bg-3 rounded-full overflow-hidden">
+                            <div class="h-full bg-accent rounded-full" style="width: {{ item.progress }}%;"></div>
+                        </div>
+                        <span class="text-[10px] text-fg-3 tabular-nums">{{ item.progress }}%</span>
+                    </div>
+                </div>
+            </a>
+            {%- endfor %}
+        </div>
+    </section>
+    {%- endif %}
+
+    {# ───────── Fresh from follows ───────── #}
+    {%- if fresh_updates %}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
+                {{ icon('rss', 11) }} Свіже від ваших
+            </h2>
+            <a href="/feed" class="text-xs text-fg-3 hover:text-fg-1">Стрічка →</a>
+        </div>
+        <div class="flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
+            {%- for u in fresh_updates %}
+            <a href="/title/{{ u.novel.id }}/read?ch={{ u.chapter_no }}{% if u.team %}&team={{ u.team.id }}{% endif %}" class="flex items-center gap-3 px-4 py-3 hover:bg-bg-2/50 transition {% if not loop.last %}border-b border-line-soft{% endif %}">
+                <div class="w-7 h-7 shrink-0 rounded-md bg-bg-2 flex items-center justify-center text-accent">
+                    {{ icon('rss', 13) }}
+                </div>
+                <div class="flex-1 min-w-0 flex items-center gap-2 text-[13px] flex-wrap">
+                    {%- if u.team %}
+                    <span class="inline-flex items-center gap-1.5 shrink-0">
+                        <div class="avatar w-4 h-4 text-[9px]">{{ u.team.avatar }}</div>
+                        <span class="text-fg-2">{{ u.team.name }}</span>
+                    </span>
+                    <span class="text-fg-4 shrink-0">·</span>
+                    {%- endif %}
+                    <span class="text-fg-1 truncate">
+                        <span class="text-fg-0 font-medium">розділ {{ u.chapter_no }}</span>
+                        {%- if u.chapter_title %} «{{ u.chapter_title }}»{%- endif %}
+                        у <span class="text-accent">{{ u.novel.title | truncate(40) }}</span>
+                    </span>
+                </div>
+                <span class="text-[11px] text-fg-3 shrink-0 whitespace-nowrap">{{ u.time }}</span>
+            </a>
+            {%- endfor %}
+        </div>
+    </section>
+    {%- endif %}
+
+    {# ───────── Editorial pick — demoted ───────── #}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
+                {{ icon('sparkle', 11) }} Редакторський вибір
+            </h2>
+        </div>
+        <a href="/title/{{ featured.id }}" class="block">
+            <div class="relative cursor-pointer min-h-[180px] rounded-lg overflow-hidden border border-line-soft">
+                <div class="absolute inset-0">
+                    {{ cover(featured.title, featured.author, featured.id, show_text=false) }}
+                </div>
+                <div class="absolute inset-0" style="background: linear-gradient(110deg, rgba(14,17,14,0.95) 0%, rgba(14,17,14,0.7) 50%, rgba(14,17,14,0.4) 100%);"></div>
+                <div class="relative flex flex-col justify-end p-6 max-w-[560px] min-h-[180px]">
+                    <span class="text-[10px] font-semibold tracking-[0.1em] uppercase text-accent mb-1.5">Тиждень тому · в тренді</span>
+                    <h3 class="font-serif text-2xl font-medium leading-[1.1] mb-1.5 text-white line-clamp-2">{{ featured.title }}</h3>
+                    <div class="text-white/70 text-[12px] mb-2">{{ featured.author }} · {{ featured.chapter_count }} розділів</div>
+                    <p class="text-white/85 text-[13px] leading-[1.5] m-0 line-clamp-2">{{ featured.summary }}</p>
+                </div>
+            </div>
+        </a>
+    </section>
+
+    {# ───────── Trending ───────── #}
+    <section class="mb-9">
+        <div class="flex items-baseline justify-between mb-3.5">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
+                {{ icon('flame', 11) }} Зараз у тренді
+            </h2>
+            <a href="/search?sort=trending" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-[18px]">
+            {%- for n in trending %}
+            {{ novel_card(n, with_covers=true) }}
+            {%- endfor %}
+        </div>
+    </section>
+
+    {# ───────── Recently updated ───────── #}
+    <section>
+        <div class="flex items-baseline justify-between mb-3.5">
+            <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Нещодавно оновлені</h2>
+            <a href="/search?sort=updated" class="text-xs text-fg-3 hover:text-fg-1">Більше →</a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-[18px]">
+            {%- for n in new_releases %}
+            {{ novel_card(n, with_covers=true) }}
+            {%- endfor %}
+        </div>
+    </section>
+
+</div>
+{% endblock %}

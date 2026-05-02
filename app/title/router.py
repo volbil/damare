@@ -205,6 +205,9 @@ async def search(
     kind: str = Query("all", alias="type"),
     lang: str = "all",
     team: str = "all",
+    rating: str = "all",
+    status: str = "all",
+    sort: str = "kudos",
 ):
     valid_kinds = {"all", "translation", "original"}
     if kind not in valid_kinds:
@@ -213,6 +216,18 @@ async def search(
     valid_team_ids = {"all"} | {t["id"] for t in TEAMS}
     if team not in valid_team_ids:
         team = "all"
+
+    valid_ratings = {"all", "G", "T", "M"}
+    if rating not in valid_ratings:
+        rating = "all"
+
+    valid_statuses = {"all", "ongoing", "finished"}
+    if status not in valid_statuses:
+        status = "all"
+
+    valid_sorts = {"kudos", "date", "words", "hits"}
+    if sort not in valid_sorts:
+        sort = "kudos"
 
     # Apply filters
     results = list(NOVELS)
@@ -230,6 +245,23 @@ async def search(
             if any(ta.get("team_id") == team for ta in n.get("teams_active", []))
         ]
 
+    if rating != "all":
+        results = [n for n in results if n.get("rating") == rating]
+
+    if status != "all":
+        # Map URL-friendly slug to the data's Ukrainian status string
+        status_map = {"ongoing": "У процесі", "finished": "Завершено"}
+        results = [n for n in results if n.get("status") == status_map[status]]
+
+    # Apply sort. NOVELS list order is treated as "newest first" for date.
+    if sort == "kudos":
+        results.sort(key=lambda n: n.get("kudos", 0), reverse=True)
+    elif sort == "words":
+        results.sort(key=lambda n: n.get("words", 0), reverse=True)
+    elif sort == "hits":
+        results.sort(key=lambda n: n.get("hits", 0), reverse=True)
+    # sort == "date" → leave NOVELS list order
+
     # Source languages found in actual translation data — keeps filter honest
     available_langs = sorted({
         n.get("source_language")
@@ -238,10 +270,19 @@ async def search(
     })
 
     def search_url(**overrides):
-        params = {"q": q, "type": kind, "lang": lang, "team": team}
+        params = {
+            "q": q,
+            "type": kind,
+            "lang": lang,
+            "team": team,
+            "rating": rating,
+            "status": status,
+            "sort": sort,
+        }
         params.update(overrides)
         # Strip defaults so URLs stay tidy
-        params = {k: v for k, v in params.items() if v and v != "all"}
+        defaults = {"type": "all", "lang": "all", "team": "all", "rating": "all", "status": "all", "sort": "kudos"}
+        params = {k: v for k, v in params.items() if v and v != defaults.get(k)}
         if not params:
             return "/search"
         return "/search?" + urlencode(params)
@@ -274,6 +315,26 @@ async def search(
             "href": search_url(team=t["id"]),
         })
 
+    rating_filters = [
+        {"label": "Усі", "active": rating == "all", "href": search_url(rating="all")},
+        {"label": "G", "active": rating == "G", "href": search_url(rating="G")},
+        {"label": "T", "active": rating == "T", "href": search_url(rating="T")},
+        {"label": "M", "active": rating == "M", "href": search_url(rating="M")},
+    ]
+
+    status_filters = [
+        {"label": "Усі", "active": status == "all", "href": search_url(status="all")},
+        {"label": "У процесі", "active": status == "ongoing", "href": search_url(status="ongoing")},
+        {"label": "Завершено", "active": status == "finished", "href": search_url(status="finished")},
+    ]
+
+    sort_filters = [
+        {"label": "Kudos", "active": sort == "kudos", "href": search_url(sort="kudos")},
+        {"label": "Дата", "active": sort == "date", "href": search_url(sort="date")},
+        {"label": "Слова", "active": sort == "words", "href": search_url(sort="words")},
+        {"label": "Хіти", "active": sort == "hits", "href": search_url(sort="hits")},
+    ]
+
     return templates.TemplateResponse(
         "search/search.html",
         {
@@ -290,10 +351,16 @@ async def search(
             "type_filters": type_filters,
             "lang_filters": lang_filters,
             "team_filters": team_filters,
+            "rating_filters": rating_filters,
+            "status_filters": status_filters,
+            "sort_filters": sort_filters,
             "show_lang_filter": kind != "original",
             "current_kind": kind,
             "current_lang": lang,
             "current_team": team,
+            "current_rating": rating,
+            "current_status": status,
+            "current_sort": sort,
         },
     )
 
@@ -621,6 +688,7 @@ async def articles(
     request: Request,
     user: User | None = Depends(auth_optional),
     tag: str = "Усі",
+    sort: str = "fresh",
 ):
     featured = {
         "title": "Як писати тишу: чого нас вчить епістолярний жанр у 2026 році",
@@ -630,16 +698,56 @@ async def articles(
         "kudos": 412, "comments": 38,
     }
 
-    article_list = [
-        {"cat": "Розбір", "title": "«Янголи їдять борщ»: коротка форма як магія", "author": "архіваріус", "avatar": "АР", "time": "8 хв · 4 дні тому", "kudos": 184, "comments": 22, "official": False},
-        {"cat": "Поради", "title": "Шість способів вийти з письменницького блоку, які не «гуляйте у парку»", "author": "Тарас Вовк", "avatar": "ТВ", "time": "6 хв · тиждень тому", "kudos": 622, "comments": 91, "official": False},
+    # cat values are aligned with tag_filter labels so the filter can match exactly
+    all_articles = [
+        {"cat": "Розбори", "title": "«Янголи їдять борщ»: коротка форма як магія", "author": "архіваріус", "avatar": "АР", "time": "8 хв · 4 дні тому", "kudos": 184, "comments": 22, "official": False},
+        {"cat": "Майстерність", "title": "Шість способів вийти з письменницького блоку, які не «гуляйте у парку»", "author": "Тарас Вовк", "avatar": "ТВ", "time": "6 хв · тиждень тому", "kudos": 622, "comments": 91, "official": False},
         {"cat": "Інтерв'ю", "title": "Розмова з Мирославою Дід: «Я не вірю в музу, я вірю в дисципліну»", "author": "Damare", "avatar": "DM", "time": "14 хв · тиждень тому", "kudos": 298, "comments": 44, "official": True},
         {"cat": "Рекомендації", "title": "Десять українських романів, які варто прочитати взимку", "author": "оля_читає", "avatar": "ОЧ", "time": "10 хв · 2 тижні тому", "kudos": 1100, "comments": 168, "official": False},
-        {"cat": "Майстерня", "title": "Як я писала роман по 200 слів на день (і вижила)", "author": "Богдана Шум", "avatar": "БШ", "time": "7 хв · 2 тижні тому", "kudos": 487, "comments": 73, "official": False},
-        {"cat": "Розбір", "title": "Магічний реалізм по-українськи: відмінності від латиноамериканської традиції", "author": "Андрій Чорний", "avatar": "АЧ", "time": "18 хв · 3 тижні тому", "kudos": 712, "comments": 102, "official": False},
+        {"cat": "Майстерність", "title": "Як я писала роман по 200 слів на день (і вижила)", "author": "Богдана Шум", "avatar": "БШ", "time": "7 хв · 2 тижні тому", "kudos": 487, "comments": 73, "official": False},
+        {"cat": "Розбори", "title": "Магічний реалізм по-українськи: відмінності від латиноамериканської традиції", "author": "Андрій Чорний", "avatar": "АЧ", "time": "18 хв · 3 тижні тому", "kudos": 712, "comments": 102, "official": False},
+        {"cat": "Жанри", "title": "Чому ізекай досі працює: дванадцять років після піку жанру", "author": "Тарас Вовк", "avatar": "ТВ", "time": "11 хв · 3 тижні тому", "kudos": 384, "comments": 67, "official": False},
+        {"cat": "Переклад", "title": "Як перекладати японську тишу: нотатки команди «Тиша»", "author": "Маринка К.", "avatar": "МК", "time": "9 хв · місяць тому", "kudos": 521, "comments": 88, "official": False},
     ]
 
     tag_filter = ["Усі", "Майстерність", "Рекомендації", "Інтерв'ю", "Розбори", "Жанри", "Видавництво", "Переклад"]
+    active_tag = tag if tag in tag_filter else "Усі"
+
+    valid_sorts = {"fresh", "popular", "read"}
+    if sort not in valid_sorts:
+        sort = "fresh"
+
+    article_list = (
+        list(all_articles) if active_tag == "Усі"
+        else [a for a in all_articles if a["cat"] == active_tag]
+    )
+
+    if sort == "popular":
+        article_list.sort(key=lambda a: a["kudos"], reverse=True)
+    elif sort == "read":
+        # No `views` field; comments is the closest proxy for engagement
+        article_list.sort(key=lambda a: a["comments"], reverse=True)
+    # sort == "fresh" → keep existing list order
+
+    def articles_url(**overrides):
+        params = {"tag": active_tag, "sort": sort}
+        params.update(overrides)
+        defaults = {"tag": "Усі", "sort": "fresh"}
+        params = {k: v for k, v in params.items() if v and v != defaults.get(k)}
+        if not params:
+            return "/articles"
+        return "/articles?" + urlencode(params)
+
+    sort_filters = [
+        {"label": "Найсвіжіші", "active": sort == "fresh", "href": articles_url(sort="fresh")},
+        {"label": "Найпопулярніші", "active": sort == "popular", "href": articles_url(sort="popular")},
+        {"label": "Найчитаніші", "active": sort == "read", "href": articles_url(sort="read")},
+    ]
+
+    tag_filters = [
+        {"label": t, "active": t == active_tag, "href": articles_url(tag=t)}
+        for t in tag_filter
+    ]
 
     return templates.TemplateResponse(
         "articles/articles.html",
@@ -650,8 +758,9 @@ async def articles(
             "page_title": "Записник",
             "featured": featured,
             "articles": article_list,
-            "tag_filter": tag_filter,
-            "active_tag": tag if tag in tag_filter else "Усі",
+            "tag_filters": tag_filters,
+            "active_tag": active_tag,
+            "sort_filters": sort_filters,
         },
     )
 
@@ -660,9 +769,16 @@ async def articles(
 async def feed(
     request: Request,
     user: User | None = Depends(auth_optional),
-    tab: str = "За підпискою",
+    tab: str = "follows",
 ):
-    posts = [
+    valid_tabs = {"follows", "all", "quotes", "mine"}
+    if tab not in valid_tabs:
+        tab = "follows"
+
+    # Stub: assume the logged-in user is kalyna_l. Real auth would supply this.
+    current_handle = "kalyna_l"
+
+    all_posts = [
         {
             "user": "Калина Левчук", "handle": "kalyna_l", "avatar": "КЛ", "time": "2 год тому",
             "type": "note", "is_following": True,
@@ -705,6 +821,16 @@ async def feed(
         },
     ]
 
+    # Apply tab filter
+    if tab == "follows":
+        posts = [p for p in all_posts if p.get("is_following")]
+    elif tab == "quotes":
+        posts = [p for p in all_posts if p.get("type") == "quote"]
+    elif tab == "mine":
+        posts = [p for p in all_posts if p.get("handle") == current_handle]
+    else:  # "all"
+        posts = list(all_posts)
+
     writing_now = [
         {"name": "Калина Левчук", "status": "дописує розд. 4"},
         {"name": "Тарас Вовк", "status": "редагує розд. 32"},
@@ -712,10 +838,10 @@ async def feed(
     ]
 
     tabs = [
-        {"id": "За підпискою", "label": "За підпискою"},
-        {"id": "Усе", "label": "Усе"},
-        {"id": "Цитати", "label": "Цитати"},
-        {"id": "Тільки мої", "label": "Тільки мої"},
+        {"id": "follows", "label": "За підпискою"},
+        {"id": "all", "label": "Усе"},
+        {"id": "quotes", "label": "Цитати"},
+        {"id": "mine", "label": "Тільки мої"},
     ]
 
     return templates.TemplateResponse(

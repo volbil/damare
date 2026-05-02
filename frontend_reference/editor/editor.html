@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+
+{% block content %}
+<div class="bg-bg-0 min-h-full flex flex-col">
+    {# Editor topbar #}
+    <div class="flex items-center gap-3 px-6 py-2.5 border-b border-line-soft bg-bg-0 sticky top-0 z-10">
+        <div class="flex items-center gap-1.5 text-xs text-fg-2">
+            <span>{{ novel_title }}</span>
+            <span class="text-fg-3">{{ icon('chevron-r', 11) }}</span>
+            <span>Розділ {{ chapter_no }}</span>
+        </div>
+        <div class="flex-1"></div>
+        <span class="text-[11px] text-fg-3 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full" style="background: #7cb98a;"></span>
+            Збережено · щойно
+        </span>
+        <button class="btn sm ghost">{{ icon('eye', 12) }} Перегляд</button>
+        <button class="btn sm">Зберегти чернетку</button>
+        <button class="btn sm primary">Опублікувати</button>
+    </div>
+
+    {# Editor area + right rail #}
+    <div class="flex-1 grid grid-cols-1 md:grid-cols-[1fr_280px]">
+        <div class="py-8">
+            <div class="max-w-[680px] mx-auto px-4 md:px-8">
+                {# Toolbar #}
+                <div class="flex items-center gap-0.5 px-1.5 py-1 bg-bg-1 border border-line-soft rounded-md mb-8 w-fit">
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('type', 14) }}</button>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('bold', 14) }}</button>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('italic', 14) }}</button>
+                    <div class="w-px h-4 bg-line-soft mx-1"></div>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('quote', 14) }}</button>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('list', 14) }}</button>
+                    <div class="w-px h-4 bg-line-soft mx-1"></div>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('image', 14) }}</button>
+                    <button class="btn ghost icon sm w-7 h-7 text-fg-2">{{ icon('minus', 14) }}</button>
+                </div>
+
+                <input
+                    type="text"
+                    value="{{ chapter_title }}"
+                    placeholder="Назва розділу"
+                    class="w-full p-0 mb-6 bg-transparent border-0 outline-none font-serif text-4xl font-medium text-fg-0 tracking-tight" />
+
+                <textarea
+                    placeholder="Почніть писати…"
+                    class="w-full min-h-[480px] p-0 bg-transparent border-0 outline-none resize-none font-serif text-[17px] leading-[1.7] text-fg-0">{{ chapter_body }}</textarea>
+            </div>
+        </div>
+
+        {# Right rail #}
+        <aside class="md:border-l border-t md:border-t-0 border-line-soft bg-bg-0 p-4 md:p-5">
+            {# Stats #}
+            <section class="mb-6">
+                <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2.5">Статистика</h4>
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-fg-3">Слів</span>
+                        <span class="text-fg-0 tabular-nums font-medium">{{ word_count | thousands_uk }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-fg-3">Символів</span>
+                        <span class="text-fg-0 tabular-nums font-medium">{{ char_count | thousands_uk }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-fg-3">Час читання</span>
+                        <span class="text-fg-0 tabular-nums font-medium">~2 хв</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-fg-3">Сесія</span>
+                        <span class="text-fg-0 tabular-nums font-medium">34 хв</span>
+                    </div>
+                </div>
+            </section>
+
+            {# Chapter visibility #}
+            <section class="mb-6">
+                <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2.5">Розділ</h4>
+                <div class="flex flex-col gap-2">
+                    <label class="flex flex-col gap-1 text-xs">
+                        <span class="text-fg-3">Видимість</span>
+                        <select class="bg-bg-1 border border-line text-fg-1 rounded-md px-2 py-1.5 text-xs outline-none">
+                            <option>Чернетка</option>
+                            <option>Тільки за посиланням</option>
+                            <option>Опубліковано</option>
+                        </select>
+                    </label>
+                    <label class="flex flex-col gap-1 text-xs">
+                        <span class="text-fg-3">Заплановано на</span>
+                        <input type="text" value="не заплановано" class="bg-bg-1 border border-line text-fg-1 rounded-md px-2 py-1.5 text-xs outline-none" />
+                    </label>
+                </div>
+            </section>
+
+            {# Notes #}
+            <section class="mb-6">
+                <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2.5">Примітки автора</h4>
+                <textarea class="w-full min-h-[80px] p-2.5 bg-bg-1 border border-line-soft rounded-md text-fg-1 text-xs leading-relaxed resize-y outline-none">Цей розділ — серцевина першої частини. Перечитати на тиждень.</textarea>
+            </section>
+
+            {# Activity #}
+            <section>
+                <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2.5">Активність</h4>
+                <div class="flex flex-col gap-2.5 text-xs">
+                    <div class="text-fg-2"><span class="text-accent">+412</span> слів сьогодні</div>
+                    <div class="flex gap-[3px] items-end h-8">
+                        {%- set heights = [18, 24, 12, 30, 22, 28, 34, 14, 26, 32, 30, 22, 28, 24] %}
+                        {%- for h in heights %}
+                        <div class="flex-1 rounded-[1px] {{ 'bg-accent' if loop.index0 == 13 else 'bg-bg-3' }}" style="height: {{ h }}%;"></div>
+                        {%- endfor %}
+                    </div>
+                    <div class="text-fg-3 text-[11px]">14 днів поспіль 🔥</div>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}

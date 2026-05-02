@@ -1,0 +1,2 @@
+{# Page hot reload #}
+{% if DEBUG %} {{ hot_reload.script(url_for('hot-reload')) | safe }} {% endif %}

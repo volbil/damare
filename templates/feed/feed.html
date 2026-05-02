@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "components/icon.html" import icon %}
 {% from "components/cover.html" import cover %}
+{% from "components/toggle.html" import kudos_button, bookmark_button %}
 
 {% block content %}
 <div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-[1fr_240px] gap-6 md:gap-8">
@@ -31,6 +32,12 @@
         </div>
 
         {# Feed #}
+        {%- if not posts %}
+        <div class="text-fg-3 text-sm py-12 text-center bg-bg-1 border border-line-soft rounded-md">
+            <div class="text-fg-1 mb-1">У цій вкладці поки що тиша.</div>
+            <div class="text-xs">Спробуйте іншу вкладку або підпишіться на більше людей.</div>
+        </div>
+        {%- endif %}
         <div class="flex flex-col gap-3">
             {%- for post in posts %}
             <article class="p-[18px] bg-bg-1 border border-line-soft rounded-lg">
@@ -100,19 +107,17 @@
                 {%- endif %}
 
                 {# Actions #}
-                <div class="flex gap-[18px] pt-2 border-t border-line-soft">
-                    <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
-                        {{ icon('heart', 14) }} {{ post.kudos }}
-                    </button>
+                <div class="flex gap-[18px] pt-2 border-t border-line-soft items-center">
+                    {{ kudos_button(post.kudos) }}
                     <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
                         {{ icon('message', 14) }} {{ post.comments }}
                     </button>
                     <button type="button" class="flex items-center gap-1.5 text-xs text-fg-2 hover:text-fg-0">
                         {{ icon('rss', 14) }} {{ post.reposts }}
                     </button>
-                    <button type="button" class="ml-auto text-fg-3 p-1 hover:text-fg-1">
-                        {{ icon('bookmark', 14) }}
-                    </button>
+                    <div class="ml-auto">
+                        {{ bookmark_button() }}
+                    </div>
                 </div>
             </article>
             {%- endfor %}

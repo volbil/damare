@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <title>Damare · Hikka-style — alt direction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="tokens-hikka.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    html, body, #root { height: 100%; }
+    body { margin: 0; background: #0a0a0a; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="data.jsx"></script>
+  <script type="text/babel" src="covers.jsx"></script>
+  <script type="text/babel" src="hikka-chrome.jsx"></script>
+  <script type="text/babel" src="hikka-cover.jsx"></script>
+  <script type="text/babel" src="hikka-screen-home.jsx"></script>
+  <script type="text/babel" src="hikka-screen-novel.jsx"></script>
+  <script type="text/babel" src="hikka-screen-watchlist.jsx"></script>
+  <script type="text/babel" src="hikka-screen-community.jsx"></script>
+
+  <script type="text/babel">
+  const { useState, useEffect } = React;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "scarlet",
+    "density": "regular"
+  }/*EDITMODE-END*/;
+
+  const HK_ACCENTS = {
+    scarlet:  { hex: 'oklch(0.62 0.22 25)',  soft: 'oklch(0.62 0.22 25 / 0.14)',  name: 'Scarlet (Hikka default)' },
+    amber:    { hex: 'oklch(0.74 0.16 70)',  soft: 'oklch(0.74 0.16 70 / 0.14)',  name: 'Amber' },
+    lime:     { hex: 'oklch(0.78 0.18 130)', soft: 'oklch(0.78 0.18 130 / 0.14)', name: 'Lime' },
+    cyan:     { hex: 'oklch(0.78 0.13 200)', soft: 'oklch(0.78 0.13 200 / 0.14)', name: 'Cyan' },
+    indigo:   { hex: 'oklch(0.65 0.20 270)', soft: 'oklch(0.65 0.20 270 / 0.14)', name: 'Indigo' },
+    fuchsia:  { hex: 'oklch(0.68 0.25 330)', soft: 'oklch(0.68 0.25 330 / 0.14)', name: 'Fuchsia' },
+  };
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+    useEffect(() => {
+      const root = document.documentElement;
+      const a = HK_ACCENTS[t.accent] || HK_ACCENTS.scarlet;
+      root.style.setProperty('--hk-accent', a.hex);
+      root.style.setProperty('--hk-accent-soft', a.soft);
+    }, [t.accent]);
+
+    const hkaProps = { className: 'hka', 'data-density': t.density };
+    const screenStyle = {
+      width: 1320, display: 'flex',
+      background: 'var(--hk-bg-0)', overflow: 'hidden',
+      borderRadius: 'var(--hk-r-lg)',
+      border: '1px solid var(--hk-line)',
+    };
+    const sideMain = (active, page, content, height = 900) => (
+      <div {...hkaProps} style={{ ...screenStyle, height }}>
+        <HkSidebar active={active} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <HkTopbar page={page} />
+          {content}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="hka" style={{ minHeight: '100%', background: 'var(--hk-bg-0)' }}>
+        <DesignCanvas dark>
+          <DCSection id="hk-overview" title="Damare × Hikka — direction overview"
+                      subtitle="A reframe of Damare as if it were Hikka: dark zinc UI, single-chroma accent, watch-list states, dense data tables, status-coded everything. Same brand and content; opposite visual register from the warm cream-paper direction.">
+            <DCArtboard id="hk-tokens" label="Tokens at a glance" width={1320} height={620}>
+              <div {...hkaProps} style={{ ...screenStyle, height: 620, display: 'block', padding: 32 }}>
+                <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 6 }}>
+                  Token system — neutral zinc, accent-as-state
+                </h1>
+                <p style={{ fontSize: 13, color: 'var(--hk-fg-2)', maxWidth: 680, marginBottom: 26, lineHeight: 1.55 }}>
+                  Damare's existing palette is warm cream paper; Hikka's is shadcn dark. This direction
+                  keeps the brand voice but swaps the chrome wholesale: backgrounds get darker as they
+                  raise, lines stay hairline (8% white), color is reserved almost entirely for
+                  watch-list states and the score scale.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 26 }}>
+                  {[
+                    ['--hk-bg-0', 'oklch(0.145 0 0)', 'page'],
+                    ['--hk-bg-1', 'oklch(0.18 0 0)',  'card'],
+                    ['--hk-bg-2', 'oklch(0.22 0 0)',  'raised'],
+                    ['--hk-bg-3', 'oklch(0.27 0 0)',  'hover'],
+                    ['--hk-bg-4', 'oklch(0.32 0 0)',  'border-strong'],
+                  ].map(([n, v, l]) => (
+                    <div key={n} style={{ background: v, border: '1px solid var(--hk-line)',
+                                            borderRadius: 'var(--hk-r-md)', padding: 14, height: 80 }}>
+                      <div style={{ fontFamily: 'var(--hk-font-mono)', fontSize: 10.5, color: 'var(--hk-fg-3)' }}>{n}</div>
+                      <div style={{ fontSize: 13, color: 'var(--hk-fg-0)', fontWeight: 500, marginTop: 4 }}>{l}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+                  <div>
+                    <h4 style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.08em',
+                                   color: 'var(--hk-fg-3)', marginBottom: 12 }}>СТАТУСИ ЧИТАННЯ</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <HkStatus kind="reading" />
+                      <HkStatus kind="planning" />
+                      <HkStatus kind="completed" />
+                      <HkStatus kind="onhold" />
+                      <HkStatus kind="dropped" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.08em',
+                                   color: 'var(--hk-fg-3)', marginBottom: 12 }}>ШКАЛА ОЦІНКИ (color-coded)</h4>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map(s => (
+                        <HkScore key={s} value={s} />
+                      ))}
+                    </div>
+                    <h4 style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.08em',
+                                   color: 'var(--hk-fg-3)', margin: '20px 0 12px' }}>КОМПОНЕНТИ</h4>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <button className="hk-btn primary"><Icon name="play" size={12} /> Читати</button>
+                      <button className="hk-btn">Кнопка</button>
+                      <button className="hk-btn outline">Outline</button>
+                      <button className="hk-btn ghost">Ghost</button>
+                      <span className="hk-badge">Badge</span>
+                      <span className="hk-badge accent">Acc</span>
+                      <span className="hk-badge outline">14+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="hk-home" title="Home — discovery"
+                      subtitle="Hero with backdrop blur, trending-7 row, schedule + new-chapters split, seasonal grid, community collections">
+            <DCArtboard id="hk-home-1" label="Home" width={1320} height={1900}>
+              {sideMain('home', null, <HkHomeScreen />, 1900)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="hk-novel" title="Novel detail — info-dense"
+                      subtitle="Backdrop banner, info table left, tabs (Огляд/Розділи/Персонажі/Відгуки), atmosphere meters and score histogram">
+            <DCArtboard id="hk-novel-1" label="Novel · Сім зимових ночей" width={1320} height={1500}>
+              {sideMain('discover', 'Сім зимових ночей', <HkNovelScreen />, 1500)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="hk-list" title="Watch-list — status tabs + dense table"
+                      subtitle="The most Hikka-coded screen: 5 watch-list states as tabs, a score-colored sortable table, expanded user profile header, and toggle to a poster grid">
+            <DCArtboard id="hk-list-1" label="Watch-list · Читаю (12)" width={1320} height={950}>
+              {sideMain('list', 'Мій список', <HkWatchlistScreen />, 950)}
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="hk-community" title="Community — activity feed"
+                      subtitle="Mixed activity feed: reviews, list updates, official collections, comments, follows. Right rail with tag cloud, top readers, announcements.">
+            <DCArtboard id="hk-comm-1" label="Community · Стрічка" width={1320} height={1500}>
+              {sideMain('forums', 'Спільнота', <HkCommunityScreen />, 1500)}
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+
+        <TweaksPanel>
+          <TweakSection label="Акцент" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div className="twk-lbl"><span>Колір</span>
+              <span className="twk-val">{HK_ACCENTS[t.accent]?.name}</span></div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {Object.entries(HK_ACCENTS).map(([k, info]) => (
+                <button key={k} title={info.name}
+                        onClick={() => setTweak('accent', k)}
+                        style={{ width: 26, height: 26, borderRadius: 999, background: info.hex,
+                                  border: t.accent === k ? '2px solid #fff' : '1px solid rgba(255,255,255,0.15)',
+                                  cursor: 'pointer', padding: 0 }} />
+              ))}
+            </div>
+          </div>
+
+          <TweakSection label="Щільність" />
+          <TweakRadio label="" value={t.density}
+                      options={['compact', 'regular', 'comfy']}
+                      onChange={(v) => setTweak('density', v)} />
+
+          <TweakSection label="Зворотні посилання" />
+          <a href="Damare.html" style={{ display: 'block', fontSize: 12, color: 'rgba(41,38,27,0.7)',
+                                            padding: '6px 0', textDecoration: 'underline' }}>
+            ← Назад до основного напрямку (Damare)
+          </a>
+        </TweaksPanel>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

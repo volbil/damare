@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>Damare — Home revisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  // Mirror Damare @theme tokens (oklch values copied from static/input.css)
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          'bg-0': 'oklch(0.13 0 0)',
+          'bg-1': 'oklch(0.18 0 0)',
+          'bg-2': 'oklch(0.22 0 0)',
+          'bg-3': 'oklch(0.27 0 0)',
+          'bg-4': 'oklch(0.32 0 0)',
+          'line':      'oklch(0.42 0 0 / 0.7)',
+          'line-soft': 'oklch(0.42 0 0 / 0.35)',
+          'fg-0': 'oklch(0.96 0.005 80)',
+          'fg-1': 'oklch(0.85 0.006 80)',
+          'fg-2': 'oklch(0.66 0.008 75)',
+          'fg-3': 'oklch(0.50 0.008 70)',
+          'fg-4': 'oklch(0.38 0.008 65)',
+          'accent':      'oklch(0.60 0.13 155)',
+          'accent-soft': 'oklch(0.60 0.13 155 / 0.18)',
+          'accent-fg':   'oklch(0.14 0.02 155)',
+          'warn': 'oklch(0.72 0.14 35)',
+          'love': 'oklch(0.74 0.14 20)',
+          'info': 'oklch(0.74 0.08 220)',
+        },
+        fontFamily: {
+          sans:  ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          serif: ['"IBM Plex Serif"', '"Iowan Old Style"', 'Georgia', 'serif'],
+          mono:  ['"IBM Plex Mono"', 'ui-monospace', 'SF Mono', 'Menlo', 'monospace'],
+        },
+        borderRadius: { xs: '0', sm: '2px', md: '4px', lg: '6px', xl: '10px' },
+      }
+    }
+  }
+</script>
+<style>
+  body { background: oklch(0.10 0 0); color: oklch(0.85 0.006 80); font-family: "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  /* Component classes ported from Damare input.css */
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.02em;
+    border-radius: 0;
+    background: oklch(0.22 0 0);
+    color: oklch(0.85 0.006 80);
+    border: 1px solid oklch(0.42 0 0 / 0.35);
+    white-space: nowrap;
+  }
+  .tag.fandom { background: oklch(0.60 0.13 155 / 0.18); color: oklch(0.60 0.13 155); border-color: transparent; }
+  .tag.warn { background: oklch(0.72 0.14 35 / 0.16); color: oklch(0.72 0.14 35); border-color: transparent; }
+  .tag.love { background: oklch(0.74 0.14 20 / 0.18); color: oklch(0.74 0.14 20); border-color: transparent; }
+  .tag.rating { background: oklch(0.22 0 0); color: oklch(0.66 0.008 75); font-variant: small-caps; letter-spacing: 0.08em; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 34px; padding: 0 14px;
+    border-radius: 4px; font-size: 13px; font-weight: 500;
+    background: oklch(0.22 0 0); color: oklch(0.96 0.005 80);
+    border: 1px solid oklch(0.42 0 0 / 0.35);
+    white-space: nowrap; cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  .btn:hover { background: oklch(0.27 0 0); }
+  .btn.primary { background: oklch(0.60 0.13 155); color: oklch(0.14 0.02 155); border-color: transparent; font-weight: 600; }
+  .btn.primary:hover { background: oklch(0.68 0.13 155); }
+  .btn.ghost { background: transparent; border-color: transparent; }
+  .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  .btn.icon { width: 34px; padding: 0; }
+  .btn.icon.sm { width: 28px; }
+
+  .stat-row { display: flex; gap: 16px; color: oklch(0.66 0.008 75); font-size: 12px; align-items: center; }
+  .stat-row .stat { display: inline-flex; align-items: center; gap: 5px; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+    background: oklch(0.27 0 0); color: oklch(0.85 0.006 80);
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 12px;
+    letter-spacing: 0.02em; flex-shrink: 0; user-select: none;
+  }
+
+  .cover {
+    position: relative; border-radius: 2px; overflow: hidden;
+    background: oklch(0.22 0 0); aspect-ratio: 2 / 3;
+    align-self: flex-start; width: 100%;
+  }
+
+  .redact-bar {
+    display: inline-block; width: 0.7em; height: 0.85em;
+    background: currentColor; vertical-align: -0.08em; flex-shrink: 0;
+  }
+
+  /* Compare-board chrome */
+  .panel-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: oklch(0.50 0.008 70);
+  }
+  .panel-label .num {
+    display: inline-block; padding: 2px 6px;
+    background: oklch(0.18 0 0); border: 1px solid oklch(0.42 0 0 / 0.35);
+    color: oklch(0.85 0.006 80); margin-right: 8px;
+  }
+  .change-mark {
+    position: absolute; top: 6px; right: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px; letter-spacing: 0.08em;
+    background: oklch(0.74 0.14 20); color: oklch(0.14 0.02 20);
+    padding: 1px 5px; pointer-events: none; z-index: 5;
+  }
+  .panel { background: oklch(0.13 0 0); }
+  .panel-frame { border: 1px solid oklch(0.42 0 0 / 0.35); }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 1280px) { .compare-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- Top board chrome -->
+<header class="border-b border-line-soft bg-bg-0 sticky top-0 z-30">
+  <div class="max-w-[1640px] mx-auto px-6 h-12 flex items-center gap-4">
+    <span class="font-bold text-fg-0 tracking-tight">damare</span>
+    <span class="redact-bar text-accent" style="height: 0.7em;"></span>
+    <span class="panel-label ml-2">home / порівняння</span>
+    <div class="flex-1"></div>
+    <div class="flex items-center gap-1.5 mr-3">
+      <button id="zoom-out" class="btn ghost icon sm" title="Зменшити (Ctrl/Cmd + −)">−</button>
+      <button id="zoom-reset" class="btn ghost sm" title="100% (Ctrl/Cmd + 0)" style="font-family: 'IBM Plex Mono', monospace; min-width: 50px;"><span id="zoom-pct">100%</span></button>
+      <button id="zoom-in" class="btn ghost icon sm" title="Збільшити (Ctrl/Cmd + +)">+</button>
+    </div>
+    <span class="panel-label">4 зміни · v1</span>
+  </div>
+</header>
+
+<script>
+  // Manual zoom — works inside any iframe sandbox that blocks pinch.
+  // Ctrl/Cmd + wheel, Ctrl/Cmd + +/-/0, and the toolbar buttons.
+  (function () {
+    const KEY = 'damare-mock-zoom';
+    let zoom = parseFloat(localStorage.getItem(KEY) || '1');
+    const apply = () => {
+      zoom = Math.max(0.5, Math.min(2.5, zoom));
+      document.documentElement.style.setProperty('zoom', zoom);
+      // Firefox doesn't support `zoom`; transform fallback:
+      if (!CSS.supports('zoom', '1')) {
+        document.body.style.transform = `scale(${zoom})`;
+        document.body.style.transformOrigin = '0 0';
+        document.body.style.width = (100 / zoom) + '%';
+      }
+      const pct = document.getElementById('zoom-pct');
+      if (pct) pct.textContent = Math.round(zoom * 100) + '%';
+      localStorage.setItem(KEY, String(zoom));
+    };
+    const step = (d) => { zoom = +(zoom + d).toFixed(2); apply(); };
+    document.addEventListener('DOMContentLoaded', () => {
+      apply();
+      document.getElementById('zoom-in')   .addEventListener('click', () => step(+0.1));
+      document.getElementById('zoom-out')  .addEventListener('click', () => step(-0.1));
+      document.getElementById('zoom-reset').addEventListener('click', () => { zoom = 1; apply(); });
+    });
+    window.addEventListener('keydown', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (e.key === '=' || e.key === '+') { step(+0.1); e.preventDefault(); }
+      else if (e.key === '-')              { step(-0.1); e.preventDefault(); }
+      else if (e.key === '0')              { zoom = 1; apply(); e.preventDefault(); }
+    });
+    window.addEventListener('wheel', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      step(e.deltaY < 0 ? +0.05 : -0.05);
+    }, { passive: false });
+  })();
+</script>
+
+<main class="max-w-[1640px] mx-auto px-6 py-6">
+
+  <!-- Diff legend -->
+  <div class="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11.5px] text-fg-3">
+    <span class="panel-label" style="letter-spacing: 0.06em;">що змінено:</span>
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 bg-love"></span> 1. редакторський вибір — справжній якір</span>
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 bg-love"></span> 2. свіже від ваших — соціальніше</span>
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 bg-love"></span> 3. продовжити читати — більше ваги</span>
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 bg-love"></span> 4. бейджі обкладинок — менше шуму</span>
+  </div>
+
+  <!-- Headers -->
+  <div class="compare-grid mb-3">
+    <div class="panel-label"><span class="num">A</span> Зараз</div>
+    <div class="panel-label"><span class="num">B</span> Запропоновано</div>
+  </div>
+
+  <!-- Side-by-side panels -->
+  <div class="compare-grid">
+
+    <!-- ════════════════ A. CURRENT ════════════════ -->
+    <section class="panel panel-frame" id="panel-current">
+      <div id="home-current"></div>
+    </section>
+
+    <!-- ════════════════ B. REVISED ════════════════ -->
+    <section class="panel panel-frame" id="panel-revised">
+      <div id="home-revised"></div>
+    </section>
+
+  </div>
+
+  <!-- Notes -->
+  <section class="mt-12 panel panel-frame p-7">
+    <div class="panel-label mb-4"><span class="num">→</span> Чому ці зміни</div>
+    <div class="grid md:grid-cols-2 gap-x-10 gap-y-5 text-[13px] text-fg-1 leading-[1.55] max-w-[1100px]">
+      <div>
+        <div class="text-fg-0 font-semibold mb-1.5 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 bg-love"></span> 1. Редакторський вибір — справжній якір</div>
+        <p class="text-fg-2">Зараз це широка темна плашка з градієнтом і дрібним текстом — той самий темний прямокутник, що й сусіди. У версії B з’являється двоколонна композиція: повноцінна обкладинка (140&nbsp;×&nbsp;210), тег «<span class="font-mono">★ ОБРАНО · ТИЖДЕНЬ 18</span>» в кольорі <code class="text-love">love</code>, заголовок у serif, <em>витягнута цитата</em> з тексту й коротке пояснення «<span class="text-fg-1">чому редакція обрала</span>». Це єдине місце на сторінці, де колір love потрапляє над згин — він і має тут бути.</p>
+      </div>
+      <div>
+        <div class="text-fg-0 font-semibold mb-1.5 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 bg-love"></span> 2. «Свіже від ваших» — соціальніше</div>
+        <p class="text-fg-2">A — це лог-стрічка: rss-іконка, мікротекст, час. Гірш за все: усе одного візуального ваги. B перебудовує рядок як справжній feed-айтем: 32-піксельний rectangular avatar команди/автора, ім’я акцентом, серифний рядок «розділ N&nbsp;«заголовок»» жирніший за дату. Час зсувається вправо tabular. Один рядок став тричі цінним.</p>
+      </div>
+      <div>
+        <div class="text-fg-0 font-semibold mb-1.5 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 bg-love"></span> 3. «Продовжити читати» — більше ваги</div>
+        <p class="text-fg-2">Обкладинка 60&nbsp;→&nbsp;76&nbsp;px (узгоджується з <code>novel_card_list</code>, який і так використовує 76). Хедлайн «розділ X з Y» у моно бере одну лінію зверху, заголовок — окремою стрічкою. На прогресі&nbsp;&gt;&nbsp;80% з’являється тонкий лейбл «останній розділ» в acent — нагорода за дочитування.</p>
+      </div>
+      <div>
+        <div class="text-fg-0 font-semibold mb-1.5 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 bg-love"></span> 4. Бейджі обкладинок — менше шуму</div>
+        <p class="text-fg-2">У сітці «у тренді» зараз кожна обкладинка несе бейдж у лівому верхньому куті (UA/ENG/ОРИГ) + інколи «Завершено» праворуч. П’ять майже-однакових прямокутників в одній лінії ока виглядають як цінникова стіна. B залишає <em>тільки</em> бейдж мови для перекладів і прибирає «ОРИГ» з cover-сітки (показуємо його лише в list view і фільтрах). «Завершено» — лишаємо, це справжня інформація.</p>
+      </div>
+    </div>
+
+    <hr class="my-6 border-line-soft">
+
+    <div class="panel-label mb-3"><span class="num">→</span> Як це лягає на код</div>
+    <div class="text-[13px] text-fg-2 leading-[1.6] max-w-[1100px]">
+      Усі зміни — це правки в трьох файлах:
+      <ul class="mt-2 space-y-1.5">
+        <li><code class="text-fg-0">templates/home/home.html</code> — секції <em>continue_reading_list</em>, <em>fresh_updates</em>, <em>featured</em></li>
+        <li><code class="text-fg-0">templates/components/novel_card.html</code> — макрос <em>novel_card_cover</em>, умова відображення origin badge</li>
+        <li><code class="text-fg-0">app/home/…</code> — лише якщо хочемо передавати <em>excerpt</em> для feed-рядків та <em>quote</em> для editorial pick (зараз їх немає в контексті). Якщо ні — fallback на summary, теж нормально.</li>
+      </ul>
+      Жодних нових токенів, жодних змін у <code>input.css</code>. <code>--color-love</code> уже саме та тепла, потрібна редакторському блоку.
+    </div>
+  </section>
+
+  <footer class="mt-10 pt-5 border-t border-line-soft text-[11px] text-fg-3 panel-label">
+    мокап для критики · скрол усередині кожної панелі
+  </footer>
+</main>
+
+<!-- Babel-transpiled view code -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="home-mock-data.jsx"></script>
+<script type="text/babel" src="home-mock-cover.jsx"></script>
+<script type="text/babel" src="home-mock-icon.jsx"></script>
+<script type="text/babel" src="home-mock-shared.jsx"></script>
+<script type="text/babel" src="home-mock-current.jsx"></script>
+<script type="text/babel" src="home-mock-revised.jsx"></script>
+<script type="text/babel">
+  ReactDOM.createRoot(document.getElementById('home-current')).render(<HomeCurrent />);
+  ReactDOM.createRoot(document.getElementById('home-revised')).render(<HomeRevised />);
+</script>
+
+</body>
+</html>

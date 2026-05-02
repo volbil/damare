@@ -1,0 +1,18 @@
+{% from "components/icon.html" import icon %}
+
+<footer class="border-t border-line-soft mt-4">
+    <div class="max-w-[1080px] mx-auto px-4 md:px-8 py-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-[12px] text-fg-3">
+        <a href="#" class="hover:text-fg-1 transition">Правила</a>
+        <a href="#" class="hover:text-fg-1 transition">Правовласникам</a>
+        <a href="#" class="hover:text-fg-1 transition inline-flex items-center gap-1.5">
+            <span class="text-love">{{ icon('heart', 12) }}</span>
+            Підтримати нас
+        </a>
+        <div class="flex items-center gap-4 ml-auto">
+            <a href="#" aria-label="Telegram" class="hover:text-fg-1 transition">{{ icon('send', 14) }}</a>
+            <a href="#" aria-label="Discord" class="hover:text-fg-1 transition">{{ icon('message', 14) }}</a>
+            <a href="#" aria-label="GitHub" class="hover:text-fg-1 transition">{{ icon('github', 14) }}</a>
+            <span class="text-fg-4 font-mono tabular-nums text-[11.5px] ml-1">© 2026 Damare</span>
+        </div>
+    </div>
+</footer>

@@ -14,6 +14,11 @@
             {{ segmented_links(type_filters) }}
         </section>
 
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Статус</h4>
+            {{ segmented_links(status_filters) }}
+        </section>
+
         {%- if show_lang_filter and lang_filters | length > 1 %}
         <section class="mb-[22px]">
             <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Мова оригіналу</h4>
@@ -39,12 +44,7 @@
 
         <section class="mb-[22px]">
             <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Рейтинг</h4>
-            {{ segmented(['Усі', 'G', 'T', 'M'], 'Усі') }}
-        </section>
-
-        <section class="mb-[22px]">
-            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Статус</h4>
-            {{ segmented(['Усі', 'У процесі', 'Завершено'], 'Усі') }}
+            {{ segmented_links(rating_filters) }}
         </section>
 
         <section class="mb-[22px]">
@@ -93,7 +93,7 @@
                 {%- endif %}
             </div>
             <div class="flex-1"></div>
-            {{ segmented(['Kudos', 'Дата', 'Слова', 'Хіти'], 'Kudos', small=true) }}
+            {{ segmented_links(sort_filters, small=true) }}
         </div>
 
         {%- if results %}

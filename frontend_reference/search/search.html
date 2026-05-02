@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/novel_card.html" import novel_card_list %}
+{% from "components/segmented.html" import segmented, segmented_links %}
+
+{% block content %}
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 py-6 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 md:gap-8">
+
+    {# Filter sidebar #}
+    <aside class="md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-100px)] md:overflow-auto md:pr-2">
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Тип</h4>
+            {{ segmented_links(type_filters) }}
+        </section>
+
+        {%- if show_lang_filter and lang_filters | length > 1 %}
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Мова оригіналу</h4>
+            {{ segmented_links(lang_filters) }}
+        </section>
+        {%- endif %}
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Команда</h4>
+            <div class="flex flex-col gap-0.5">
+                {%- for f in team_filters %}
+                <a href="{{ f.href }}" class="flex items-center gap-2 px-2 py-1.5 rounded-sm text-xs transition {% if f.active %}bg-bg-3 text-fg-0 font-medium{% else %}text-fg-3 hover:text-fg-1 hover:bg-bg-1{% endif %}">
+                    {%- if f.avatar %}
+                    <div class="avatar w-5 h-5 text-[10px] shrink-0">{{ f.avatar }}</div>
+                    {%- else %}
+                    <div class="w-5 h-5 shrink-0 flex items-center justify-center text-fg-3">·</div>
+                    {%- endif %}
+                    <span class="truncate">{{ f.label }}</span>
+                </a>
+                {%- endfor %}
+            </div>
+        </section>
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Рейтинг</h4>
+            {{ segmented(['Усі', 'G', 'T', 'M'], 'Усі') }}
+        </section>
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Статус</h4>
+            {{ segmented(['Усі', 'У процесі', 'Завершено'], 'Усі') }}
+        </section>
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Кількість слів</h4>
+            <div class="flex justify-between text-[11px] text-fg-3 mb-1">
+                <span>&lt; 5k</span>
+                <span>&gt; 100k</span>
+            </div>
+            <input type="range" value="50" class="w-full" style="accent-color: var(--color-accent);" />
+        </section>
+
+        <section class="mb-[22px]">
+            <h4 class="text-[10px] font-semibold tracking-[0.08em] uppercase text-fg-3 mb-2">Популярні теги</h4>
+            <div class="flex flex-wrap gap-1.5">
+                {%- for t in popular_tags[:9] %}
+                <button type="button" class="tag cursor-pointer">
+                    {{ t.name }}
+                    <span class="text-fg-3 ml-0.5">{{ "%.1f"|format(t.count / 1000) }}k</span>
+                </button>
+                {%- endfor %}
+            </div>
+        </section>
+    </aside>
+
+    {# Results column #}
+    <div>
+        {# Search input #}
+        <div class="relative mb-4">
+            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none">
+                {{ icon('search', 16) }}
+            </div>
+            <input
+                type="text"
+                value="{{ query }}"
+                placeholder="Пошук творів, авторів, тегів…"
+                class="w-full h-11 pl-10 pr-3.5 bg-bg-1 border border-line rounded-md text-fg-0 text-sm outline-none placeholder:text-fg-3" />
+        </div>
+
+        {# Result header #}
+        <div class="flex items-center mb-3.5 gap-3">
+            <div class="text-[13px] text-fg-2">
+                <span class="text-fg-0 font-semibold">{{ result_count | thousands_uk }}</span>
+                {%- if result_count == 1 %} результат
+                {%- elif result_count < 5 %} результати
+                {%- else %} результатів
+                {%- endif %}
+            </div>
+            <div class="flex-1"></div>
+            {{ segmented(['Kudos', 'Дата', 'Слова', 'Хіти'], 'Kudos', small=true) }}
+        </div>
+
+        {%- if results %}
+        {# Results list #}
+        <div class="flex flex-col gap-2.5">
+            {%- for n in results %}
+            {{ novel_card_list(n) }}
+            {%- endfor %}
+        </div>
+
+        {%- if result_count > results | length %}
+        <div class="flex justify-center mt-6">
+            <button type="button" class="btn">Більше результатів ↓</button>
+        </div>
+        {%- endif %}
+        {%- else %}
+        <div class="text-fg-3 text-sm py-12 text-center bg-bg-1 border border-line-soft rounded-md">
+            <div class="text-fg-1 mb-1">Шукали скрізь, не знайшли.</div>
+            <div class="text-xs">Спробуйте послабити фільтри або змінити запит.</div>
+        </div>
+        {%- endif %}
+    </div>
+</div>
+{% endblock %}

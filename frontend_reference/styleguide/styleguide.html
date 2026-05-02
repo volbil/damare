@@ -1,0 +1,623 @@
+{% extends "base.html" %}
+{% from "components/icon.html" import icon %}
+{% from "components/cover.html" import cover %}
+{% from "components/novel_card.html" import novel_card_cover, novel_card_list %}
+{% from "components/segmented.html" import segmented %}
+{% from "components/genres.html" import genres_select %}
+
+{% macro code_block() %}
+<div class="relative mt-3" x-data="{ copied: false }">
+    <pre class="bg-bg-2 px-4 py-3 pr-24 rounded-md overflow-x-auto text-[12px] font-mono text-fg-1 m-0 leading-[1.55]"><code>{{ caller() | trim | forceescape }}</code></pre>
+    <button type="button" @click="navigator.clipboard.writeText($el.parentElement.querySelector('code').innerText); copied=true; setTimeout(() => copied=false, 1500)" class="absolute top-2 right-2 btn ghost sm h-6 px-2 text-[11px]">
+        <span x-show="!copied">Копіювати</span>
+        <span x-show="copied" style="display: none;">✓ Скопійовано</span>
+    </button>
+</div>
+{% endmacro %}
+
+{% macro entry(title, description=None) %}
+<section class="mb-10">
+    <h3 class="text-base font-semibold text-fg-0 mb-1">{{ title }}</h3>
+    {%- if description %}
+    <p class="text-[13px] text-fg-3 mb-4">{{ description }}</p>
+    {%- endif %}
+    {{ caller() }}
+</section>
+{% endmacro %}
+
+{% block content %}
+<div class="max-w-[1080px] mx-auto px-4 md:px-8 pt-10 pb-20">
+    {# Header #}
+    <header class="mb-8">
+        <div class="text-[11px] text-accent tracking-[0.1em] uppercase mb-2">Damare · Devtools</div>
+        <h1 class="font-serif text-4xl font-medium tracking-tight mb-2">Бібліотека компонентів</h1>
+        <p class="text-sm text-fg-3 max-w-[560px]">Усі візуальні елементи інтерфейсу з прикладами використання. Натисніть «Копіювати», щоб забрати код собі.</p>
+    </header>
+
+    {# TOC #}
+    <nav class="flex gap-1 mb-10 sticky top-0 z-10 bg-bg-0/95 backdrop-blur-md py-3 border-b border-line-soft flex-wrap">
+        <a href="#tokens" class="text-[13px] text-fg-2 hover:text-fg-0 px-3 py-1.5 rounded-md hover:bg-bg-2">Токени</a>
+        <a href="#atoms" class="text-[13px] text-fg-2 hover:text-fg-0 px-3 py-1.5 rounded-md hover:bg-bg-2">Атоми</a>
+        <a href="#forms" class="text-[13px] text-fg-2 hover:text-fg-0 px-3 py-1.5 rounded-md hover:bg-bg-2">Форми</a>
+        <a href="#composites" class="text-[13px] text-fg-2 hover:text-fg-0 px-3 py-1.5 rounded-md hover:bg-bg-2">Композити</a>
+        <a href="#filters" class="text-[13px] text-fg-2 hover:text-fg-0 px-3 py-1.5 rounded-md hover:bg-bg-2">Фільтри</a>
+    </nav>
+
+    {# ── TOKENS ── #}
+    <section id="tokens" class="mb-16 scroll-mt-20">
+        <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Токени</h2>
+        <p class="text-sm text-fg-3 mb-8">Дизайн-система — кольори, типографіка, радіуси, тіні, ширини, бректкпоінти, щільність. Живуть у <code class="font-mono text-[12px] bg-bg-2 px-1.5 py-0.5 rounded">static/input.css</code> під <code class="font-mono text-[12px] bg-bg-2 px-1.5 py-0.5 rounded">@theme</code>.</p>
+
+        {% call entry("Кольори", "Палітра з префіксом --color-*. Доступні як Tailwind-утиліти (bg-bg-0, text-fg-1, border-line-soft).") %}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {%- for c in tokens.colors %}
+            <div class="rounded-md border border-line-soft overflow-hidden">
+                <div class="h-16" style="background: var(--color-{{ c }});"></div>
+                <div class="p-2.5 bg-bg-1">
+                    <div class="text-[12px] font-mono text-fg-0">--color-{{ c }}</div>
+                </div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}<div class="bg-bg-1 text-fg-1 border-line-soft">…</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Типографіка", "IBM Plex родина — sans, slab serif, mono. Інституційний, технічний, без літературного флеру.") %}
+        <div class="space-y-3">
+            <div class="p-4 bg-bg-1 border border-line-soft rounded-md">
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">font-sans · IBM Plex Sans</div>
+                <div class="text-2xl font-sans">Швидкий рудий лис стрибає через лінивого пса.</div>
+            </div>
+            <div class="p-4 bg-bg-1 border border-line-soft rounded-md">
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">font-serif · IBM Plex Serif</div>
+                <div class="text-2xl font-serif">Швидкий рудий лис стрибає через лінивого пса.</div>
+            </div>
+            <div class="p-4 bg-bg-1 border border-line-soft rounded-md">
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">font-mono · IBM Plex Mono</div>
+                <div class="text-base font-mono">function quickBrownFox() { return true; }</div>
+            </div>
+        </div>
+        {% endcall %}
+
+        {% call entry("Радіуси", "Жорсткі — після переходу на брутальну ідентичність радіуси скоротили вдвічі.") %}
+        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {%- for r, px in [('xs', '0'), ('sm', '2px'), ('md', '4px'), ('lg', '6px'), ('xl', '10px')] %}
+            <div class="text-center">
+                <div class="bg-bg-3 mx-auto mb-2" style="width: 80px; height: 80px; border-radius: var(--radius-{{ r }});"></div>
+                <div class="text-[12px] font-mono text-fg-1">rounded-{{ r }}</div>
+                <div class="text-[11px] text-fg-3">{{ px }}</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% endcall %}
+
+        {% call entry("Тіні", "Зберігаються як токени, але рідко вживаються — брутальна геометрія покладається на межі та контраст.") %}
+        <div class="grid grid-cols-3 gap-4 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {%- for s in ['sm', 'md', 'lg'] %}
+            <div class="text-center">
+                <div class="bg-bg-3 mx-auto mb-2 rounded-md" style="height: 80px; box-shadow: var(--shadow-{{ s }});"></div>
+                <div class="text-[12px] font-mono text-fg-1">shadow-{{ s }}</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% endcall %}
+
+        {% call entry("Контейнери", "Стандартизовані ширини контенту. Кожна ширина має конкретне призначення — не змішуй.") %}
+        <div class="space-y-2 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {%- for w, label in [(1280, 'Navbar / chrome — найширше'), (1080, 'Discovery — home, search, profile, title, forums, articles, feed, styleguide'), (760, 'Discussion — comments'), (640, 'Reading + forms — reader, login, create')] %}
+            <div class="flex items-center gap-3">
+                <div class="font-mono text-[12px] text-fg-1 w-16 text-right tabular-nums shrink-0">{{ w }}px</div>
+                <div class="bg-bg-3 h-6 rounded-xs shrink-0" style="width: {{ (w / 1280) * 100 }}%;"></div>
+                <div class="text-[11px] text-fg-2 truncate">{{ label }}</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}<div class="max-w-[1080px] mx-auto px-4 md:px-8">…</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Бректкпоінти", "Стандартні Tailwind v4. Префікси sm:, md:, lg: вмикаються від відповідної ширини.") %}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {%- for prefix, px, label in [('sm:', '640px', 'Малий екран'), ('md:', '768px', 'Планшет'), ('lg:', '1024px', 'Десктоп'), ('xl:', '1280px', 'Широкий')] %}
+            <div class="text-center">
+                <div class="font-mono text-[16px] font-semibold text-fg-0">{{ prefix }}</div>
+                <div class="font-mono text-[11px] text-fg-3 tabular-nums mt-0.5">≥ {{ px }}</div>
+                <div class="text-[10px] text-fg-3 mt-0.5">{{ label }}</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">…</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Щільність", "Атрибут data-density на елементі з класом .dmr масштабує деякі компоненти (теги, ряд статистики). За замовчуванням стоїть regular на body.") %}
+        <div class="space-y-3">
+            {%- for d in ['compact', 'regular', 'comfy'] %}
+            <div class="dmr p-4 bg-bg-1 border border-line-soft rounded-md" data-density="{{ d }}">
+                <code class="font-mono text-[11px] bg-bg-2 px-1.5 py-0.5 rounded">data-density="{{ d }}"</code>
+                <div class="stat-row mt-3">
+                    <span class="stat">{{ icon('heart', 12) }}1 284</span>
+                    <span class="stat">{{ icon('eye', 12) }}12.5k</span>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <span class="tag">тег</span>
+                    <span class="tag warn">попередження</span>
+                </div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}<body class="dmr" data-density="regular">…</body>{% endcall %}
+        {% endcall %}
+    </section>
+
+    {# ── ATOMS ── #}
+    <section id="atoms" class="mb-16 scroll-mt-20">
+        <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Атоми</h2>
+        <p class="text-sm text-fg-3 mb-8">Базові будівельні блоки — іконки, кнопки, теги, маленькі картки.</p>
+
+        {% call entry("Іконка", "Векторні штрихові 24×24, успадковують currentColor. 52 варіанти. Назви, що закінчуються на -fill, мають заповнений варіант.") %}
+        <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 p-4 bg-bg-1 border border-line-soft rounded-md mb-3">
+            {%- for name in icon_names %}
+            <div class="flex flex-col items-center gap-1.5 p-2 hover:bg-bg-2 rounded-md cursor-pointer" title="{{ name }}">
+                <div class="text-fg-0">{{ icon(name, 18) }}</div>
+                <div class="text-[10px] text-fg-3 font-mono truncate max-w-full">{{ name }}</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}{% raw %}{% from "components/icon.html" import icon %}
+
+{{ icon('heart', 16) }}
+{{ icon('heart-fill', 16) }}{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("Редакційна плашка", "Бренд-мотив — буквалізація «замовкни». Прямокутний блок 0.7em × 0.85em, успадковує currentColor. Працює як буллет, роздільник, декоративний знак у заголовках.") %}
+        <div class="space-y-5 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div>
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">Розмір — за поточним em</div>
+                <div class="flex items-baseline gap-5 flex-wrap">
+                    <span class="text-xs">текст<span class="redact-bar text-accent ml-1"></span></span>
+                    <span class="text-base">текст<span class="redact-bar text-accent ml-1"></span></span>
+                    <span class="text-2xl">текст<span class="redact-bar text-accent ml-1"></span></span>
+                    <span class="text-4xl">текст<span class="redact-bar text-accent ml-1"></span></span>
+                </div>
+            </div>
+            <div>
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">Як буллет</div>
+                <ul class="space-y-1 text-sm m-0 p-0 list-none">
+                    <li class="flex items-baseline gap-2"><span class="redact-bar text-fg-3"></span><span>Перший пункт</span></li>
+                    <li class="flex items-baseline gap-2"><span class="redact-bar text-fg-3"></span><span>Другий пункт</span></li>
+                    <li class="flex items-baseline gap-2"><span class="redact-bar text-fg-3"></span><span>Третій пункт</span></li>
+                </ul>
+            </div>
+            <div>
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">У заголовку</div>
+                <h2 class="font-bold text-2xl text-fg-0 tracking-tight inline-flex items-center gap-2"><span class="redact-bar text-accent"></span>Розділ</h2>
+            </div>
+        </div>
+        {% call code_block() %}<span class="redact-bar text-accent"></span>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Знак", "Wordmark — текст «damare» у IBM Plex Sans Bold з акцентною редакційною плашкою. Геометричний логотип-«Д» більше не використовується.") %}
+        <div class="flex flex-wrap items-end gap-10 p-8 bg-bg-1 border border-line-soft rounded-md">
+            {%- for size in [16, 24, 36] %}
+            <div class="text-center">
+                <div class="font-bold text-fg-0 tracking-tight inline-flex items-center gap-1" style="font-size: {{ size }}px;">
+                    <span>damare</span>
+                    <span class="redact-bar text-accent"></span>
+                </div>
+                <div class="text-[10px] text-fg-3 mt-3 font-mono">{{ size }}px</div>
+            </div>
+            {%- endfor %}
+        </div>
+        {% call code_block() %}<a href="/" class="flex items-center gap-1">
+    <span class="font-bold text-[18px] text-fg-0 tracking-tight">damare</span>
+    <span class="redact-bar text-accent"></span>
+</a>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Обкладинка", "Детермінований SVG — однакові семена дають однакові обкладинки. 12 палітр × 6 розкладок. За замовчуванням заповнює всю ширину контейнера, аспект 2:3 фіксує висоту.") %}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div class="cover">{{ cover('Перший твір', 'Автор', 'demo1') }}</div>
+            <div class="cover">{{ cover('Другий твір', 'Інший автор', 'demo2') }}</div>
+            <div class="cover">{{ cover('Третій твір', 'Хтось ще', 'demo3') }}</div>
+            <div class="cover">{{ cover('Без тексту', 'Прихований', 'demo4', show_text=false) }}</div>
+        </div>
+        {% call code_block() %}{% raw %}{% from "components/cover.html" import cover %}
+
+<div class="cover w-32">
+    {{ cover(novel.title, novel.author, novel.id) }}
+</div>{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("Аватар", "Прямокутна плашка з ініціалами (radius-sm). Моноширинний шрифт. Розмір через w-N h-N, шрифт через text-N.") %}
+        <div class="flex items-end gap-6 p-6 bg-bg-1 border border-line-soft rounded-md flex-wrap">
+            <div class="text-center"><div class="avatar w-6 h-6 text-[10px]">КЛ</div><div class="text-[10px] text-fg-3 mt-2 font-mono">w-6</div></div>
+            <div class="text-center"><div class="avatar w-8 h-8">КЛ</div><div class="text-[10px] text-fg-3 mt-2 font-mono">w-8</div></div>
+            <div class="text-center"><div class="avatar w-10 h-10 text-sm">КЛ</div><div class="text-[10px] text-fg-3 mt-2 font-mono">w-10</div></div>
+            <div class="text-center"><div class="avatar w-16 h-16 text-xl">КЛ</div><div class="text-[10px] text-fg-3 mt-2 font-mono">w-16</div></div>
+            <div class="text-center"><div class="avatar w-16 h-16 text-xl bg-accent text-accent-fg">КЛ</div><div class="text-[10px] text-fg-3 mt-2 font-mono">+ accent</div></div>
+        </div>
+        {% call code_block() %}<div class="avatar w-8 h-8">КЛ</div>
+<div class="avatar w-16 h-16 text-xl bg-accent text-accent-fg">КЛ</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Тег", "Метадата-стиль: прямокутні, моноширинні, малі. Чотири варіанти — базовий, фендом, попередження, рейтинг.") %}
+        <div class="flex flex-wrap gap-2 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <span class="tag">містика</span>
+            <span class="tag fandom">Original</span>
+            <span class="tag warn">смерть персонажа</span>
+            <span class="tag rating">M</span>
+        </div>
+        {% call code_block() %}<span class="tag">містика</span>
+<span class="tag fandom">Original</span>
+<span class="tag warn">смерть персонажа</span>
+<span class="tag rating">M</span>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Чіп фільтра", "Альтернатива тегу — округла плашка для увімкнено/вимкнено стану. Не моноширинний, не для метаданих. Використовуй для інтерактивних фільтрів (як на сторінці статей).") %}
+        <div class="flex flex-wrap gap-2 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <button type="button" class="px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border bg-fg-0 text-bg-0 border-fg-0 font-semibold">Активний</button>
+            <button type="button" class="px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border bg-bg-1 text-fg-1 border-line-soft hover:border-line">Неактивний</button>
+            <button type="button" class="px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border bg-bg-1 text-fg-1 border-line-soft hover:border-line">Інший</button>
+            <button type="button" class="px-3.5 py-1.5 text-[12.5px] rounded-full whitespace-nowrap border bg-bg-1 text-fg-1 border-line-soft hover:border-line">Ще один</button>
+        </div>
+        {% call code_block() %}{# Активний #}
+<button class="px-3.5 py-1.5 text-[12.5px] rounded-full border bg-fg-0 text-bg-0 border-fg-0 font-semibold">Активний</button>
+{# Неактивний #}
+<button class="px-3.5 py-1.5 text-[12.5px] rounded-full border bg-bg-1 text-fg-1 border-line-soft">Неактивний</button>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Кнопка", "Базовий .btn та модифікатори: primary, ghost, sm, icon. Можна комбінувати — btn primary sm icon.") %}
+        <div class="flex flex-wrap gap-2 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <button type="button" class="btn">Звичайна</button>
+            <button type="button" class="btn primary">Акцентна</button>
+            <button type="button" class="btn ghost">Прозора</button>
+            <button type="button" class="btn sm">Мала</button>
+            <button type="button" class="btn primary sm">Мала акцентна</button>
+            <button type="button" class="btn icon">{{ icon('heart', 14) }}</button>
+            <button type="button" class="btn icon sm">{{ icon('heart', 12) }}</button>
+        </div>
+        {% call code_block() %}<button class="btn">Звичайна</button>
+<button class="btn primary">Акцентна</button>
+<button class="btn ghost">Прозора</button>
+<button class="btn sm">Мала</button>
+<button class="btn icon">…</button>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Сегментований перемикач", "Множина опцій з однією активною. Параметр small=true дає компактну версію.") %}
+        <div class="flex flex-wrap gap-4 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {{ segmented(['Усі', 'G', 'T', 'M'], 'T') }}
+            {{ segmented(['Kudos', 'Дата', 'Слова'], 'Kudos', small=true) }}
+        </div>
+        {% call code_block() %}{% raw %}{% from "components/segmented.html" import segmented %}
+
+{{ segmented(['Усі', 'G', 'T', 'M'], 'T') }}
+{{ segmented(['Kudos', 'Дата'], 'Kudos', small=true) }}{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("Ряд статистики", "Моноширинні цифри з табулярним вирівнюванням — числа стають архітектурою.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div class="stat-row">
+                <span class="stat">{{ icon('heart', 12) }}1 284</span>
+                <span class="stat">{{ icon('bookmark', 12) }}312</span>
+                <span class="stat">{{ icon('message', 12) }}89</span>
+                <span class="stat">{{ icon('eye', 12) }}12.5k</span>
+            </div>
+        </div>
+        {% call code_block() %}<div class="stat-row">
+    <span class="stat">…heart… 1 284</span>
+    <span class="stat">…bookmark… 312</span>
+    <span class="stat">…message… 89</span>
+    <span class="stat">…eye… 12.5k</span>
+</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Заголовок секції", "Двочастинна структура: малий лейбл-кікер + великий заголовок. Використовується на верхівці кожної секції на сторінках.") %}
+        <div class="space-y-6 p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div>
+                <div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">Малий лейбл</div>
+                <h3 class="font-serif text-2xl font-medium tracking-tight">Заголовок секції</h3>
+            </div>
+            <hr class="hr">
+            <div>
+                <div class="text-[11px] text-accent uppercase tracking-[0.1em] mb-2">Акцентний кікер</div>
+                <h3 class="font-serif text-2xl font-medium tracking-tight">Інший заголовок</h3>
+            </div>
+        </div>
+        {% call code_block() %}<div class="text-[10px] uppercase tracking-[0.06em] text-fg-3 mb-2">Малий лейбл</div>
+<h3 class="font-serif text-2xl font-medium tracking-tight">Заголовок секції</h3>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Буквиця (drop cap)", "Декоративна перша літера абзацу — float-left, велика, акцентного кольору. Використовуй у першому абзаці глави в рідері.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-[600px]">
+            <p class="font-serif text-[18px] leading-[1.75] m-0 text-pretty">
+                <span class="font-serif float-left text-accent" style="font-size: 61px; line-height: 0.85; padding-right: 10px; padding-top: 8px;">Я</span>помер у п'ятницю ввечері. Не від чогось ефектного. Не від драконячого вогню чи прокляття стародавніх. Я помер тому, що сів за робочий стіл після п'яти кав і дванадцятигодинної зміни в лабораторії, і моє серце мовчки сказало: «ну все, з мене досить».
+            </p>
+        </div>
+        {% call code_block() %}<p class="font-serif text-[18px] leading-[1.75] text-pretty">
+    <span class="font-serif float-left text-accent" style="font-size: 61px; line-height: 0.85; padding-right: 10px; padding-top: 8px;">Я</span>помер у п'ятницю…
+</p>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Розкривач спойлеру", "Alpine-патерн. Кнопка-приманка ховає текст до кліку. Використовуй у коментарях та теорійних обговореннях.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md" x-data="{ revealed: false }">
+            <button type="button" x-show="!revealed" @click="revealed = true" class="text-xs px-3 py-2 bg-bg-2 rounded-md text-fg-2 border border-line-soft">
+                ⚠ Спойлер · натисніть, щоб показати
+            </button>
+            <p x-show="revealed" class="text-sm m-0 text-fg-1" style="display: none;">
+                Я зрозуміла, ким насправді була та жінка біля вокзалу!
+            </p>
+        </div>
+        {% call code_block() %}<div x-data="{ revealed: false }">
+    <button x-show="!revealed" @click="revealed = true" class="text-xs px-3 py-2 bg-bg-2 rounded-md text-fg-2 border border-line-soft">
+        ⚠ Спойлер · натисніть, щоб показати
+    </button>
+    <p x-show="revealed" style="display: none;">Прихований текст…</p>
+</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Лінія") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div class="text-fg-2">Текст вище</div>
+            <hr class="hr my-3">
+            <div class="text-fg-2">Текст нижче</div>
+        </div>
+        {% call code_block() %}<hr class="hr">{% endcall %}
+        {% endcall %}
+    </section>
+
+    {# ── FORMS ── #}
+    <section id="forms" class="mb-16 scroll-mt-20">
+        <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Форми</h2>
+        <p class="text-sm text-fg-3 mb-8">Стандартизовані поля вводу. Усі ділять одну систему: фон bg-bg-1, межа line-soft, фокус підсилює межу до line.</p>
+
+        {% call entry("Текстове поле", "Підпис над полем: малий, fg-3. Поле висотою 40px, моноспейсу немає.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[12px] text-fg-3">Назва</span>
+                <input type="text" placeholder="Введіть назву…" class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition" />
+            </label>
+        </div>
+        {% call code_block() %}<label class="flex flex-col gap-1.5">
+    <span class="text-[12px] text-fg-3">Назва</span>
+    <input type="text" class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition" />
+</label>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Текстова область", "Той самий патерн, але з resize-y та паддингом замість фіксованої висоти.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[12px] text-fg-3">Опис</span>
+                <textarea rows="3" placeholder="Кілька речень…" class="px-3.5 py-2.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition resize-y"></textarea>
+            </label>
+        </div>
+        {% call code_block() %}<label class="flex flex-col gap-1.5">
+    <span class="text-[12px] text-fg-3">Опис</span>
+    <textarea rows="3" class="px-3.5 py-2.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition resize-y"></textarea>
+</label>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Випадаючий список", "Нативний select зі стилем у тон. Працює на мобільних з системним пікером.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[12px] text-fg-3">Статус</span>
+                <select class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition">
+                    <option>Онґоїнґ</option>
+                    <option>Завершено</option>
+                    <option>На паузі</option>
+                </select>
+            </label>
+        </div>
+        {% call code_block() %}<select class="h-10 px-3.5 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition">
+    <option>Опція 1</option>
+    <option>Опція 2</option>
+</select>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Прапорець (checkbox)", "Нативний checkbox із accent-color на токен. Потрібно загорнути в <label> для кліку по тексту.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" class="h-4 w-4 cursor-pointer" style="accent-color: var(--color-accent);" />
+                <span class="text-sm select-none">Я погоджуюсь з умовами</span>
+            </label>
+        </div>
+        {% call code_block() %}<label class="flex items-center gap-2.5 cursor-pointer">
+    <input type="checkbox" class="h-4 w-4 cursor-pointer" style="accent-color: var(--color-accent);" />
+    <span class="text-sm select-none">Я погоджуюсь</span>
+</label>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Файлове поле", "Стилізована «Choose File» кнопка через file:* модифікатори Tailwind v4.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[12px] text-fg-3">Постер</span>
+                <input type="file" accept="image/*" class="h-10 px-3.5 py-2 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition file:mr-3 file:px-2 file:py-0.5 file:rounded file:border-0 file:bg-bg-2 file:text-fg-1 file:text-xs file:cursor-pointer file:font-medium" />
+            </label>
+        </div>
+        {% call code_block() %}<input type="file" accept="image/*" class="h-10 px-3.5 py-2 bg-bg-1 border border-line-soft rounded-md text-fg-0 text-sm outline-none focus:border-line transition file:mr-3 file:px-2 file:py-0.5 file:rounded file:border-0 file:bg-bg-2 file:text-fg-1 file:text-xs file:cursor-pointer file:font-medium" />{% endcall %}
+        {% endcall %}
+
+        {% call entry("Слайдер діапазону", "Нативний range з accent-color. Простий і функціональний.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            <label class="flex flex-col gap-1.5">
+                <div class="flex justify-between text-[11px] text-fg-3 mb-1">
+                    <span>&lt; 5k</span>
+                    <span>&gt; 100k</span>
+                </div>
+                <input type="range" value="50" class="w-full" style="accent-color: var(--color-accent);" />
+            </label>
+        </div>
+        {% call code_block() %}<input type="range" value="50" class="w-full" style="accent-color: var(--color-accent);" />{% endcall %}
+        {% endcall %}
+
+        {% call entry("Мультиселект", "Alpine-компонент із чипами. Печатай для пошуку, Enter додає, Backspace видаляє останній. Прихований <input type='hidden'> зберігає значення для форми.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md max-w-md">
+            {{ genres_select() }}
+        </div>
+        {% call code_block() %}{% raw %}{% from "components/genres.html" import genres_select %}
+
+{{ genres_select(name="genres") }}{% endraw %}{% endcall %}
+        {% endcall %}
+    </section>
+
+    {# ── COMPOSITES ── #}
+    <section id="composites" class="mb-16 scroll-mt-20">
+        <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Композити</h2>
+        <p class="text-sm text-fg-3 mb-8">Складніші компоненти, зібрані з атомів.</p>
+
+        {% call entry("Картка з обкладинкою", "Сітковий варіант — постер зверху, заголовок (clamp 2 рядки + min-h щоб картки вирівнювались), автор, статистика. Лівий-верхній кут постера показує мітку походження: мова-джерело (JP, KR, ZH) для перекладів, акцентна «ОРИГ» для оригіналів.") %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6 bg-bg-1 border border-line-soft rounded-md">
+            {{ novel_card_cover(demo_translation) }}
+            {{ novel_card_cover(demo_original) }}
+            {{ novel_card_cover(demo_translation) }}
+        </div>
+        {% call code_block() %}{% raw %}{% from "components/novel_card.html" import novel_card %}
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-[18px]">
+    {% for n in novels %}
+    {{ novel_card(n, with_covers=true) }}
+    {% endfor %}
+</div>{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("Картка-рядок", "Горизонтальний варіант — мала обкладинка + повний опис + теги + статистика. Заголовний ряд містить мітку типу («JP · ПЕРЕКЛАД» або «ОРИГІНАЛ») поряд із рейтингом. Для перекладів під автором додається рядок «перекладає [команда]».") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md flex flex-col gap-3">
+            {{ novel_card_list(demo_translation) }}
+            {{ novel_card_list(demo_original) }}
+        </div>
+        {% call code_block() %}{% raw %}{{ novel_card(novel, with_covers=false) }}{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("Плитка статистики", "Тривимірна сітка з роздільниками через gap-px та лінійним фоном. Велика цифра + малий лейбл під нею. Використовується на профілі.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden max-w-[320px]">
+                {%- for v, l in [('12', 'творів'), ('4.2k', 'читачів'), ('38k', 'kudos')] %}
+                <div class="bg-bg-1 px-2.5 py-3 text-center">
+                    <div class="text-[17px] font-semibold text-fg-0 tabular-nums">{{ v }}</div>
+                    <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">{{ l }}</div>
+                </div>
+                {%- endfor %}
+            </div>
+        </div>
+        {% call code_block() %}<div class="grid grid-cols-3 gap-px bg-line-soft border border-line-soft rounded-md overflow-hidden">
+    <div class="bg-bg-1 px-2.5 py-3 text-center">
+        <div class="text-[17px] font-semibold text-fg-0 tabular-nums">12</div>
+        <div class="text-[10.5px] text-fg-3 uppercase tracking-[0.06em] mt-0.5">творів</div>
+    </div>
+    {# … 2 ще #}
+</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Композер", "Поле введення з форматувальною панеллю. Аватар зліва, textarea + контроли праворуч. Використовується у коментарях і стрічці авторів.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md">
+            <div class="flex gap-3 p-3.5 bg-bg-1 border border-line-soft rounded-lg">
+                <div class="avatar w-8 h-8">МК</div>
+                <div class="flex-1">
+                    <textarea placeholder="Поділіться думкою про розділ…" class="w-full min-h-[64px] p-2.5 bg-bg-0 border border-line-soft rounded-md text-fg-1 text-[13.5px] leading-[1.55] resize-y outline-none focus:border-line"></textarea>
+                    <div class="flex items-center mt-2 flex-wrap gap-2">
+                        <div class="flex gap-1">
+                            <button type="button" class="btn ghost icon sm">{{ icon('bold', 13) }}</button>
+                            <button type="button" class="btn ghost icon sm">{{ icon('italic', 13) }}</button>
+                            <button type="button" class="btn ghost icon sm">{{ icon('quote', 13) }}</button>
+                        </div>
+                        <span class="flex-1 text-[11px] text-fg-3 ml-3 min-w-0">Markdown підтримується</span>
+                        <button type="button" class="btn primary sm">{{ icon('send', 12) }} Опублікувати</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% call code_block() %}<div class="flex gap-3 p-3.5 bg-bg-1 border border-line-soft rounded-lg">
+    <div class="avatar w-8 h-8">МК</div>
+    <div class="flex-1">
+        <textarea placeholder="…" class="w-full min-h-[64px] p-2.5 bg-bg-0 border border-line-soft rounded-md text-fg-1 text-[13.5px] resize-y outline-none focus:border-line"></textarea>
+        <div class="flex items-center mt-2">
+            <div class="flex gap-1">
+                <button class="btn ghost icon sm">…bold…</button>
+                {# … #}
+            </div>
+            <span class="flex-1"></span>
+            <button class="btn primary sm">Опублікувати</button>
+        </div>
+    </div>
+</div>{% endcall %}
+        {% endcall %}
+
+        {% call entry("Коментар", "Аватар + ім'я + опціональний бейдж «Автор» + час + текст + дії. Якщо це автор — аватар отримує bg-accent text-accent-fg.") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md space-y-5">
+            {# Author comment #}
+            <div class="flex gap-3">
+                <div class="avatar w-8 h-8 shrink-0 bg-accent text-accent-fg">КЛ</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="text-[13px] font-medium text-fg-0">Калина Левчук</span>
+                        <span class="text-[9.5px] font-semibold px-1.5 py-0.5 bg-accent-soft text-accent rounded-full tracking-[0.04em] uppercase">Автор</span>
+                        <span class="text-[11.5px] text-fg-3">· щойно</span>
+                    </div>
+                    <p class="text-[13.5px] leading-[1.6] text-fg-1 m-0 mb-2 text-pretty">
+                        Дуже дякую. Я вагалась цілий тиждень, чи не вийде штучно. Приємно знати, що ні 🤍
+                    </p>
+                    <div class="flex items-center gap-3.5 text-[11.5px] text-fg-3">
+                        <button type="button" class="flex items-center gap-1 text-fg-2">{{ icon('heart', 12) }} 32</button>
+                        <button type="button" class="flex items-center gap-1 text-fg-2">{{ icon('message', 12) }} Відповісти</button>
+                    </div>
+                </div>
+            </div>
+            {# Regular comment #}
+            <div class="flex gap-3">
+                <div class="avatar w-8 h-8 shrink-0">ОЧ</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="text-[13px] font-medium text-fg-0">оля_читає</span>
+                        <span class="text-[11.5px] text-fg-3">· 2 год тому</span>
+                    </div>
+                    <p class="text-[13.5px] leading-[1.6] text-fg-1 m-0 mb-2 text-pretty">
+                        Господи, цей розділ просто розриває серце.
+                    </p>
+                    <div class="flex items-center gap-3.5 text-[11.5px] text-fg-3">
+                        <button type="button" class="flex items-center gap-1 text-fg-2">{{ icon('heart', 12) }} 23</button>
+                        <button type="button" class="flex items-center gap-1 text-fg-2">{{ icon('message', 12) }} Відповісти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% call code_block() %}<div class="flex gap-3">
+    <div class="avatar w-8 h-8 shrink-0 bg-accent text-accent-fg">КЛ</div>
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="text-[13px] font-medium text-fg-0">Ім'я</span>
+            <span class="text-[9.5px] font-semibold px-1.5 py-0.5 bg-accent-soft text-accent rounded-full tracking-[0.04em] uppercase">Автор</span>
+            <span class="text-[11.5px] text-fg-3">· час</span>
+        </div>
+        <p class="text-[13.5px] leading-[1.6] text-fg-1 m-0 mb-2">Текст…</p>
+        <div class="flex items-center gap-3.5 text-[11.5px] text-fg-3">
+            <button class="flex items-center gap-1 text-fg-2">…heart… 32</button>
+            <button class="flex items-center gap-1 text-fg-2">…message… Відповісти</button>
+        </div>
+    </div>
+</div>{% endcall %}
+        {% endcall %}
+    </section>
+
+    {# ── FILTERS ── #}
+    <section id="filters" class="mb-16 scroll-mt-20">
+        <h2 class="font-serif text-3xl font-medium tracking-tight mb-2">Фільтри</h2>
+        <p class="text-sm text-fg-3 mb-8">Jinja-фільтри для форматування даних. Реєструються у <code class="font-mono text-[12px] bg-bg-2 px-1.5 py-0.5 rounded">app/__init__.py</code>.</p>
+
+        {% call entry("thousands_uk", "Форматує число українським тисячним розділювачем (пробіл).") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md font-mono text-sm space-y-1">
+            <div><span class="text-fg-3">1284</span> → <span class="text-fg-0 font-semibold">{{ 1284 | thousands_uk }}</span></div>
+            <div><span class="text-fg-3">52480</span> → <span class="text-fg-0 font-semibold">{{ 52480 | thousands_uk }}</span></div>
+            <div><span class="text-fg-3">1000000</span> → <span class="text-fg-0 font-semibold">{{ 1000000 | thousands_uk }}</span></div>
+        </div>
+        {% call code_block() %}{% raw %}{{ novel.kudos | thousands_uk }}{% endraw %}{% endcall %}
+        {% endcall %}
+
+        {% call entry("initials", "Витягує до 2 ініціалів з імені (перші літери двох перших слів).") %}
+        <div class="p-6 bg-bg-1 border border-line-soft rounded-md font-mono text-sm space-y-1">
+            <div><span class="text-fg-3">"Калина Левчук"</span> → <span class="text-fg-0 font-semibold">{{ "Калина Левчук" | initials }}</span></div>
+            <div><span class="text-fg-3">"Хіросі Канесакі"</span> → <span class="text-fg-0 font-semibold">{{ "Хіросі Канесакі" | initials }}</span></div>
+            <div><span class="text-fg-3">"kalyna_l"</span> → <span class="text-fg-0 font-semibold">{{ "kalyna_l" | initials }}</span></div>
+        </div>
+        {% call code_block() %}{% raw %}<div class="avatar">{{ user.name | initials }}</div>{% endraw %}{% endcall %}
+        {% endcall %}
+    </section>
+</div>
+{% endblock %}
