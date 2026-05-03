@@ -227,8 +227,19 @@ _TRANS_TO_TEAM_STATUS = {
 
 # ─── Junk filter ────────────────────────────────────────────────────────
 
+# Manually-hidden ranobe IDs. Anything in here is filtered out
+# alongside automatic junk during build. Add IDs and a brief reason.
+_HIDDEN_IDS = {
+    4145,  # "Весілля" — author requested
+    2928,  # "Монолог травниці" — author requested
+}
+
+
 def is_junk_record(record):
-    """Discard test entries and titles with trailing whitespace."""
+    """Discard test entries, titles with trailing whitespace, and the manual hide list."""
+
+    if record.get("id") in _HIDDEN_IDS:
+        return True
 
     title = record.get("title_ua") or ""
 
