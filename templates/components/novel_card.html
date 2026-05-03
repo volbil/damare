@@ -15,7 +15,7 @@
 <a href="/title/{{ novel.id }}" class="block">
     <article class="cursor-pointer flex flex-col gap-2.5">
         <div class="cover shadow-sm">
-            {{ cover(novel.title, novel.author, novel.id) }}
+            {{ cover(novel.title, novel.author, novel.id, url=novel.cover_image) }}
             {# Origin badge (top-left) — source-language code for translations,
                accent "ОРИГ" for originals so they pop visually. #}
             {%- if novel.type == 'translation' %}
@@ -51,7 +51,7 @@
     <article class="cursor-pointer flex items-start gap-3.5 p-4 rounded-lg bg-bg-1 border border-line-soft">
         {%- if show_cover %}
         <div class="cover w-[76px] flex-shrink-0">
-            {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
+            {{ cover(novel.title, novel.author, novel.id, show_text=false, url=novel.cover_image) }}
         </div>
         {%- endif %}
         <div class="flex-1 min-w-0 flex flex-col gap-1.5">

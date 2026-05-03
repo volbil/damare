@@ -19,6 +19,11 @@ static/styles.css
 .claude/
 *.db
 
+# Stub data — code is committed, data is not
+stub/ranobe.json
+stub/*.pkl
+stub/cache/
+
 # PyRight
 pyrightconfig.json
 

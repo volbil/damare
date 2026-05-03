@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from app.database import sessionmanager
 from app.utils import get_settings, cover_palette, cover_layout, css_mtime
 from app.stub_data import NOTIFICATIONS, team_by_id
+from app.stub_proxy import proxy_url
 from fastapi import FastAPI
 import arel
 
@@ -19,6 +20,10 @@ templates.env.globals["cover_layout"] = cover_layout
 templates.env.globals["team_by_id"] = team_by_id
 templates.env.globals["NOTIFICATIONS"] = NOTIFICATIONS
 templates.env.globals["css_mtime"] = css_mtime
+# proxy_url() rewrites external image URLs to /stub/proxy?url=… in dev,
+# pass-through otherwise. Always exposed; the actual /stub/proxy
+# endpoint only mounts when debug is on.
+templates.env.globals["proxy_url"] = proxy_url
 
 
 def thousands_uk(n):
@@ -121,6 +126,12 @@ def create_app(init_db: bool = True) -> FastAPI:
     app.include_router(title_router)
     app.include_router(home_router)
     app.include_router(auth_router)
+
+    # Dev-only image proxy + cache (SSRF-gated to ALLOWED_HOSTS).
+    # Mounted only in debug — production GET /stub/proxy returns 404.
+    if settings.backend.debug:
+        from .stub_proxy import router as stub_proxy_router
+        app.include_router(stub_proxy_router)
 
     # @app.exception_handler(Exception)
     # async def custom_exception_handler(request: Request, exc: Exception):

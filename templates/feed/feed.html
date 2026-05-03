@@ -60,7 +60,7 @@
                 {%- if post.type == 'rec' and post.attached %}
                 <a href="/title/{{ post.attached.id }}" class="flex gap-3 p-3 mb-3 bg-bg-0 border border-line-soft rounded-md hover:border-line transition">
                     <div class="cover w-[50px] shrink-0">
-                        {{ cover(post.attached.title, post.attached.author, post.attached.id, show_text=false) }}
+                        {{ cover(post.attached.title, post.attached.author, post.attached.id, show_text=false, url=post.attached.cover_image) }}
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="font-serif text-sm text-fg-0 line-clamp-2">{{ post.attached.title }}</div>
@@ -149,7 +149,7 @@
                 {%- for n in recommendations %}
                 <a href="/title/{{ n.id }}" class="flex gap-2.5">
                     <div class="cover w-9 shrink-0">
-                        {{ cover(n.title, n.author, n.id, show_text=false) }}
+                        {{ cover(n.title, n.author, n.id, show_text=false, url=n.cover_image) }}
                     </div>
                     <div class="min-w-0">
                         <div class="font-serif text-[12.5px] leading-[1.25] text-fg-0 line-clamp-2">{{ n.title }}</div>

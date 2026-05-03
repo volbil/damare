@@ -7,12 +7,12 @@
     {# ────────────────────────── Hero ────────────────────────── #}
     <div class="relative border-b border-line-soft">
         <div class="absolute inset-0 opacity-30 overflow-hidden">
-            {{ cover(novel.title, novel.author, novel.id, show_text=false) }}
+            {{ cover(novel.title, novel.author, novel.id, show_text=false, url=novel.background_image or novel.cover_image) }}
             <div class="absolute inset-0" style="background: linear-gradient(180deg, transparent 0%, var(--color-bg-0) 90%);"></div>
         </div>
         <div class="relative max-w-[1140px] mx-auto px-4 md:px-8 pt-8 md:pt-10 pb-8 flex flex-col md:flex-row gap-5 md:gap-7">
             <div class="cover w-[200px] shrink-0 shadow-lg">
-                {{ cover(novel.title, novel.author, novel.id) }}
+                {{ cover(novel.title, novel.author, novel.id, url=novel.cover_image) }}
             </div>
             <div class="flex-1 pt-3">
                 {# Type / rating / status tags #}
@@ -221,7 +221,7 @@
                     {%- for nv in similar %}
                     <a href="/title/{{ nv.id }}" class="flex gap-2.5 cursor-pointer">
                         <div class="cover w-10 shrink-0">
-                            {{ cover(nv.title, nv.author, nv.id, show_text=false) }}
+                            {{ cover(nv.title, nv.author, nv.id, show_text=false, url=nv.cover_image) }}
                         </div>
                         <div class="min-w-0">
                             <div class="font-serif text-[12.5px] leading-[1.25] text-fg-0 line-clamp-2">{{ nv.title }}</div>

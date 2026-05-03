@@ -23,7 +23,7 @@
             {%- for n in top_week %}
             <a href="#" class="group block">
                 <div class="cover w-full mb-2 relative">
-                    {{ cover(n.title, n.author, n.id, show_text=false) }}
+                    {{ cover(n.title, n.author, n.id, show_text=false, url=n.cover_image) }}
                     <span class="absolute top-1 left-1 px-1.5 py-[1px] bg-black/65 text-white text-[10px] font-mono font-semibold tabular-nums" style="backdrop-filter: blur(4px);">#{{ n.rank }}</span>
                     {%- if n.is_translation and n.source_language %}
                     <span class="absolute top-1 right-1 text-[8.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 text-white px-1.5 py-[1px]" style="backdrop-filter: blur(6px);">{{ n.source_language | upper }}</span>
@@ -55,7 +55,7 @@
             {%- for item in continue_reading_list %}
             <a href="/title/{{ item.novel.id }}/read" class="flex gap-3 p-4 bg-bg-1 border border-line-soft rounded-md hover:border-line transition">
                 <div class="cover w-[60px] shrink-0">
-                    {{ cover(item.novel.title, item.novel.author, item.novel.id, show_text=false) }}
+                    {{ cover(item.novel.title, item.novel.author, item.novel.id, show_text=false, url=item.novel.cover_image) }}
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col">
                     <div class="text-[11px] text-fg-3 uppercase tracking-[0.06em] mb-1">Розділ {{ item.chapter_no }} з {{ item.novel.chapter_count }}</div>
@@ -100,7 +100,7 @@
             <a href="#" class="group block">
                 <article class="flex gap-4 p-4 bg-bg-1 border border-line-soft rounded-md hover:border-line transition h-full">
                     <div class="cover w-[100px] shrink-0 relative">
-                        {{ cover(h.title, h.author_or_team, h.id, show_text=false) }}
+                        {{ cover(h.title, h.author_or_team, h.id, show_text=false, url=h.cover_image) }}
                         {%- if h.is_translation and h.source_language %}
                         <span class="absolute top-1.5 left-1.5 text-[9px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 text-white px-[6px] py-[2px]" style="backdrop-filter: blur(6px);">{{ h.source_language | upper }}</span>
                         {%- else %}

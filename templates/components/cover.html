@@ -1,7 +1,17 @@
-{# Programmatic SVG cover, ported from frontend_reference/covers.jsx.
-   Calls cover_palette() and cover_layout() exposed as Jinja globals. #}
+{# Cover renderer.
 
-{% macro cover(title, author='', seed='', show_text=true) -%}
+   Two modes:
+   • If `url` is given (and truthy), render an <img> with that source.
+   • Otherwise, render a deterministic SVG via cover_palette()/cover_layout().
+
+   The SVG path is the original behaviour and serves as a fallback when
+   a novel has no real cover image (originals, missing data, etc.). #}
+
+{% macro cover(title, author='', seed='', show_text=true, url=None) -%}
+{%- if url -%}
+<img src="{{ proxy_url(url) }}" alt="{{ title }}" loading="lazy" decoding="async"
+     style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+{%- else -%}
 {%- set palette_seed = seed if seed else title -%}
 {%- set pal = cover_palette(palette_seed) -%}
 {%- set lay = cover_layout(seed, title) -%}
@@ -50,4 +60,5 @@
 {%- endif -%}
 {%- endif -%}
 </svg>
+{%- endif -%}
 {%- endmacro %}
