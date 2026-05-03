@@ -11,7 +11,7 @@
 {% from "components/cover.html" import cover %}
 
 
-{% macro novel_card_cover(novel) -%}
+{% macro novel_card_cover(novel, show_author=true) -%}
 <a href="/title/{{ novel.id }}" class="block">
     <article class="cursor-pointer flex flex-col gap-2.5">
         <div class="cover shadow-sm">
@@ -34,7 +34,9 @@
         </div>
         <div>
             <h3 class="text-sm font-serif font-medium leading-tight mb-[3px] line-clamp-2 min-h-[2.5em]">{{ novel.title }}</h3>
+            {%- if show_author %}
             <div class="text-[11.5px] text-fg-3">{{ novel.author }}</div>
+            {%- endif %}
             <div class="stat-row mt-2 text-[11px]">
                 <span class="stat">{{ icon('heart', 11) }}{{ novel.kudos | thousands_uk }}</span>
                 <span class="stat">{{ icon('message', 11) }}{{ novel.comments }}</span>
@@ -95,6 +97,6 @@
 {%- endmacro %}
 
 
-{% macro novel_card(novel, with_covers=true) -%}
-{%- if with_covers -%}{{ novel_card_cover(novel) }}{%- else -%}{{ novel_card_list(novel) }}{%- endif -%}
+{% macro novel_card(novel, with_covers=true, show_author=true) -%}
+{%- if with_covers -%}{{ novel_card_cover(novel, show_author=show_author) }}{%- else -%}{{ novel_card_list(novel) }}{%- endif -%}
 {%- endmacro %}

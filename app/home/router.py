@@ -89,8 +89,8 @@ async def home(request: Request, user: User | None = Depends(auth_optional)):
             "top_week": TOP_WEEK[:7],
             "hot_now": HOT_NOW,
             "recent_comments": RECENT_COMMENTS,
-            "trending": NOVELS[2:7],
-            "new_releases": NOVELS[:5],
+            "trending": NOVELS[2:8],
+            "new_releases": NOVELS[:6],
             "hot_now_updated": "оновлено 2 хв тому",
         },
     )

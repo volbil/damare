@@ -305,7 +305,6 @@ def parse_novel(record):
     raw_chapters_sorted = sorted(raw_chapters, key=_ch_sort_key)
 
     chapters_full = []
-    excerpt_text = ""
     word_count = 0
 
     for i, ch in enumerate(raw_chapters_sorted, start=1):
@@ -314,12 +313,6 @@ def parse_novel(record):
             text = strip_html(p.get("content") or "")
             pages.append({"order": p.get("order", 0), "text": text})
             word_count += len(text.split())
-
-        if not excerpt_text:
-            for p in pages:
-                if p["text"]:
-                    excerpt_text = p["text"]
-                    break
 
         team_obj = ch.get("team") or {}
         chapter_no = i  # Sequential, matches existing schema's "no" field
@@ -345,18 +338,22 @@ def parse_novel(record):
         }
         chapters_full.append(chapter_dict)
 
-    # Excerpt — first ~140 chars from first available chapter text
+    # Excerpt — synopsis from the uploader's "descriptions" field. This is
+    # the platform's pitch copy — actually written to answer "what is this
+    # book about?", which beats random opening prose for a discovery card.
+    # Same 180-char + word-boundary trim, sized for line-clamp-3 in Hot Now.
+    description = (record.get("descriptions") or "").strip()
     excerpt = ""
-    if excerpt_text:
-        first_para = excerpt_text.split("\n")[0]
-        excerpt = first_para[:140]
-        if len(first_para) > 140:
-            excerpt = excerpt.rsplit(" ", 1)[0].rstrip(",.;:") + "…"
+    if description:
+        flat = re.sub(r"\s+", " ", description).strip()
+        excerpt = flat[:180]
+        if len(flat) > 180:
+            excerpt = excerpt.rsplit(" ", 1)[0].rstrip(",.;:—– ") + "…"
 
-    # Fandom — for translations, use the original title as a "fandom" tag
+    # Fandom is reserved for actual fanfic relationships (e.g. "Дім Дракона").
+    # The native-script title goes into title_native instead — surfaced on
+    # the title-detail page, kept off home cards where it reads as noise.
     fandom = None
-    if is_translation and title_orig and title_orig != title_ua:
-        fandom = title_orig if len(title_orig) <= 40 else None
 
     # Teams — collect from top-level + per-chapter
     raw_teams = record.get("teams") or []
@@ -391,6 +388,7 @@ def parse_novel(record):
 
         "title": title_ua,
         "title_en": title_en,
+        "title_native": title_orig if title_orig and title_orig != title_ua else None,
         "title_ja": title_orig if src_lang == "ja" else None,
         "title_romaji": None,
 

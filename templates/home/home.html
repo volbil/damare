@@ -35,8 +35,7 @@
                     <span class="text-fg-3">{%- if n.votes >= 1000 %}{{ "%.1f"|format(n.votes / 1000) }}k{%- else %}{{ n.votes }}{%- endif %}</span>
                     <span class="ml-auto text-[11px] {% if n.trend == 'NEW' %}text-love{% elif n.trend.startswith('↑') %}text-accent{% else %}text-fg-3{% endif %}">{{ n.trend }}</span>
                 </div>
-                <div class="font-serif text-[13px] leading-[1.25] text-fg-0 line-clamp-2 mb-0.5 group-hover:text-accent transition">{{ n.title }}</div>
-                <div class="text-[11px] text-fg-3 truncate">{{ n.author }}</div>
+                <div class="font-serif text-[13px] leading-[1.25] text-fg-0 line-clamp-2 group-hover:text-accent transition">{{ n.title }}</div>
             </a>
             {%- endfor %}
         </div>
@@ -59,8 +58,7 @@
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col">
                     <div class="text-[11px] text-fg-3 uppercase tracking-[0.06em] mb-1">Розділ {{ item.chapter_no }} з {{ item.novel.chapter_count }}</div>
-                    <div class="font-serif text-[14px] leading-[1.25] text-fg-0 mb-1 line-clamp-2">{{ item.novel.title }}</div>
-                    <div class="text-[12px] text-fg-3 truncate">{{ item.novel.author }}</div>
+                    <div class="font-serif text-[14px] leading-[1.25] text-fg-0 line-clamp-2">{{ item.novel.title }}</div>
                     <div class="flex items-center gap-2 mt-auto pt-2">
                         <div class="flex-1 h-0.5 bg-bg-3 rounded-full overflow-hidden">
                             <div class="h-full bg-accent rounded-full" style="width: {{ item.progress }}%;"></div>
@@ -113,17 +111,13 @@
                             <span class="font-mono text-[11px] font-semibold tracking-[0.02em] whitespace-nowrap">{{ h.signal_label }}</span>
                             <span class="text-[11px] opacity-75 whitespace-nowrap truncate">· {{ h.signal_detail }}</span>
                         </div>
-                        <h3 class="font-serif text-[17px] leading-[1.2] text-fg-0 mb-1 line-clamp-2">{{ h.title }}</h3>
-                        <div class="text-[12px] text-fg-3 mb-2 truncate">
-                            {%- if h.fandom %}
-                            <span class="text-fg-2">{{ h.author_or_team }}</span>
-                            <span class="text-fg-4 mx-1.5">·</span>
+                        <h3 class="font-serif text-[17px] leading-[1.2] text-fg-0 mb-2 line-clamp-2">{{ h.title }}</h3>
+                        {%- if h.fandom %}
+                        <div class="mb-2 truncate">
                             <span class="tag fandom" style="font-size: 9.5px; padding: 1px 5px; vertical-align: baseline;">{{ h.fandom }}</span>
-                            {%- else %}
-                            <span class="text-fg-2">{{ h.author_or_team }}</span>
-                            {%- endif %}
                         </div>
-                        <p class="font-serif italic text-[14px] leading-[1.5] text-fg-2 m-0 line-clamp-2 mb-2">«{{ h.excerpt }}»</p>
+                        {%- endif %}
+                        <p class="font-serif italic text-[14px] leading-[1.5] text-fg-2 m-0 line-clamp-3 mb-2">{{ h.excerpt }}</p>
                         <div class="mt-auto pt-1 flex items-baseline gap-2 text-[12px] text-fg-3 font-mono">
                             <span class="tabular-nums">розділ&nbsp;{{ h.last_chapter_no }}/{{ h.chapter_count }}</span>
                             <span class="text-fg-4">·</span>
@@ -217,9 +211,9 @@
             </h2>
             <a href="/search?sort=trending" class="text-[12px] text-fg-3 hover:text-fg-1">Більше →</a>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {%- for n in trending %}
-            {{ novel_card(n, with_covers=true) }}
+            {{ novel_card(n, with_covers=true, show_author=false) }}
             {%- endfor %}
         </div>
     </section>
@@ -230,9 +224,9 @@
             <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Нещодавно оновлені</h2>
             <a href="/search?sort=updated" class="text-[12px] text-fg-3 hover:text-fg-1">Більше →</a>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {%- for n in new_releases %}
-            {{ novel_card(n, with_covers=true) }}
+            {{ novel_card(n, with_covers=true, show_author=false) }}
             {%- endfor %}
         </div>
     </section>
