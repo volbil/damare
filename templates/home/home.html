@@ -57,10 +57,16 @@
                     {{ cover(item.novel.title, item.novel.author, item.novel.id, show_text=false, url=item.novel.cover_image) }}
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col">
-                    <div class="text-[11px] text-fg-3 uppercase tracking-[0.06em] mb-1">Розділ {{ item.chapter_no }} з {{ item.novel.chapter_count }}</div>
-                    <div class="font-serif text-[14px] leading-[1.25] text-fg-0 line-clamp-2">{{ item.novel.title }}</div>
+                    <div class="text-[11px] text-fg-3 uppercase tracking-[0.06em] mb-1">
+                        Розділ {{ item.chapter_no }} з {{ item.novel.chapter_count }}
+                        {%- if item.last_read %} · {{ item.last_read }}{%- endif %}
+                    </div>
+                    <div class="font-serif text-[14px] leading-[1.25] text-fg-0 line-clamp-2 mb-1">{{ item.novel.title }}</div>
+                    {%- if item.next_chapter_title %}
+                    <div class="font-serif text-[12.5px] leading-[1.4] text-fg-2 truncate">Далі: «{{ item.next_chapter_title }}»</div>
+                    {%- endif %}
                     <div class="flex items-center gap-2 mt-auto pt-2">
-                        <div class="flex-1 h-0.5 bg-bg-3 rounded-full overflow-hidden">
+                        <div class="flex-1 h-1 bg-bg-3 rounded-full overflow-hidden">
                             <div class="h-full bg-accent rounded-full" style="width: {{ item.progress }}%;"></div>
                         </div>
                         <span class="text-[11px] text-fg-3 tabular-nums">{{ item.progress }}%</span>
@@ -117,7 +123,7 @@
                             <span class="tag fandom" style="font-size: 9.5px; padding: 1px 5px; vertical-align: baseline;">{{ h.fandom }}</span>
                         </div>
                         {%- endif %}
-                        <p class="font-serif italic text-[14px] leading-[1.5] text-fg-2 m-0 line-clamp-3 mb-2">{{ h.excerpt }}</p>
+                        <p class="font-serif text-[14px] leading-[1.5] text-fg-2 m-0 line-clamp-3 mb-2">{{ h.excerpt }}</p>
                         <div class="mt-auto pt-1 flex items-baseline gap-2 text-[12px] text-fg-3 font-mono">
                             <span class="tabular-nums">розділ&nbsp;{{ h.last_chapter_no }}/{{ h.chapter_count }}</span>
                             <span class="text-fg-4">·</span>
