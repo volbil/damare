@@ -19,7 +19,7 @@
             {# Origin badge (top-left) — source-language code for translations,
                accent "ОРИГ" for originals so they pop visually. #}
             {%- if novel.type == 'translation' %}
-            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">{{ novel.source_language | upper }}</span>
+            <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/80 backdrop-blur-md text-white px-[7px] py-[3px]">{{ novel.source_language | upper }}</span>
             {%- else %}
             <span class="absolute top-2 left-2 text-[9.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-accent text-accent-fg px-[7px] py-[3px]">ОРИГ</span>
             {%- endif %}
@@ -29,7 +29,7 @@
             </div>
             {%- endif %}
             {%- if novel.status == 'Завершено' %}
-            <span class="absolute top-2 right-2 text-[9.5px] font-semibold tracking-[0.06em] uppercase bg-black/55 backdrop-blur-md text-white px-[7px] py-[3px]">Завершено</span>
+            <span class="absolute top-2 right-2 text-[9.5px] font-semibold tracking-[0.06em] uppercase bg-black/80 backdrop-blur-md text-white px-[7px] py-[3px]">Завершено</span>
             {%- endif %}
         </div>
         <div>

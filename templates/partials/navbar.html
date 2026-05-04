@@ -16,7 +16,18 @@
 ] %}
 
 <nav x-data="{ menu: false }" class="border-b border-line-soft bg-bg-0 sticky top-0 z-20">
-    <div class="max-w-[1280px] mx-auto px-4 md:px-6 h-14 flex items-center gap-3 md:gap-6">
+    {# Container width — currently SYMMETRIC with content (max-w-[1140px]).
+       To switch to ASYMMETRIC chrome (navbar wider than body, "platform"
+       feel — see GitHub, Linear, Notion):
+         1. Change max-w-[1140px] → max-w-[1280px] on this <div>.
+         2. Change px-4 md:px-8 → px-4 md:px-6 if you want slightly tighter
+            padding on chrome vs body (optional; cosmetic).
+         3. Footer (templates/partials/footer.html) follows the same width
+            as the navbar — switch it to 1280 too if you want the chrome
+            band (top + bottom) to match.
+       Pros and cons of each were discussed; symmetric reads as
+       editorial/cohesive, asymmetric reads as platform/spacious. #}
+    <div class="max-w-[1140px] mx-auto px-4 md:px-6 h-14 flex items-center gap-3 md:gap-6">
         <a href="/" class="flex items-center gap-1 shrink-0">
             <span class="font-bold text-[18px] text-fg-0 tracking-tight">damare</span>
             <span class="redact-bar text-accent"></span>

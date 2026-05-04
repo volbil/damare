@@ -17,16 +17,16 @@
                 <span class="whitespace-nowrap">Топ тижня</span>
                 <span class="text-fg-4 normal-case font-normal tracking-normal text-[11px] ml-1 hidden sm:inline">· за оцінками читачів</span>
             </h2>
-            <a href="#" class="text-[12px] text-fg-3 hover:text-fg-1 whitespace-nowrap shrink-0">Увесь рейтинг →</a>
+            <a href="#" class="text-[13px] text-fg-3 hover:text-fg-1 whitespace-nowrap shrink-0">Увесь рейтинг →</a>
         </div>
         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
             {%- for n in top_week %}
             <a href="#" class="group block">
                 <div class="cover w-full mb-2 relative">
                     {{ cover(n.title, n.author, n.id, show_text=false, url=n.cover_image) }}
-                    <span class="absolute top-1 left-1 px-1.5 py-[1px] bg-black/65 text-white text-[10px] font-mono font-semibold tabular-nums" style="backdrop-filter: blur(4px);">#{{ n.rank }}</span>
+                    <span class="absolute top-1 left-1 px-1.5 py-[1px] bg-black/80 text-white text-[10px] font-mono font-semibold tabular-nums" style="backdrop-filter: blur(4px);">#{{ n.rank }}</span>
                     {%- if n.is_translation and n.source_language %}
-                    <span class="absolute top-1 right-1 text-[8.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 text-white px-1.5 py-[1px]" style="backdrop-filter: blur(6px);">{{ n.source_language | upper }}</span>
+                    <span class="absolute top-1 right-1 text-[8.5px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/80 text-white px-1.5 py-[1px]" style="backdrop-filter: blur(6px);">{{ n.source_language | upper }}</span>
                     {%- endif %}
                 </div>
                 <div class="flex items-baseline gap-1.5 mb-0.5 text-[11px] font-mono tabular-nums">
@@ -35,7 +35,7 @@
                     <span class="text-fg-3">{%- if n.votes >= 1000 %}{{ "%.1f"|format(n.votes / 1000) }}k{%- else %}{{ n.votes }}{%- endif %}</span>
                     <span class="ml-auto text-[11px] {% if n.trend == 'NEW' %}text-love{% elif n.trend.startswith('↑') %}text-accent{% else %}text-fg-3{% endif %}">{{ n.trend }}</span>
                 </div>
-                <div class="font-serif text-[13px] leading-[1.25] text-fg-0 line-clamp-2 group-hover:text-accent transition">{{ n.title }}</div>
+                <div class="font-serif text-[13px] leading-[1.25] text-fg-0 line-clamp-2 min-h-[2.5em] group-hover:text-accent transition">{{ n.title }}</div>
             </a>
             {%- endfor %}
         </div>
@@ -48,7 +48,7 @@
             <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">
                 Продовжити читати · {{ continue_reading_list | length }}
             </h2>
-            <a href="/profile?tab=reading" class="text-[12px] text-fg-3 hover:text-fg-1">Уся бібліотека →</a>
+            <a href="/profile?tab=reading" class="text-[13px] text-fg-3 hover:text-fg-1">Уся бібліотека →</a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             {%- for item in continue_reading_list %}
@@ -63,10 +63,11 @@
                     </div>
                     <div class="font-serif text-[14px] leading-[1.25] text-fg-0 line-clamp-2 mb-1">{{ item.novel.title }}</div>
                     {%- if item.next_chapter_title %}
-                    <div class="font-serif text-[12.5px] leading-[1.4] text-fg-2 truncate">Далі: «{{ item.next_chapter_title }}»</div>
+                    {# -ml-1 pl-1 = optical bleed for italic left-bearing (Cyrillic capitals like Д get clipped by overflow:hidden otherwise). Net visual position is unchanged. #}
+                    <div class="font-serif italic text-[12.5px] leading-[1.4] text-fg-2 truncate -ml-1 pl-1">Далі: «{{ item.next_chapter_title }}»</div>
                     {%- endif %}
                     <div class="flex items-center gap-2 mt-auto pt-2">
-                        <div class="flex-1 h-1 bg-bg-3 rounded-full overflow-hidden">
+                        <div class="flex-1 h-1.5 bg-bg-3 rounded-full overflow-hidden">
                             <div class="h-full bg-accent rounded-full" style="width: {{ item.progress }}%;"></div>
                         </div>
                         <span class="text-[11px] text-fg-3 tabular-nums">{{ item.progress }}%</span>
@@ -106,7 +107,7 @@
                     <div class="cover w-[100px] shrink-0 relative">
                         {{ cover(h.title, h.author_or_team, h.id, show_text=false, url=h.cover_image) }}
                         {%- if h.is_translation and h.source_language %}
-                        <span class="absolute top-1.5 left-1.5 text-[9px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/55 text-white px-[6px] py-[2px]" style="backdrop-filter: blur(6px);">{{ h.source_language | upper }}</span>
+                        <span class="absolute top-1.5 left-1.5 text-[9px] font-mono font-semibold tracking-[0.04em] uppercase bg-black/80 text-white px-[6px] py-[2px]" style="backdrop-filter: blur(6px);">{{ h.source_language | upper }}</span>
                         {%- else %}
                         <span class="absolute top-1.5 left-1.5 text-[9px] font-mono font-semibold tracking-[0.04em] uppercase bg-accent text-accent-fg px-[6px] py-[2px]">ОРИГ</span>
                         {%- endif %}
@@ -123,7 +124,8 @@
                             <span class="tag fandom" style="font-size: 9.5px; padding: 1px 5px; vertical-align: baseline;">{{ h.fandom }}</span>
                         </div>
                         {%- endif %}
-                        <p class="font-serif text-[14px] leading-[1.5] text-fg-2 m-0 line-clamp-3 mb-2">{{ h.excerpt }}</p>
+                        {# -ml-1 pl-1 = optical bleed for italic left-bearing (synopsis often starts with Д/А/В/П/Я which get clipped by line-clamp's overflow:hidden). Net visual position is unchanged. #}
+                        <p class="font-serif italic text-[14px] leading-[1.5] text-fg-2 mt-0 mr-0 mb-2 line-clamp-3 -ml-1 pl-1">{{ h.excerpt }}</p>
                         <div class="mt-auto pt-1 flex items-baseline gap-2 text-[12px] text-fg-3 font-mono">
                             <span class="tabular-nums">розділ&nbsp;{{ h.last_chapter_no }}/{{ h.chapter_count }}</span>
                             <span class="text-fg-4">·</span>
@@ -146,7 +148,7 @@
                 <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
                     {{ icon('rss', 11) }} Свіже від ваших
                 </h2>
-                <a href="/feed" class="text-[12px] text-fg-3 hover:text-fg-1">Стрічка →</a>
+                <a href="/feed" class="text-[13px] text-fg-3 hover:text-fg-1">Стрічка →</a>
             </div>
             <div class="flex-1 flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
                 {%- for u in fresh_updates %}
@@ -181,7 +183,7 @@
                 <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
                     {{ icon('message', 11) }} Свіжі коментарі
                 </h2>
-                <a href="#" class="text-[12px] text-fg-3 hover:text-fg-1">Усі →</a>
+                <a href="#" class="text-[13px] text-fg-3 hover:text-fg-1">Усі →</a>
             </div>
             <div class="flex-1 flex flex-col bg-bg-1 border border-line-soft rounded-lg overflow-hidden">
                 {%- for c in recent_comments %}
@@ -215,7 +217,7 @@
             <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3 inline-flex items-center gap-1.5">
                 {{ icon('flame', 11) }} У тренді цього тижня
             </h2>
-            <a href="/search?sort=trending" class="text-[12px] text-fg-3 hover:text-fg-1">Більше →</a>
+            <a href="/search?sort=trending" class="text-[13px] text-fg-3 hover:text-fg-1">Більше →</a>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {%- for n in trending %}
@@ -228,7 +230,7 @@
     <section class="mb-10">
         <div class="flex items-baseline justify-between mb-4">
             <h2 class="text-[13px] font-semibold tracking-[0.06em] uppercase text-fg-3">Нещодавно оновлені</h2>
-            <a href="/search?sort=updated" class="text-[12px] text-fg-3 hover:text-fg-1">Більше →</a>
+            <a href="/search?sort=updated" class="text-[13px] text-fg-3 hover:text-fg-1">Більше →</a>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {%- for n in new_releases %}
